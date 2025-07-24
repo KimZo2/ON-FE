@@ -16,7 +16,7 @@ const Main = () => {
   const [ison,setOn] = useState(false);
 
   return (
-    <div className="container">
+    <div className="main-container">
 
       {/* 헤더 */}
       <Header/>

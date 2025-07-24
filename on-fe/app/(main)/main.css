@@ -1,5 +1,5 @@
 /* 전체 페이지 컨테이너 - 배경 이미지*/
-.container {
+.main-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #000000ff 0%, #000000ff 50%, #000000ff 100%);
   position: relative;
