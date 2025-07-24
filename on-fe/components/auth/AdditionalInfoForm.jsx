@@ -2,7 +2,6 @@ import React from 'react'
 
 const AdditionalInfoForm = () => {
     return (
-        <div className="additional-info">
             <div className='inputs'>
 
                 <p className="logo">ON</p>
@@ -26,7 +25,6 @@ const AdditionalInfoForm = () => {
                 </div>
                 <button className="submit-btn">회원가입</button>
             </div>
-        </div>
     )
 }
 

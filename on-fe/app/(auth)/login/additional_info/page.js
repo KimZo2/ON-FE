@@ -1,7 +1,7 @@
 'use client';
 import AdditionalInfoForm from '@/components/auth/AdditionalInfoForm';
-import './info-form.css';
 import FormLayout from '@/components/form/FormLayOut';
+import '@/app/(auth)/login/additional_info/info-form.css'
 
 export default function AdditionalInfoPage() {
     return (
