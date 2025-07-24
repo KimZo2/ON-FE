@@ -7,7 +7,7 @@
 .logo {
     color: #FFF;
     font-family: "Press Start 2P";
-    font-size: 32px;
+    font-size: 1rem;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
@@ -18,7 +18,7 @@
 .login {
     color: #FFF;
     font-family: "Press Start 2P";
-    font-size: 20px;
+    font-size: 1rem;
     font-style: normal;
     font-weight: 400;
     line-height: normal;

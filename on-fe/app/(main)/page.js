@@ -28,8 +28,8 @@ const Main = () => {
       <div className="content">
           <Image 
           src="/assets/on_icon.svg"
-          width={500}
-          height={500}
+          width={300}
+          height={300}
           alt='on'/>
         <div className="text-section">
           <div className="main-title">{sub_title}</div>
