@@ -3,7 +3,6 @@ import { handleGoogle, handleKakao } from '@/util/AuthUtil'
 
 const SignInForm = () => {
     return (
-        // <div className="signup-form">
             <div className='login_buttons'>
                 <p className="logo">ON</p>
                 <div className="kakao" onClick={() => handleKakao()}>
@@ -18,9 +17,7 @@ const SignInForm = () => {
                 <div className='github'>
                     <div className='github_icon'></div>
                     깃허브 로그인</div>
-
             </div>
-        // </div>
     )
 }
 
