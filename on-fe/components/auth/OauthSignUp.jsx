@@ -9,9 +9,11 @@ import { usePathname, useSearchParams } from 'next/navigation';
 
 const SERVER_URL = process.env.NEXT_PUBLIC_BE_SERVER_URL;
 
-const OauthSignUp = async () => {
+const OauthSignUp = () => {
 
-   await new Promise((resolve) => setTimeout(resolve, 3000));
+  const path = usePathname();
+  const code = useSearchParams().get('code');
+
 
   return (
     <div>
