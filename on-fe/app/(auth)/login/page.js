@@ -2,6 +2,7 @@
 import './form.css';
 
 export default function LogInPage() {
+
     return (
         <div className='bg'>
             <div className="signup-form">
