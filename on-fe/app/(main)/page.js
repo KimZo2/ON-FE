@@ -5,7 +5,7 @@ import FlyingStar from '../ui/background/FlyingStar.jsx';
 import './main.css';
 import Link from 'next/link.js';
 import Image from 'next/image.js';
-import Header from '../components/Header.jsx';
+import Header from '../../components/Header.jsx';
 
 const Main = () => {
 

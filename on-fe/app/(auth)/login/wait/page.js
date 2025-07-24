@@ -1,8 +1,8 @@
 "use client"
 
 import { Suspense } from 'react';
-import OauthSignUp from '@/app/components/auth/OauthSignUp';
-import LoadingSpinner from '@/app/components/loading/LoadingSpinner';
+import OauthSignUp from '@/components/auth/OauthSignUp';
+import LoadingSpinner from '@/components/loading/LoadingSpinner';
 
 export default async function Page() {
 
