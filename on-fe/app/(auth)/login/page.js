@@ -1,4 +1,5 @@
 'use client';
+import { handleGoogle, handleKakao } from '../util/AuthUtil';
 import './form.css';
 
 export default function LogInPage() {
@@ -7,12 +8,11 @@ export default function LogInPage() {
         <div className='bg'>
             <div className="signup-form">
                 <div className='login_buttons'>
-
                     <p className="logo">ON</p>
-                    <div className="kakao">
+                    <div className="kakao" onClick={() => handleKakao()}>
                         <div className='kakao_icon'></div>
                         카카오 로그인</div>
-                    <div className="google">
+                    <div className="google" onClick={() => handleGoogle()}>
                         <div className='google_icon'></div>
                         구글 로그인</div>
                     <div className="naver">
