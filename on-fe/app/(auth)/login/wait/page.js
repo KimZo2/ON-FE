@@ -1,13 +1,14 @@
-'use client'
-import { Suspense } from 'react';
-import {OauthSignUp} from '@/app/components/auth/OauthSignup'
+"use client"
 
-export default function Page() {
+import { Suspense } from 'react';
+import OauthSignUp from '@/app/components/auth/OauthSignUp';
+import LoadingSpinner from '@/app/components/loading/LoadingSpinner';
+
+export default async function Page() {
 
     return (
     <div>
-      <Suspense fallback={()=> <p>사용자 정보 불러오는 중...</p>}>
-        {/* <불러오는 컴포넌트/> */}
+      <Suspense fallback={<LoadingSpinner/>}>
         <OauthSignUp/>
       </Suspense>
     </div>

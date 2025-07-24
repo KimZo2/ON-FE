@@ -9,7 +9,6 @@ const Header = () => {
     <div className="headers">
         <Link href="/" className="logo">ON</Link>
         <Link href="/login" className="login">login</Link>
-        
     </div>
 
   )

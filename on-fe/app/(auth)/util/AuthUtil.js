@@ -1,4 +1,5 @@
 const KAKAO_CLIENT_ID = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID
+const BE_SERVER_URL = process.env.NEXT_PUBLIC_BE_SERVER_URL
 
 export function handleKakao(){
     console.log(KAKAO_CLIENT_ID);
