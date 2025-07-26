@@ -1,41 +1,49 @@
-"use client"
-import LoadingSpinner from '@/components/loading/LoadingSpinner';
-import { useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
-import axios from 'axios';
-import { useRouter } from 'next/navigation';
+'use client'
+import { useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import LoadingSpinner from '@/components/loading/LoadingSpinner'
+import axios from 'axios'
 
-const SERVER_URL = process.env.NEXT_PUBLIC_BE_SERVER_URL;
+const SERVER_URL = process.env.NEXT_PUBLIC_BE_SERVER_URL
 
-export default function Page() {
-
-  const code = useSearchParams().get("code");
-  const oauthType = useSearchParams().get('oauth');
+export default function OAuthCallbackPage() {
+  const router = useRouter()
+  const params = useSearchParams()
+  const code      = params.get('code')
+  // const oauthType = params.get('oauth')
+  const oauthType = 'kakao';
 
   useEffect(() => {
-    const response = axios.post(SERVER_URL + `/auth/login/${oauthType}`, { accessToken: code });
-    
-    if(response.status===200){
-      loginSuccess();
+    if (!code || !oauthType) {
+      router.replace('/login')
+      return
     }
-    else {
-      const provider = response.data.provider;
-      const providerId = response.data.providerId;
-      requiredAdditionalInfo({provider, providerId});
-    }
-  })
+
+    ;(async () => {
+      try {
+        // sendTempCode를 여기서 정의하거나, 필요한 값을 인자로 넘깁니다.
+        const res = await axios.get(
+          `${SERVER_URL}/auth/login/${oauthType}`,
+          { accessToken: code }
+        )
+
+        if (res.status === 200 && res.data.registered) {
+          router.replace('/')
+        } else {
+          const { provider, providerId } = res.data
+          const query = new URLSearchParams({ provider, providerId }).toString()
+          router.replace(`/additional-info?${query}`)
+        }
+      } catch (err) {
+        console.error(err)
+        router.replace('/login')
+      }
+    })()
+  }, [code, oauthType, router])
 
   return (
-    <div>
+    <div className="flex items-center justify-center h-screen">
       <LoadingSpinner />
     </div>
-  );
-}
-
-const loginSuccess = () => {
-  const router = useRouter();
-  router.push("/");
-};
-const requiredAdditionalInfo = ({provider, providerId}) => {
-  router.push(`/additional-info?provider=${provider}&providerId=${providerId}`);
+  )
 }
