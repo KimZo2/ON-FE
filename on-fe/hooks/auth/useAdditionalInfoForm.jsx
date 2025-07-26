@@ -43,7 +43,7 @@ export function useAdditionalInfoForm() {
         `${process.env.NEXT_PUBLIC_BE_SERVER_URL}/auth/signup`,
         payload
       )
-      if (res.status === 200) {
+      if (res.status===201) {
         alert('회원가입 성공!')
         router.push('/')
       } else {

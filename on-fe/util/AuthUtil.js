@@ -1,9 +1,10 @@
-const KAKAO_CLIENT_ID = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID
+const KAKAO_CLIENT_ID = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID;
+const KAKAO_REDIRECT_URL = process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URL;
 
 export function handleKakao(){
     console.log(KAKAO_CLIENT_ID);
     // 카카오 로그인 페이지로 이동하기
-    window.location.href=`https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${KAKAO_CLIENT_ID}&redirect_uri=http://localhost:3000/login/wait`;
+    window.location.href=`https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${KAKAO_CLIENT_ID}&redirect_uri=${KAKAO_REDIRECT_URL}`;
 }
 
 export function handleNaver(){
