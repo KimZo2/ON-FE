@@ -2,7 +2,6 @@
 
 import {React,useState} from 'react';
 import FlyingStar from '../ui/background/FlyingStar.jsx';
-import './main.css';
 import Link from 'next/link.js';
 import Image from 'next/image.js';
 import Header from '../../components/Header.jsx';
@@ -16,7 +15,7 @@ const Main = () => {
   const [ison,setOn] = useState(false);
 
   return (
-    <div className="main-container">
+    <div className="min-h-screen relative overflow-hidden bg-black bg-opacity-100">
 
       {/* 헤더 */}
       <Header/>
@@ -25,17 +24,22 @@ const Main = () => {
       <FlyingStar />
 
       {/* 본문 콘텐츠 */}
-      <div className="content">
+      <div className="relative max-w-[1200px] mx-auto p-12 px-6 grid gap-12 items-center justify-items-center text-center min-h-screen">
           <Image 
           src="/assets/on_icon.svg"
           width={300}
           height={300}
           alt='on'/>
-        <div className="text-section">
-          <div className="main-title">{sub_title}</div>
-          <div className="subtitle">{title}</div>
-          <div className="description">{slogan}</div>
-           <Link href="/login" className='button'>시작하기</Link>
+        <div className="flex flex-col gap-8 items-center max-w-[800px]">
+          <div className="font-press-start text-white text-[0.8rem] font-semibold tracking-wider uppercase">{sub_title}</div>
+          <div className="text-[2rem] font-black leading-[1.1] font-press-start bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">{title}</div>
+          <div className="text-gray-300 text-base leading-relaxed max-w-[32rem]">{slogan}</div>
+           <Link
+              href="/login"
+              className="px-8 py-4 text-base text-white rounded-md bg-gray-700/70 shadow-[0_10px_15px_rgba(255,255,255,0.1)] transition-all duration-300 ease-in-out cursor-pointer overflow-hidden
+                hover:-translate-y-0.5 hover:shadow-[0_20px_25px_rgba(0,0,0,0.15)]"
+            >시작하기</Link>
+
         </div>
       </div>
     </div>

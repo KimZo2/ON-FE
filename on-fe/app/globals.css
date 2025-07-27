@@ -1,12 +1,14 @@
 @import url('https://cdn.jsdelivr.net/npm/pretendard@latest/dist/web/static/pretendard.css');
 @import "tailwindcss";
 
-* {
-  font-family: 'Pretendard';
+/* 기본 폰트는 body에만 적용해야 Tailwind 클래스가 덮어쓸 수 있음 */
+body {
+  font-family: 'Pretendard', sans-serif;
 }
 
 html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  
 }
