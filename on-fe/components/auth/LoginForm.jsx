@@ -1,7 +1,7 @@
 import React from 'react'
 import { handleGoogle, handleKakao } from '@/util/AuthUtil'
 
-const SignInForm = () => {
+const LoginForm = () => {
     return (
             <div className='login_buttons'>
                 <p className="logo">ON</p>
@@ -21,4 +21,4 @@ const SignInForm = () => {
     )
 }
 
-export default SignInForm
+export default LoginForm

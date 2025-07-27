@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { redirect, useRouter, useSearchParams } from 'next/navigation'
 import LoadingSpinner from '@/components/loading/LoadingSpinner'
 import axios from 'axios'
+import { saveAccessToken, saveNickName } from '@/util/AuthUtil'
 
 const SERVER_URL = process.env.NEXT_PUBLIC_BE_SERVER_URL;
 const CLIENT_ID = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID;
@@ -23,7 +24,6 @@ export default function OAuthCallbackPage() {
     ; (async () => {
       try {
         // sendTempCode를 여기서 정의하거나, 필요한 값을 인자로 넘깁니다.
-
         const accessToken = await fetchKakaoAccessToken(code)
           .then(response => response.data)
           .then(data => data.access_token)
@@ -35,6 +35,10 @@ export default function OAuthCallbackPage() {
         console.log(accessToken);
 
         const response = await sendLoginRequest({ oauthType, accessToken });
+        const { token, nickname } = response.data;
+
+        saveAccessToken(token);
+        saveNickName(nickname);
 
         router.replace("/");
 
