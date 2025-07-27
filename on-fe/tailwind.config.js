@@ -8,11 +8,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        // Tailwind 기본 sans-serif 설정 덮어쓰기
-        sans: ['Pretendard', 'sans-serif'],
-
-        // 내가 쓸 custom 폰트는 따로 등록
-        'press-start': ['"Press Start 2P"', 'cursive'],
+        pretendard: ['Pretendard', 'sans-serif'],
+        'press-start': ['Press Start 2P', 'cursive'],
       },
     },
   },
