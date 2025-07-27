@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import './flyingstar.css'; 
 
 export default function FlyingStar() {
   const [stars, setStars] = useState([]);
@@ -33,11 +32,11 @@ export default function FlyingStar() {
   }, []);
 
   return (
-    <div className="star-field">
+    <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
       {stars.map(star => (
         <div
           key={star.id}
-          className="star"
+          className="absolute bg-white rounded-full animate-pulse"
           style={{
             left: `${star.x}%`,
             top: `${star.y}%`,
