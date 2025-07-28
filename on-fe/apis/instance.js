@@ -7,8 +7,7 @@ export const backendApiInstance = axios.create({
     baseURL: process.env.NEXT_PUBLIC_BE_SERVER_URL,
     headers: {
         "Content-Type": "application/json",
-    },
-    withCredentials: true,
+    }
 })
 
 /**
