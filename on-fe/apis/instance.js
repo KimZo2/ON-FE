@@ -1,5 +1,7 @@
 import axios from "axios";
 
+// TODO: withCredentials 처리해주기
+
 /**
  * ON-BE 서버로 요청을 보내는 인스턴스 생성
  */
