@@ -1,6 +1,10 @@
-import { Scene } from 'phaser';
+// Dynamic import for Phaser to avoid SSR issues
+let Phaser = null;
+if (typeof window !== 'undefined') {
+    Phaser = require('phaser');
+}
 
-export class Preloader extends Scene
+export class Preloader extends (Phaser?.Scene || Object)
 {
     constructor ()
     {
