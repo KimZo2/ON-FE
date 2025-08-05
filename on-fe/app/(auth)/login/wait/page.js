@@ -14,7 +14,8 @@ export default function OAuthCallbackPage() {
   const router = useRouter()
   const params = useSearchParams()
   const code = params.get('code')
-  const oauthType = 'kakao'; // TODO: 추후, 동적으로 변경
+  // const oauthType = 'kakao'; // TODO: 추후, 동적으로 변경
+  const oauthType = params.get('oauthType');  
 
   useEffect(() => {
     if (!code || !oauthType) {
