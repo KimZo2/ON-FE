@@ -53,8 +53,8 @@ export default function MetaversePage() {
                         </svg>
                         <h1 className="text-2xl font-bold text-white mb-2">로그인이 필요합니다</h1>
                         <p className="text-blue-200 mb-6">
-                            메타버스에 입장하려면 먼저 로그인해주세요.<br />
-                            다른 사용자들과 함께 가상 세계를 탐험해보세요!
+                            방에 입장하려면 먼저 로그인해주세요.<br />
+                            다른 사용자들과 함께 공부해봐요!
                         </p>
                     </div>
 

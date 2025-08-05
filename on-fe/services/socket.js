@@ -1,5 +1,8 @@
 import { io } from 'socket.io-client';
 
+// TODO: 나중에 BE 소켓 API 명세 나오면 해당 URI로 변경
+const socketServerUrl = process.env.NEXT_PUBLIC_BE_SOCKET_SERVER_URL;
+
 class SocketService {
     constructor() {
         this.socket = null;
@@ -8,7 +11,7 @@ class SocketService {
         this.maxReconnectAttempts = 5;
     }
 
-    connect(serverUrl = 'http://localhost:3001') {
+    connect(serverUrl = socketServerUrl) {
         if (this.socket && this.isConnected) {
             return this.socket;
         }

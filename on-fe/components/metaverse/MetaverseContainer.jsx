@@ -81,23 +81,41 @@ export default function MetaverseContainer({ userNickName }) {
                 setOnlineCount(count);
             });
 
-            // Phaser 게임 시작
-            if (gameRef.current && !phaserGameRef.current) {
-                phaserGameRef.current = StartGame(gameRef.current);
-
-                // 게임이 준비되면 메타버스 씬으로 전환
-                phaserGameRef.current.events.on('ready', () => {
-                    const scene = phaserGameRef.current.scene.getScene('MetaverseScene');
-                    if (scene) {
-                        phaserGameRef.current.scene.start('MetaverseScene', {
-                            socket: socket,
-                            playerId: playerId,
-                            playerName: playerName.trim()
-                        });
-                        setCurrentScene(scene);
+            // Phaser 게임 시작 - DOM 렌더링 완료 후 초기화
+            const initializePhaserGame = () => {
+                if (gameRef.current && !phaserGameRef.current) {
+                    phaserGameRef.current = StartGame(gameRef.current);
+                    
+                    if (!phaserGameRef.current) {
+                        throw new Error('Phaser 게임 초기화 실패');
                     }
-                });
-            }
+                    
+                    // 게임이 준비되면 메타버스 씬으로 전환
+                    setTimeout(() => {
+                        try {
+                            phaserGameRef.current.scene.start('MetaverseScene', {
+                                socket: socket,
+                                playerId: playerId,
+                                playerName: playerName.trim()
+                            });
+                            
+                            const scene = phaserGameRef.current.scene.getScene('MetaverseScene');
+                            setCurrentScene(scene);
+                        } catch (sceneError) {
+                            console.error('씬 전환 실패:', sceneError);
+                        }
+                    }, 1000);
+                } else {
+                    // gameRef가 null이면 잠시 후 다시 시도
+                    if (!gameRef.current) {
+                        setTimeout(initializePhaserGame, 500);
+                        return;
+                    }
+                }
+            };
+
+            // DOM 렌더링 완료를 기다린 후 Phaser 초기화
+            setTimeout(initializePhaserGame, 100);
 
             setIsGameStarted(true);
             setIsConnecting(false);
@@ -131,6 +149,7 @@ export default function MetaverseContainer({ userNickName }) {
             <div className="relative w-full h-screen bg-gray-900">
                 <div
                     ref={gameRef}
+                    id="game-container"
                     className="w-full h-full"
                     style={{ width: '100%', height: '100%' }}
                 />
