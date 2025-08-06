@@ -22,7 +22,7 @@ const Header = () => {
 
       {isLogin ? (
         <div className="flex items-center gap-4">
-          <span className="text-white text-[1rem] font-pretendard">{getNickName()}님 안녕하세요!</span>
+          <span className="text-white text-[1rem] font-pretendard"> Welcome {getNickName()}!</span>
           <button
             onClick={handleLogout}
             className="text-white text-[0.9rem] px-3 py-1 border border-white rounded hover:bg-white hover:text-black transition"
