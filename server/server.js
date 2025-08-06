@@ -46,6 +46,13 @@ const broadcastToAllExcept = (socketId, event, data) => {
 io.on('connection', (socket) => {
     console.log(`✅ 새로운 사용자 연결: ${socket.id}`);
 
+    // 클라이언트에게 연결 완료 확인 메시지 전송
+    socket.emit('connected', { 
+        socketId: socket.id, 
+        timestamp: new Date().toISOString(),
+        message: '서버 연결 완료' 
+    });
+
     // 연결된 사용자 수 전송
     broadcastOnlineCount();
 

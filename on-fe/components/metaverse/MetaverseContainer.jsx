@@ -37,44 +37,12 @@ export default function MetaverseContainer({ userNickName }) {
         setConnectionError('');
 
         try {
-            // Socket 연결
-            const socket = socketService.connect();
+            // Socket 연결 및 연결 완료 대기
+            const socket = await socketService.connect();
 
             if (!socket) {
                 throw new Error('소켓 연결에 실패했습니다.');
             }
-
-            // 연결 완료를 기다림
-            await new Promise((resolve, reject) => {
-                const timeout = setTimeout(() => {
-                    reject(new Error('연결 시간 초과'));
-                }, 10000);
-
-                // 이미 연결된 경우 바로 resolve
-                if (socket.connected) {
-                    clearTimeout(timeout);
-                    resolve();
-                    return;
-                }
-
-                // 연결 대기
-                const onConnect = () => {
-                    clearTimeout(timeout);
-                    socket.off('connect', onConnect);
-                    socket.off('connect_error', onError);
-                    resolve();
-                };
-
-                const onError = (error) => {
-                    clearTimeout(timeout);
-                    socket.off('connect', onConnect);
-                    socket.off('connect_error', onError);
-                    reject(error);
-                };
-
-                socket.on('connect', onConnect);
-                socket.on('connect_error', onError);
-            });
 
             // 온라인 카운트 업데이트 리스너
             socket.on('onlineCount', (count) => {
