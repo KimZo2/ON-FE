@@ -1,10 +1,11 @@
 import React from 'react'
 import { handleGithub, handleGoogle, handleKakao } from '@/util/AuthUtil'
+import Link from 'next/link'
 
 const LoginForm = () => {
   return (
-    <div className="flex flex-col gap-8 w-[20dvw] items-center">
-      <p className="text-black text-center font-press-start text-[36px]">ON</p>
+    <div className="flex flex-col gap-8 w-[20dvw] items-center bg-black">
+      <Link href="/" className="text-white text-center font-press-start text-[36px]">ON</Link>
 
       {/* 카카오 로그인 */}
       <div
