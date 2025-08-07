@@ -1,6 +1,10 @@
-import { Scene } from 'phaser';
+// Dynamic import for Phaser to avoid SSR issues
+let Phaser = null;
+if (typeof window !== 'undefined') {
+    Phaser = require('phaser');
+}
 
-export class Boot extends Scene
+export class Boot extends (Phaser?.Scene || Object)
 {
     constructor ()
     {

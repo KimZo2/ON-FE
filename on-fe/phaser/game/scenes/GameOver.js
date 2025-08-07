@@ -1,7 +1,12 @@
 import { EventBus } from '../EventBus';
-import { Scene } from 'phaser';
 
-export class GameOver extends Scene
+// Dynamic import for Phaser to avoid SSR issues
+let Phaser = null;
+if (typeof window !== 'undefined') {
+    Phaser = require('phaser');
+}
+
+export class GameOver extends (Phaser?.Scene || Object)
 {
     constructor ()
     {
