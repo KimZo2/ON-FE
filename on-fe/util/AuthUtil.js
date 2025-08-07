@@ -1,5 +1,6 @@
 const KAKAO_CLIENT_ID = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID;
 const KAKAO_REDIRECT_URL = process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URL;
+const GITHUB_CLIENT_ID = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID;
 
 export function handleKakao(){
     console.log(KAKAO_CLIENT_ID);
@@ -18,8 +19,8 @@ export function handleGoogle(){
 }
 
 export function handleGithub(){
-    alert("곧 만나요~!");
     // 깃허브 로그인 페이지로 이동하기
+    window.location.href=`https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}`;
 }
 
 export function saveAccessToken(accessToken){
@@ -30,7 +31,7 @@ export function saveNickName(nickName) {
     localStorage.setItem("nickName", nickName);
 }
 
-export function removeAcessToken(){
+export function removeAccessToken(){
     localStorage.removeItem("accessToken");
 }
 

@@ -1,10 +1,11 @@
 import React from 'react'
-import { handleGoogle, handleKakao } from '@/util/AuthUtil'
+import { handleGithub, handleGoogle, handleKakao } from '@/util/AuthUtil'
+import Link from 'next/link'
 
 const LoginForm = () => {
   return (
-    <div className="flex flex-col gap-8 w-[20dvw] items-center">
-      <p className="text-black text-center font-press-start text-[36px]">ON</p>
+    <div className="flex flex-col gap-8 w-[20dvw] items-center bg-black">
+      <Link href="/" className="text-white text-center font-press-start text-[36px]">ON</Link>
 
       {/* 카카오 로그인 */}
       <div
@@ -43,6 +44,7 @@ const LoginForm = () => {
         className="flex items-center justify-center w-full px-6 py-6 gap-5
                    rounded-[12px] bg-white text-[1dvw] border border-[#BEBEBE]
                    hover:bg-black hover:text-white cursor-pointer transition-colors"
+        onClick={handleGithub}
       >
         <div className="w-[35px] h-[35px] bg-[url('/assets/github_icon.svg')] bg-center bg-cover bg-no-repeat" />
         깃허브 로그인

@@ -3,15 +3,17 @@ import React from 'react'
 import FormField from '@/components/form/FormField'
 import CheckboxField from '@/components/form/CheckboxField'
 import { useAdditionalInfoForm } from '@/hooks/auth/useAdditionalInfoForm'
+import Link from 'next/link'
 
 export default function AdditionalInfoForm() {
     const { form, isSubmitting, handleChange, handleSubmit } = useAdditionalInfoForm();
 
     return (
         <form onSubmit={handleSubmit} className="inputs">
-            <p className="logo">ON</p>
+            <Link href="/" className="text-white text-center font-press-start text-[36px]">ON</Link>
 
             <FormField
+                className=""
                 label="*이름"
                 name="name"
                 value={form.name}
