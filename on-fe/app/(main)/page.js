@@ -37,18 +37,11 @@ const Main = () => {
           <div className="text-gray-300 text-base leading-relaxed max-w-[32rem]">{slogan}</div>
            
 
-           {isLogin ? 
-                    <Link
-                        href="/room"
-                        className="px-8 py-4 text-base text-white rounded-md bg-gray-700/70 shadow-[0_10px_15px_rgba(255,255,255,0.1)] transition-all duration-300 ease-in-out cursor-pointer overflow-hidden
-                          hover:-translate-y-0.5 hover:shadow-[0_20px_25px_rgba(0,0,0,0.15)]"
-                      >시작하기</Link>   :
-                    <Link
-                        href="/login"
-                        className="px-8 py-4 text-base text-white rounded-md bg-gray-700/70 shadow-[0_10px_15px_rgba(255,255,255,0.1)] transition-all duration-300 ease-in-out cursor-pointer overflow-hidden
-                          hover:-translate-y-0.5 hover:shadow-[0_20px_25px_rgba(0,0,0,0.15)]"
-                    >시작하기</Link>        
-            }
+          <Link
+              href={isLogin ? "/room" : "/login"}
+              className="px-8 py-4 text-base text-white rounded-md bg-gray-700/70 shadow-[0_10px_15px_rgba(255,255,255,0.1)] transition-all duration-300 ease-in-out cursor-pointer overflow-hidden
+                hover:-translate-y-0.5 hover:shadow-[0_20px_25px_rgba(0,0,0,0.15)]"
+          >시작하기</Link>
            
 
         </div>
