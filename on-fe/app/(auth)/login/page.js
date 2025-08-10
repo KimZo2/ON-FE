@@ -7,15 +7,11 @@ export default function LogInPage() {
 
     return (
         <div className="min-h-screen relative overflow-hidden bg-black">
-
-        <FormLayOut>
-
-            {/* 별 배경 */}
             <FlyingStar />
 
-            <LoginForm/>
-            
-        </FormLayOut>
+            <FormLayOut>
+                <LoginForm/>
+            </FormLayOut>
         </div>
     );
 }
