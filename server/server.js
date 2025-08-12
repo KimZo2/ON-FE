@@ -100,15 +100,21 @@ io.on('connection', (socket) => {
     socket.on('playerMove', (moveData) => {
         const player = gameState.players.get(moveData.id);
         if (player) {
-            // 플레이어 위치 업데이트
+            // 플레이어 위치와 방향 정보 업데이트
             player.x = moveData.x;
             player.y = moveData.y;
+            if (moveData.direction) {
+                player.direction = moveData.direction;
+                player.isMoving = moveData.isMoving || false;
+            }
             
             // 다른 플레이어들에게 이동 정보 전송
             broadcastToAllExcept(socket.id, 'playerMoved', {
                 id: moveData.id,
                 x: moveData.x,
-                y: moveData.y
+                y: moveData.y,
+                direction: moveData.direction,
+                isMoving: moveData.isMoving || false
             });
         }
     });
