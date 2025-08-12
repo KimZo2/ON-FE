@@ -2,10 +2,12 @@
 
 import { useState, useRef, useEffect } from 'react';
 
-export default function ChatInterface({ onSendMessage }) {
+export default function ChatInterface({ onSendMessage, messages = [], currentPlayerId }) {
     const [message, setMessage] = useState('');
     const [isMinimized, setIsMinimized] = useState(false);
-    const [chatHistory, setChatHistory] = useState([]);
+    
+    // props로 받은 messages를 사용
+    const chatHistory = messages;
     const inputRef = useRef(null);
     const chatHistoryRef = useRef(null);
 
@@ -18,16 +20,6 @@ export default function ChatInterface({ onSendMessage }) {
 
     const handleSendMessage = () => {
         if (message.trim() && onSendMessage) {
-            const newMessage = {
-                id: Date.now(),
-                text: message.trim(),
-                timestamp: new Date(),
-                isOwn: true
-            };
-
-            // 로컬 채팅 히스토리에 추가
-            setChatHistory(prev => [...prev.slice(-19), newMessage]); // 최근 20개만 유지
-
             onSendMessage(message.trim());
             setMessage('');
             
@@ -49,21 +41,7 @@ export default function ChatInterface({ onSendMessage }) {
         setIsMinimized(!isMinimized);
     };
 
-    // 새 메시지 수신 (부모 컴포넌트에서 호출할 수 있는 함수)
-    const addReceivedMessage = (messageData) => {
-        const newMessage = {
-            id: Date.now() + Math.random(),
-            text: messageData.message,
-            playerName: messageData.playerName,
-            timestamp: new Date(),
-            isOwn: false
-        };
-
-        setChatHistory(prev => [...prev.slice(-19), newMessage]);
-    };
-
-    // 부모 컴포넌트가 이 함수에 접근할 수 있도록 useImperativeHandle 사용하거나
-    // 전역 상태 관리를 사용할 수 있지만, 여기서는 간단하게 처리
+    // props로 메시지를 받으므로 addReceivedMessage 함수는 더 이상 필요없음
 
     if (isMinimized) {
         return (
