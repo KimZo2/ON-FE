@@ -40,7 +40,7 @@ export function useAdditionalInfoForm() {
     try {
       const payload = { provider, providerId, ...form }
       const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_BE_SERVER_URL}/auth/signup`,
+        `${process.env.NEXT_PUBLIC_BE_SERVER_URL}/auth/login`,
         payload
       )
       if (res.status===201) {

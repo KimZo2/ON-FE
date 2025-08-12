@@ -4,11 +4,10 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import LoadingSpinner from '@/components/loading/LoadingSpinner'
 import { saveAccessToken, saveNickName } from '@/util/AuthUtil'
 import {
-  getKakaoAccessToken,
-  getGithubAccessToken,
-  getGoogleAccessToken,
-  getNaverAccessToken,
-  sendAccessToken
+  goKakaoLogin,
+  goGithubLogin,
+  goGoogleLogin,
+  goNaverLogin
 } from '@/apis/auth'
 
 export default function OAuthCallbackPage() {
@@ -17,22 +16,23 @@ export default function OAuthCallbackPage() {
   const code = params.get('code')
   const oauthType = params.get('oauthType')  // 'kakao', 'github', 'google', 'naver'
 
-  // 타입에 따라 적절한 액세스 토큰 요청 함수 실행
+  // 각 Oauth 제공자로부터 받은 code를 통해, 토큰 생성해주는 함수 호출 로직
   const getAccessTokenByType = async (oauthType, code) => {
     switch (oauthType) {
       case 'kakao':
-        return await getKakaoAccessToken(code)
+        return await goKakaoLogin({code})
       case 'github':
-        return await getGithubAccessToken(code)
-      // case 'google':
-      //   return await getGoogleAccessToken(code)
-      // case 'naver':
-      //   return await getNaverAccessToken(code)
+        return await goGithubLogin({code})
+      case 'google':
+        return await goGoogleLogin({code})
+      case 'naver':
+        return await goNaverLogin({code})
       default:
         throw new Error(`지원하지 않는 OAuth 타입입니다: ${oauthType}`)
     }
   }
 
+  // 로그인 페이지로 넘어온 이후, 로직
   useEffect(() => {
     if (!code || !oauthType) {
       router.replace('/login')
@@ -41,22 +41,17 @@ export default function OAuthCallbackPage() {
 
     ;(async () => {
       try {
-        const accessToken = await getAccessTokenByType(oauthType, code)
-
-        const { token, nickname } = await sendAccessToken({
-          oauthType,
-          accessToken
-        })
-
-        saveAccessToken(token)
-        saveNickName(nickname)
+        const { token, nickname } = await getAccessTokenByType(oauthType, code)
+        saveAccessToken(token);
+        saveNickName(nickname);
         router.replace('/') // main page로 이동
+      
       } catch (err) {
         if (err?.status === 428) { // 회원 정보가 없을 경우, 추가 정보 입력 페이지로 이동
           const { provider, providerId } = err.response.data
           const query = new URLSearchParams({ provider, providerId }).toString()
           router.replace(`/login/additional-info?${query}`)
-        } else {
+        } else {                  // 그 외 경우, 에러 발생 후 다시 로그인 페이지로 이동 
           console.error(err)
           router.replace('/login')
         }
