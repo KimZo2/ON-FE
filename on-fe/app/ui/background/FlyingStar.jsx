@@ -13,7 +13,7 @@ export default function FlyingStar() {
         y: Math.random() * 100,
         size: Math.random() * 2 + 1,
         opacity: Math.random() * 0.8 + 0.2,
-        speed: Math.random() * 0.5 + 0.1
+        speed: Math.random() * 0.2 + 0.05
       }));
 
     setStars(generateStars());

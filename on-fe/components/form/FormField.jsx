@@ -6,7 +6,7 @@ export default function FormField({ label, type = 'text', name, value, onChange,
     <div>
       <label className="title">{label}</label>
       <input
-        className="input"
+        className="input mt-2 w-full px-5 py-3 rounded-xl text-black bg-white placeholder:text-gray-400 focus:outline-none"
         type={type}
         name={name}
         value={value}
