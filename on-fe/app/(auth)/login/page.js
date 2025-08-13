@@ -1,12 +1,17 @@
 'use client';
 import LoginForm from '@/components/auth/LoginForm';
 import FormLayOut from '@/components/form/FormLayOut';
+import FlyingStar from '@/app/ui/background/FlyingStar';
 
 export default function LogInPage() {
 
     return (
-        <FormLayOut>
-            <LoginForm/>
-        </FormLayOut>
+        <div className="min-h-screen relative overflow-hidden bg-black">
+            <FlyingStar />
+
+            <FormLayOut>
+                <LoginForm/>
+            </FormLayOut>
+        </div>
     );
 }
