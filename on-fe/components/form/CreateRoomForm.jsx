@@ -21,51 +21,37 @@ const CreateRoomForm = ({className}) => {
                 value={form.roomName}
                 onChange={handleChange}
                 required
-                style={
-                    {
-                        titleColor:"white",
-                        font : prompt.className
-                    }
-                }
+                inputClass={`text-white ${prompt.className} !bg-black !border-white border-1`}
+                labelClass={`text-white ${prompt.className}`}
             />
             <FormField
                 label="*인원 수"
-                name="nickname"
+                name="capacity"
                 value={form.capacity}
                 onChange={handleChange}
                 required
-                style={
-                    {
-                        titleColor:"white",
-                        font : prompt.className
-                    }
-                }
+                type="number"
+                inputClass={`text-white ${prompt.className} !bg-black !border-white border-1`}
+                labelClass={`text-white ${prompt.className}`}
             />
             <FormField
-                label="*방 유지 시간"
-                name="birthday"
+                label="*방 유지 시간 (시간)"
+                name="duration"
                 value={form.duration}
                 onChange={handleChange}
                 maxLength={8}
+                type="number"
                 required
-                style={
-                    {
-                        titleColor:"white",
-                        font : prompt.className
-                    }
-                }
+                inputClass={`text-white ${prompt.className} !bg-black !border-white border-1`}
+                labelClass={`text-white ${prompt.className}`}
             />
 
             <CheckboxField
-                label="방 공개 여부 (비공개시 비밀번호를 입력해주세요.)"
+                label="비공개 방 (비공개시 비밀번호를 입력해주세요.)"
                 name="visibility"
                 checked={form.visibility}
                 onChange={handleChange}
-                style = {
-                    {
-                        font : prompt.className
-                    }
-                }
+                labelClass={prompt.className}
             />
 
             <FormField
@@ -74,16 +60,12 @@ const CreateRoomForm = ({className}) => {
                 value={form.password}
                 onChange={handleChange}
                 maxLength={4}
-                required
-                style={
-                    {
-                        titleColor:"white",
-                        font : prompt.className
-                    }
-                }
+                required={false}
+                inputClass={`text-white ${prompt.className} !bg-black !border-white border-1`}
+                labelClass={`text-white ${prompt.className}`}
             />
 
-            <button type="submit" className="bg-white" disabled={isSubmitting}>
+            <button type="submit" className="bg-[#444] rounded-xl w-full h-[3rem] text-white" disabled={isSubmitting}>
                 {isSubmitting ? '제출 중…' : '생성하기'}
             </button>
         </form>
