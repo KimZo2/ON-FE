@@ -33,14 +33,14 @@ export function useJoinRoom() {
       const res = await backendApiInstance.post('/room', payload) // TODO: API URI 수정하기
 
       if (res.status === 201) {
-        alert('방 생성 성공!')
-        router.push('/')  // TODO: 생성한 방(res.data.id)으로 이동하거나, 메인페이지로 이동하거나 
+        alert('방 입장 성공!')
+        router.push('/')  // TODO: 입장하려는 방(res.data.id)으로 이동
       } else {
         throw new Error('서버 응답 오류')
       }
     } catch (err) {
       console.error(err)
-      alert('방 생성에 실패하였습니다.')
+      alert('방 입장에 실패하였습니다.')
     } finally {
       setIsSubmitting(false)
     }
