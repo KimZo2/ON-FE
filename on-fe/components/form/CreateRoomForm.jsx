@@ -10,8 +10,8 @@ const CreateRoomForm = ({className}) => {
     const { form, isSubmitting, handleChange, handleSubmit } = useCreateRoom();
 
     return (
-        <form onSubmit={handleSubmit} className={`inputs ${className}`}>
-            <Link href="/" className="text-white text-center font-press-start text-[36px]">Create Room!</Link>
+        <form onSubmit={handleSubmit} className={`${className}`}>
+            <Link href="" className="text-white text-center font-press-start text-[36px]">Create Room!</Link>
 
             <FormField
                 className=""
