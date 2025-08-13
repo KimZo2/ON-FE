@@ -1,7 +1,8 @@
+// socketService.js
 import { io } from 'socket.io-client';
 
-// TODO: 나중에 BE 소켓 API 명세 나오면 해당 URI로 변경
-const socketServerUrl = process.env.NEXT_PUBLIC_BE_SOCKET_SERVER_URL;
+const DEFAULT_URL =
+    process.env.NEXT_PUBLIC_BE_SOCKET_SERVER_URL || 'http://localhost:3001';
 
 class SocketService {
     constructor() {
@@ -9,126 +10,105 @@ class SocketService {
         this.isConnected = false;
         this.reconnectAttempts = 0;
         this.maxReconnectAttempts = 5;
+        this._connectPromise = null; // 중복 connect() 방지
     }
 
-    async connect(serverUrl = 'http://localhost:3001') {
-        if (this.socket && this.isConnected) {
-            return this.socket;
-        }
+    connect(serverUrl = DEFAULT_URL, connectTimeout = 15000) {
+        if (this.socket && this.isConnected) return Promise.resolve(this.socket);
+        if (this._connectPromise) return this._connectPromise;
 
-        return new Promise((resolve, reject) => {
-            try {
-                this.socket = io(serverUrl, {
-                    transports: ['websocket', 'polling'],
-                    timeout: 20000,
-                    reconnection: true,
-                    reconnectionDelay: 1000,
-                    reconnectionAttempts: this.maxReconnectAttempts
-                });
+        this._connectPromise = new Promise((resolve, reject) => {
+            this.socket = io(serverUrl, {
+                transports: ['websocket', 'polling'],
+                timeout: connectTimeout,              // 엔진 타임아웃과 동일하게
+                reconnection: true,
+                reconnectionDelay: 1000,
+                reconnectionAttempts: this.maxReconnectAttempts,
+            });
 
-                // 연결 완료를 기다리는 Promise 로직을 여기에 통합
-                const timeoutId = setTimeout(() => {
-                    this.socket?.off('connect', onConnect);
-                    this.socket?.off('connected', onConnected);
-                    this.socket?.off('connect_error', onError);
-                    reject(new Error('Socket 연결 시간 초과'));
-                }, 10000);
+            const s = this.socket;
 
-                const onConnect = () => {
-                    clearTimeout(timeoutId);
-                    this.socket?.off('connect', onConnect);
-                    this.socket?.off('connected', onConnected);
-                    this.socket?.off('connect_error', onError);
-                    this.isConnected = true;
-                    this.reconnectAttempts = 0;
-                    console.log('✅ Socket connected:', this.socket.id);
-                    
-                    // 연결 완료 후 일반적인 이벤트 리스너들 설정
-                    this.setupEventListeners();
-                    
-                    resolve(this.socket);
-                };
+            const cleanup = () => {
+                s.off('connect', onConnect);
+                s.off('connect_error', onError);
+                clearTimeout(timer);
+            };
 
-                const onConnected = (data) => {
-                    clearTimeout(timeoutId);
-                    this.socket?.off('connect', onConnect);
-                    this.socket?.off('connected', onConnected);
-                    this.socket?.off('connect_error', onError);
-                    this.isConnected = true;
-                    this.reconnectAttempts = 0;
-                    console.log('✅ Server connection confirmed:', data);
-                    
-                    // 연결 완료 후 일반적인 이벤트 리스너들 설정
-                    this.setupEventListeners();
-                    
-                    resolve(this.socket);
-                };
+            const fail = (err) => {
+                cleanup();
+                try { s.disconnect(); } catch { }
+                this.socket = null;
+                this.isConnected = false;
+                reject(err);
+            };
 
-                const onError = (error) => {
-                    clearTimeout(timeoutId);
-                    this.socket?.off('connect', onConnect);
-                    this.socket?.off('connected', onConnected);
-                    this.socket?.off('connect_error', onError);
-                    this.isConnected = false;
-                    console.error('❌ Socket connection error:', error);
-                    reject(error);
-                };
+            const onConnect = () => {
+                cleanup();
+                this.isConnected = true;
+                this.reconnectAttempts = 0;
+                this._installLongLivedListeners();
+                resolve(s);
+            };
 
-                // 이벤트 리스너를 소켓 생성 직후 바로 등록
-                this.socket.on('connect', onConnect);
-                this.socket.on('connected', onConnected);  // 서버에서 보내는 연결 확인 이벤트
-                this.socket.on('connect_error', onError);
-                
-            } catch (error) {
-                console.error('Socket connection failed:', error);
-                reject(error);
-            }
+            const onError = (e) => fail(e instanceof Error ? e : new Error(String(e)));
+
+            s.once('connect', onConnect);
+            s.once('connect_error', onError);
+
+            // 수동 타임아웃: 반드시 소켓도 끊어준다
+            const timer = setTimeout(() => {
+                fail(new Error('Socket 연결 시간 초과'));
+            }, connectTimeout);
+        }).finally(() => {
+            this._connectPromise = null;
         });
+
+        return this._connectPromise;
     }
 
-    setupEventListeners() {
-        if (!this.socket) return;
+    _installLongLivedListeners() {
+        const s = this.socket;
+        if (!s || s.__listenersInstalled) return;
+        s.__listenersInstalled = true; // 중복 설치 방지
 
-        // connect 이벤트는 Promise에서 이미 처리하므로 제거
-        
-        this.socket.on('disconnect', (reason) => {
+        s.on('disconnect', (reason) => {
             console.log('❌ Socket disconnected:', reason);
             this.isConnected = false;
         });
 
-        this.socket.on('connect_error', (error) => {
+        s.on('connect_error', (error) => {
             console.error('❌ Socket connection error:', error);
             this.isConnected = false;
-            this.reconnectAttempts++;
-
+            this.reconnectAttempts += 1;
             if (this.reconnectAttempts >= this.maxReconnectAttempts) {
                 console.error('Max reconnection attempts reached');
-                this.socket.disconnect();
+                try { s.disconnect(); } catch { }
             }
         });
 
-        this.socket.on('reconnect', (attemptNumber) => {
-            console.log(`🔄 Socket reconnected after ${attemptNumber} attempts`);
+        s.on('reconnect', (attempt) => {
+            console.log(`🔄 reconnected after ${attempt} attempts`);
             this.isConnected = true;
             this.reconnectAttempts = 0;
         });
 
-        this.socket.on('reconnect_failed', () => {
-            console.error('❌ Socket reconnection failed');
-            this.isConnected = false;
-        });
+        // 참고: v4에선 이 이벤트들이 일반적
+        s.on('reconnect_attempt', (n) => console.log('reconnect_attempt', n));
+        s.on('reconnect_error', (e) => console.log('reconnect_error', e));
     }
 
     disconnect() {
         if (this.socket) {
-            this.socket.disconnect();
-            this.socket = null;
-            this.isConnected = false;
+            try { this.socket.disconnect(); } finally {
+                this.socket = null;
+                this.isConnected = false;
+                this._connectPromise = null;
+            }
         }
     }
 
     emit(event, data) {
-        if (this.socket && this.isConnected) {
+        if (this.socket && this.socket.connected) {
             this.socket.emit(event, data);
         } else {
             console.warn('Socket not connected. Cannot emit:', event);
@@ -136,27 +116,21 @@ class SocketService {
     }
 
     on(event, callback) {
-        if (this.socket) {
-            this.socket.on(event, callback);
-        }
+        if (this.socket) this.socket.on(event, callback);
     }
 
     off(event, callback) {
-        if (this.socket) {
-            this.socket.off(event, callback);
-        }
+        if (this.socket) this.socket.off(event, callback);
+    }
+
+    isSocketConnected() {
+        return !!(this.socket && this.socket.connected);
     }
 
     getSocket() {
         return this.socket;
     }
-
-    isSocketConnected() {
-        return this.isConnected && this.socket && this.socket.connected;
-    }
 }
 
-// 싱글톤 인스턴스
 const socketService = new SocketService();
-
 export default socketService;
