@@ -39,7 +39,7 @@ const page = () => {
                                 </Link>
                             </div>
                         </div>
-                        <div>
+                         <div className='flex flex-col justify-between'>
                             {onMouse[1] ? <LampOn /> : <LampOff />}
                             <div onMouseOver={() => onMouseOver(1)} onMouseLeave={() => onMouseLeave(1)}>
                                 <Link href="/room/join">
