@@ -1,7 +1,8 @@
 // hooks/useAdditionalInfoForm.js
 import { useState } from 'react'
 import axios from 'axios'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
+import { backendApiInstance } from '@/apis/instance'
 
 export function useCreateRoom() {
   const router = useRouter()
@@ -26,16 +27,21 @@ export function useCreateRoom() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!form.roomName || !form.capacity || !form.duration || !form.password) {
+    if (!form.roomName || !form.capacity || !form.duration) {
       alert('필수 항목을 올바르게 입력해 주세요.')
+      return
+    }
+
+    if(form.visibility && !form.password){
+      alert("비밀번호를 입력하세요.")
       return
     }
 
     setIsSubmitting(true)
     try {
-      const payload = { provider, providerId, ...form }
-      const res = await axios.post( // TODO: axios 객체 커스텀 하기
-        `${process.env.NEXT_PUBLIC_BE_SERVER_URL}/room`, // TODO: API URI 수정하기
+      const payload = { ...form }
+      const res = backendApiInstance.post( // TODO: axios 객체 커스텀 하기
+        `/room`, // TODO: API URI 수정하기
         payload
       )
       if (res.status===201) {
