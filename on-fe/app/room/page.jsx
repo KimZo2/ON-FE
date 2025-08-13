@@ -8,10 +8,14 @@ import LampOn from '@/components/image/LampOn';
 import LampOff from '@/components/image/LampOff';
 import StarBorderButton from '@/components/button/StarBorderButton';
 import { useState } from 'react';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
+import DefaultPageFrame from '@/components/DefaultPageFrame';
+
 
 const page = () => {
 
-    const [onMouse, setOnMouse] = useState([false,false]);
+    const [onMouse, setOnMouse] = useState([false, false]);
 
     const onMouseOver = (index) => {
         const newObj = [...onMouse];
@@ -25,12 +29,7 @@ const page = () => {
     }
 
     return (
-        <div className="min-h-screen relative overflow-hidden bg-black bg-opacity-100">
-            <Header />
-            <FlyingStar />
-
-
-            {/** TODO: 방 생성 / 방 입장 버튼 추가 */}
+        <DefaultPageFrame>
             <div className="relative max-w-[1200px] mx-auto p-12 px-6 grid gap-12 items-center justify-items-center text-center min-h-screen">
                 <div className='flex flex-col gap-[5dvw]'>
                     <StudyTogether />
@@ -38,32 +37,35 @@ const page = () => {
                         <div className='flex flex-col justify-between'>
                             {onMouse[0] ? <LampOn /> : <LampOff />}
                             <div onMouseOver={() => onMouseOver(0)} onMouseLeave={() => onMouseLeave(0)}>
-                                <RoomButton text={"Create Room!"} />
+                                <Link href="/room/create">
+                                    <RoomButton text={"Create Room!"} />
+                                </Link>
                             </div>
                         </div>
                         <div>
                             {onMouse[1] ? <LampOn /> : <LampOff />}
                             <div onMouseOver={() => onMouseOver(1)} onMouseLeave={() => onMouseLeave(1)}>
-                                <RoomButton text={"Join Room!"} />
+                                <Link href="/room/join">
+                                    <RoomButton text={"Join Room!"} />
+                                </Link>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div >
+        </DefaultPageFrame>
     )
 }
 
 const RoomButton = ({ text }) => {
     return (
-            <StarBorderButton
-                as="button"
-                className="custom-class text-xs"
-                color="cyan"
-                speed="5s"
-            >
-                <button>{text}</button>
-            </StarBorderButton>
+        <StarBorderButton
+            as="button"
+            className="custom-class text-xs"
+            speed="5s"
+        >
+            {text}
+        </StarBorderButton>
     );
 }
 
