@@ -3,34 +3,23 @@ import { useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import LoadingSpinner from '@/components/loading/LoadingSpinner'
 import { saveAccessToken, saveNickName } from '@/util/AuthUtil'
-import {
-  goKakaoLogin,
-  goGithubLogin,
-  goGoogleLogin,
-  goNaverLogin
-} from '@/apis/auth'
+import { goLogin } from '@/apis/auth'
 
 export default function OAuthCallbackPage() {
   const router = useRouter()
   const params = useSearchParams()
   const code = params.get('code')
   const oauthType = params.get('oauthType')  // 'kakao', 'github', 'google', 'naver'
+  const SUPPORTED = new Set(['kakao','github','google','naver']);
+
 
   // 각 Oauth 제공자로부터 받은 code를 통해, 토큰 생성해주는 함수 호출 로직
   const getAccessTokenByType = async (oauthType, code) => {
-    switch (oauthType) {
-      case 'kakao':
-        return await goKakaoLogin({code})
-      case 'github':
-        return await goGithubLogin({code})
-      case 'google':
-        return await goGoogleLogin({code})
-      case 'naver':
-        return await goNaverLogin({code})
-      default:
-        throw new Error(`지원하지 않는 OAuth 타입입니다: ${oauthType}`)
-    }
+  if (!SUPPORTED.has(oauthType)) {
+    throw new Error(`지원하지 않는 OAuth 타입입니다: ${oauthType}`);
   }
+  return await goLogin({ oauthType, code });
+  };
 
   // 로그인 페이지로 넘어온 이후, 로직
   useEffect(() => {

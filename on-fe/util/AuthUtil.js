@@ -17,19 +17,10 @@ export function cryptoRandom(bytes = 32) {
   return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
 }
 
+
 export function handleKakao() {
-  const state = cryptoRandom(); // 매번 랜덤
-  sessionStorage.setItem('kakao_state', state);
-
-  const params = new URLSearchParams({
-    client_id: KAKAO_CLIENT_ID,
-    redirect_uri: encodeURIComponent(KAKAO_REDIRECT_URI),
-    state: encodeURIComponent(state)
-  });
-  window.location.href = `https://kauth.kakao.com/oauth/authorize?response_type=code&${params.toString()}`
+  window.location.href = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${KAKAO_CLIENT_ID}&redirect_uri=${KAKAO_REDIRECT_URI}`
 }
-
-
 
 export function handleNaver() {
   const state = cryptoRandom();
@@ -37,8 +28,8 @@ export function handleNaver() {
 
   const params = new URLSearchParams({
     client_id: NAVER_CLIENT_ID,
-    redirect_uri: encodeURIComponent(NAVER_REDIRECT_URI),
-    state: encodeURIComponent(state)
+    redirect_uri: NAVER_REDIRECT_URI,
+    state: state
   });
   window.location.href = `https://nid.naver.com/oauth2.0/authorize?response_type=code&${params.toString()}`
 }
@@ -49,9 +40,9 @@ export function handleGoogle() {
 
   const params = new URLSearchParams({
     client_id: GOOGLE_CLIENT_ID,
-    redirect_uri: GOOGLE_REDIRECT_URI, // backend에서 등록값과 정확히 일치
+    redirect_uri: GOOGLE_REDIRECT_URI, 
     response_type: 'code',
-    scope: 'openid email profile',     // 필요한 스코프로 조정
+    scope: 'openid email profile',     
     access_type: 'offline',            // 리프레시 토큰 필요 시
     prompt: 'consent',
     state
@@ -75,11 +66,15 @@ export async function handleGithub() {
 
 
 export function saveAccessToken(accessToken){
+  if(typeof window !== 'undefined'){
     localStorage.setItem("accessToken", accessToken);
+  }
 }
 
 export function saveNickName(nickName) {
+  if(typeof window !== 'undefined'){
     localStorage.setItem("nickName", nickName);
+  }
 }
 
 export function removeAccessToken(){

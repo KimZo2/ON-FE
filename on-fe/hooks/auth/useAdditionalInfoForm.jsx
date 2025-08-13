@@ -1,7 +1,8 @@
 // hooks/useAdditionalInfoForm.js
 import { useState } from 'react'
-import axios from 'axios'
 import { useRouter, useSearchParams } from 'next/navigation'
+import axios from 'axios'
+
 
 export function useAdditionalInfoForm() {
   const router = useRouter()
@@ -40,7 +41,7 @@ export function useAdditionalInfoForm() {
     try {
       const payload = { provider, providerId, ...form }
       const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_BE_SERVER_URL}/auth/login`,
+        `${process.env.NEXT_PUBLIC_BE_SERVER_URL}/auth/signup`,
         payload
       )
       if (res.status===201) {
