@@ -1,14 +1,11 @@
 'use client'
 
-import FlyingStar from '@/components/background/FlyingStar'
-import Header from '@/components/Header'
 import React from 'react'
 import TextType from '@/components/text/TextType';
 import LampOn from '@/components/image/LampOn';
 import LampOff from '@/components/image/LampOff';
 import StarBorderButton from '@/components/button/StarBorderButton';
 import { useState } from 'react';
-import { useRouter } from 'next/router';
 import Link from 'next/link';
 import DefaultPageFrame from '@/components/DefaultPageFrame';
 
