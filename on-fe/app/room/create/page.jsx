@@ -9,7 +9,7 @@ const page = () => {
   return (
    <DefaultPageFrame>
       <FormLayOut className=''>
-        <CreateRoomForm className='w-[15dvw] flex flex-col justify-between align-center gap-3'>
+        <CreateRoomForm className='w-[15dvw] flex flex-col justify-between gap-3'>
 
         </CreateRoomForm>
       </FormLayOut>
