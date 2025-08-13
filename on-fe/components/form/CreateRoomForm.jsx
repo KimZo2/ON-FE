@@ -5,6 +5,7 @@ import React from 'react'
 import Link from 'next/link';
 import FormField from './FormField';
 import CheckboxField from './CheckboxField';
+import { prompt } from '@/constants/FONT';
 
 const CreateRoomForm = ({className}) => {
     const { form, isSubmitting, handleChange, handleSubmit } = useCreateRoom();
@@ -20,6 +21,12 @@ const CreateRoomForm = ({className}) => {
                 value={form.roomName}
                 onChange={handleChange}
                 required
+                style={
+                    {
+                        titleColor:"white",
+                        font : prompt.className
+                    }
+                }
             />
             <FormField
                 label="*인원 수"
@@ -27,6 +34,12 @@ const CreateRoomForm = ({className}) => {
                 value={form.capacity}
                 onChange={handleChange}
                 required
+                style={
+                    {
+                        titleColor:"white",
+                        font : prompt.className
+                    }
+                }
             />
             <FormField
                 label="*방 유지 시간"
@@ -35,16 +48,42 @@ const CreateRoomForm = ({className}) => {
                 onChange={handleChange}
                 maxLength={8}
                 required
+                style={
+                    {
+                        titleColor:"white",
+                        font : prompt.className
+                    }
+                }
             />
 
             <CheckboxField
-                label="방 공개 여부\n비공개시 비밀번호를 입력해주세요."
+                label="방 공개 여부 (비공개시 비밀번호를 입력해주세요.)"
                 name="visibility"
                 checked={form.visibility}
                 onChange={handleChange}
+                style = {
+                    {
+                        font : prompt.className
+                    }
+                }
             />
 
-            <button type="submit" className="submit-btn" disabled={isSubmitting}>
+            <FormField
+                label="방 비밀번호"
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                maxLength={4}
+                required
+                style={
+                    {
+                        titleColor:"white",
+                        font : prompt.className
+                    }
+                }
+            />
+
+            <button type="submit" className="bg-white" disabled={isSubmitting}>
                 {isSubmitting ? '제출 중…' : '생성하기'}
             </button>
         </form>
