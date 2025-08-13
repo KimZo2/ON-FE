@@ -16,6 +16,7 @@ export default function MetaverseContainer({ userNickName }) {
     const [playerId] = useState(() => uuidv4());
     const [onlineCount, setOnlineCount] = useState(0);
     const [currentScene, setCurrentScene] = useState(null);
+    const [chatMessages, setChatMessages] = useState([]);
 
     useEffect(() => {
         return () => {
@@ -47,6 +48,19 @@ export default function MetaverseContainer({ userNickName }) {
             // 온라인 카운트 업데이트 리스너
             socket.on('onlineCount', (count) => {
                 setOnlineCount(count);
+            });
+
+            // 채팅 메시지 수신 리스너
+            socket.on('chatMessage', (messageData) => {
+                const newMessage = {
+                    id: Date.now() + Math.random(),
+                    text: messageData.message,
+                    playerName: messageData.playerName,
+                    timestamp: new Date(),
+                    isOwn: messageData.playerId === playerId
+                };
+                
+                setChatMessages(prev => [...prev.slice(-19), newMessage]); // 최근 20개만 유지
             });
 
             // Phaser 게임 시작 - DOM 렌더링 완료 후 초기화
@@ -107,9 +121,24 @@ export default function MetaverseContainer({ userNickName }) {
     }, [userNickName, isGameStarted, isConnecting, startMetaverse]);
 
     const handleChatSend = (message) => {
+        // 여러 방법으로 MetaverseScene에 접근 시도
         if (currentScene && currentScene.sendChatMessage) {
             currentScene.sendChatMessage(message);
+            return;
         }
+        
+        // currentScene이 없으면 Phaser 게임에서 직접 씬을 찾기
+        if (phaserGameRef.current) {
+            const metaverseScene = phaserGameRef.current.scene.getScene('MetaverseScene');
+            if (metaverseScene && metaverseScene.sendChatMessage) {
+                metaverseScene.sendChatMessage(message);
+                // currentScene 상태도 업데이트
+                setCurrentScene(metaverseScene);
+                return;
+            }
+        }
+        
+        console.warn('MetaverseScene을 찾을 수 없어 채팅 메시지를 전송할 수 없습니다.');
     };
 
     if (isGameStarted) {
@@ -129,11 +158,15 @@ export default function MetaverseContainer({ userNickName }) {
                 </div>
 
                 {/* 채팅 인터페이스 */}
-                <ChatInterface onSendMessage={handleChatSend} />
+                <ChatInterface 
+                    onSendMessage={handleChatSend} 
+                    messages={chatMessages}
+                    currentPlayerId={playerId}
+                />
 
                 {/* 게임 컨트롤 안내 */}
                 <div className="absolute bottom-4 left-4 bg-black bg-opacity-50 text-white p-2 rounded text-sm">
-                    <div>이동: 화살표 키 또는 WASD</div>
+                    <div>이동: 화살표 키</div>
                     <div>채팅: 하단 입력창 사용</div>
                 </div>
             </div>
