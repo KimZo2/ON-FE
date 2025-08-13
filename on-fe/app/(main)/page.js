@@ -1,7 +1,7 @@
 'use client'
 
 import {React,useState, useEffect} from 'react';
-import FlyingStar from '../ui/background/FlyingStar.jsx';
+import FlyingStar from '../../components/background/FlyingStar.jsx';
 import Link from 'next/link.js';
 import Image from 'next/image.js';
 import Header from '../../components/Header.jsx';
