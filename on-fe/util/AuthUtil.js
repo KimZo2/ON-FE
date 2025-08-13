@@ -8,6 +8,7 @@ const GITHUB_CLIENT_ID = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID;
 const GITHUB_REDIRECT_URI = process.env.NEXT_PUBLIC_GITHUB_REDIRECT_URI;
 
 
+
 // URL-safe 토큰 (base64url). 기본 32바이트 ≈ 43자
 export function cryptoRandom(bytes = 32) {
   const buf = new Uint8Array(bytes);

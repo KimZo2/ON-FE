@@ -12,7 +12,6 @@ export default function OAuthCallbackPage() {
   const oauthType = params.get('oauthType')  // 'kakao', 'github', 'google', 'naver'
   const SUPPORTED = new Set(['kakao','github','google','naver']);
 
-
   // 각 Oauth 제공자로부터 받은 code를 통해, 토큰 생성해주는 함수 호출 로직
   const getAccessTokenByType = async (oauthType, code) => {
   if (!SUPPORTED.has(oauthType)) {
@@ -34,7 +33,7 @@ export default function OAuthCallbackPage() {
         saveAccessToken(token);
         saveNickName(nickname);
         router.replace('/') // main page로 이동
-      
+
       } catch (err) {
         if (err?.status === 428) { // 회원 정보가 없을 경우, 추가 정보 입력 페이지로 이동
           const { provider, providerId } = err.response.data
