@@ -1,14 +1,6 @@
-'use client'
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Press_Start_2P } from 'next/font/google';
-
-// 픽셀 폰트 추가
-const pressStart2P = Press_Start_2P({
-  weight: '400',       
-  subsets: ['latin'],
-  display: 'swap',
-});
+import { pressStart2P } from "@/constants/FONT";
 
 export default function RootLayout({ children }) {
   return (
