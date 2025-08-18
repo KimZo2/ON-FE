@@ -1,6 +1,6 @@
 'use client'
 
-import { useCreateRoom } from '@/hooks/CreateRoomFormHook';
+import { useCreateRoom } from '@/hooks/room/useCreateRoom';
 import React from 'react'
 import Link from 'next/link';
 import FormField from '../FormField';

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useJoinRoom } from '@/hooks/JoinRoomFormHook'; 
+import { useJoinRoom } from '@/hooks/room/useJoinRoom'; 
 
 /**
  * 방 코드를 입력받는 폼 컴포넌트

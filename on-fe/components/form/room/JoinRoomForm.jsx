@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react';
-import { useJoinRoom } from '@/hooks/JoinRoomFormHook';
+import { useJoinRoom } from '@/hooks/room/useJoinRoom';
 import CodeRoomModal from '@/components/modal/CodeRoomModal'; 
 
 const JoinRoomForm = ({className, onFormSubmissionStart, onFormSubmissionComplete}) => {
