@@ -1,7 +1,6 @@
 'use client'
 
 import React from 'react'
-import Link from 'next/link';
 import FormField from './FormField';
 import { prompt } from '@/constants/FONT';
 import { useJoinRoom } from '@/hooks/JoinRoomFormHook';
@@ -12,7 +11,6 @@ const JoinRoomForm = ({className}) => {
 
     return (
         <form onSubmit={handleSubmit} className={`${className}`}>
-            <Link href="" className="text-white text-center font-press-start text-[36px]">Join Room!</Link>
 
             <FormField
                 className=""
