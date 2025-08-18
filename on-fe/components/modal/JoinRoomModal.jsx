@@ -15,9 +15,10 @@ export default function JoinRoomModal({ onClose, onStartLoading, onStopLoading }
 
   return (
     <BaseModal
-      title="Join Room!"                      
-      onClose={onClose}                         
-      size="w-[15dvw]"
+      title="Join Room!"   
+      subtitle='입장 가능한 방을 선택해 주세요'                   
+      onClose={onClose}     
+      size='1600px'                    
     >
       <JoinRoomForm
         className="flex flex-col justify-between gap-3" 
