@@ -12,7 +12,6 @@ export function useJoinRoom() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-
   // 페이지네이션 관련 상태 추가
   const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 번호
   const itemsPerPage = 6; // ✨ 페이지당 보여줄 방의 개수 (예: 2열 * 2행 = 4개)
@@ -31,6 +30,7 @@ export function useJoinRoom() {
       { id: 10, name: 'iOS 앱 개발', participants: 10, maxParticipants: 12, isPrivate: false },
       { id: 11, name: 'Android 앱 개발', participants: 8, maxParticipants: 10, isPrivate: false },
   ];
+
   // 현재 페이지에 보여줄 방 목록 계산
     const paginatedRooms = useMemo(() => {
         const startIndex = (currentPage - 1) * itemsPerPage;
@@ -48,8 +48,6 @@ export function useJoinRoom() {
     const goToPrevPage = () => {
         setCurrentPage(prev => Math.max(prev - 1, 1));
     };
-
-
 
   const handleChange = useCallback((e) => {
     const { name, value } = e.target

@@ -50,6 +50,8 @@ const page = () => {
 
     return (
         <DefaultPageFrame>
+
+            {/* 램프 모양과 버튼 부분 */}
             <div className="relative max-w-[1200px] mx-auto p-12 px-6 grid gap-12 items-center justify-items-center text-center min-h-screen">
                 <div className='flex flex-col gap-[5dvw]'>
                     <StudyTogether />
