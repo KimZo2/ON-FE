@@ -88,15 +88,21 @@ const JoinRoomForm = ({className, onFormSubmissionStart, onFormSubmissionComplet
                                 <div
                                     key={room.id}
                                     onClick={() => !isSubmitting && handleRoomSelect(room.id)}
-                                    className={`bg-white text-gray-900 p-4 rounded-lg cursor-pointer transition-colors duration-200
-                                                ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'}`}
+                                    className={`bg-white text-gray-900 rounded-lg cursor-pointer transition-colors duration-200 p-4
+                                                ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'} flex flex-col justify-between`}
                                 >
-                                    <h4 className="font-medium text-base mb-2 truncate">{room.name}</h4>
-                                    <div className="flex justify-between items-center text-sm">
-                                        <p className="text-gray-600">
-                                            {room.participants}/{room.maxParticipants}명 참여중
-                                        </p>
-                                        {room.isPrivate && <span className="text-gray-500">🔒</span>}
+                                    {/* 방 이름: 상단에 크게 표시 */}
+                                    <div className="mb-2">
+                                        <h4 className="font-medium text-base">{room.name}</h4>
+                                    </div>
+                                    {/* 참여 인원 정보: 하단 오른쪽에 아이콘과 함께 표시 */}
+                                    <div className="flex items-center justify-end text-sm text-gray-600">
+                                        {/* 사람 아이콘 SVG */}
+                                        <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                        </svg>
+                                        {/* 현재 인원 / 최대 인원 */}
+                                        <span>{room.participants}/{room.maxParticipants}</span>
                                     </div>
                                 </div>
                             ))}
