@@ -2,7 +2,7 @@
 
 import React from 'react';
 import BaseModal from '@/components/modal/BaseModal';      
-import JoinRoomForm from '../form/JoinRoomForm';
+import JoinRoomForm from '../form/room/JoinRoomForm';
 
 export default function JoinRoomModal({ onClose, onStartLoading, onStopLoading }) {
 

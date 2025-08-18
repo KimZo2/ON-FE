@@ -3,8 +3,8 @@
 import { useCreateRoom } from '@/hooks/CreateRoomFormHook';
 import React from 'react'
 import Link from 'next/link';
-import FormField from './FormField';
-import CheckboxField from './CheckboxField';
+import FormField from '../FormField';
+import CheckboxField from '../CheckboxField';
 import { prompt } from '@/constants/FONT';
 
 const CreateRoomForm = ({className}) => {

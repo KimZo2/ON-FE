@@ -3,7 +3,7 @@
 import React from 'react'
 import DefaultPageFrame from '@/components/DefaultPageFrame'
 import FormLayOut from '@/components/form/FormLayOut'
-import JoinRoomForm from '@/components/form/JoinRoomForm'
+import JoinRoomForm from '@/components/form/room/JoinRoomForm'
 
 const page = () => {
   return (

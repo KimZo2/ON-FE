@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import CreateRoomForm from '@/components/form/CreateRoomForm'; 
+import CreateRoomForm from '@/components/form/room/CreateRoomForm'; 
 import BaseModal from '@/components/modal/BaseModal';      
 
 export default function CreateRoomModal({ onClose, onStartLoading, onStopLoading }) {
