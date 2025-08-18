@@ -87,11 +87,15 @@ export function removeNickName(){
 }
 
 export function getAccessToken(){
-    return localStorage.getItem("accessToken");
+  if(typeof window !== 'undefined'){
+    localStorage.getItem("accessToken");
+  }
 }
 
 export function getNickName(){
-    return localStorage.getItem("nickName");
+  if(typeof window !== 'undefined'){
+    localStorage.getItem("nickName");
+  }
 }
 
 export function isLoggedIn(){
