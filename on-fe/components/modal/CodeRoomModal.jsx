@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import CodeInputForm from '@/components/form/CodeInputForm'; 
+import CodeInputForm from '@/components/form/room/CodeInputForm'; 
 import BaseModal from '@/components/modal/BaseModal';      
 
 export default function CodeRoomModal({ onClose, onStartLoading, onStopLoading }) {
