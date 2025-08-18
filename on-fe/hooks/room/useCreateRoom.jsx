@@ -1,6 +1,4 @@
-// hooks/useAdditionalInfoForm.js
 import { useState } from 'react'
-import axios from 'axios'
 import { useRouter } from 'next/navigation'
 import { backendApiInstance } from '@/apis/instance'
 
@@ -46,7 +44,7 @@ export function useCreateRoom() {
       )
       if (res.status===201) {
         alert('방 생성 성공!')
-        router.push('/') // TODO: 생성한 방으로 이동하거나, 메인페이지로 이동하거나 
+        router.push('/') // TODO: 생성한 방으로 이동하기
       } else {
         throw new Error('서버 응답 오류')
       }

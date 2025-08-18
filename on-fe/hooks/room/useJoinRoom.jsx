@@ -7,7 +7,7 @@ export function useJoinRoom() {
   const router = useRouter()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [searchTerm, setSearchTerm] = useState(''); // 검색어 state 추가
+  const [searchTerm, setSearchTerm] = useState(''); 
   const { isOpen: showCodeModal, openModal: handleOpenCodeModal, closeModal: handleCloseCodeModal } = useModal(); 
 
   // 페이지네이션 관련 상태
@@ -75,7 +75,7 @@ export function useJoinRoom() {
   const handleJoinByCode = useCallback(async (code) => {
     setIsSubmitting(true);
     try {
-      // TODO: 코드로 방 입장 API 엔드포인트로 변경하세요.
+      // TODO: 코드로 방 입장 시, API 엔드포인트로 변경
       const res = await backendApiInstance.post('/api/rooms/join-by-code', { code });
 
       if (res.status === 200) {
@@ -89,7 +89,7 @@ export function useJoinRoom() {
       alert(`코드로 방 입장에 실패하였습니다. ${err.response?.data?.message || err.message}`);
     } finally {
       setIsSubmitting(false);
-      setShowCodeModal(false); // 입장 성공/실패 후 모달 닫기
+      handleCloseCodeModal(false); // 입장 성공/실패 후 모달 닫기
     }
   }, [router]);
 
@@ -97,7 +97,7 @@ export function useJoinRoom() {
   const handleJoinExistingRoom = useCallback(async (roomId) => {
     setIsSubmitting(true);
     try {
-      // TODO: 기존 방 입장 API 엔드포인트로 변경하세요.
+      // TODO: 기존 방 입장 API 엔드포인트로 변경
       const res = await backendApiInstance.post(`/api/rooms/${roomId}/join`);
 
       if (res.status === 200) {
