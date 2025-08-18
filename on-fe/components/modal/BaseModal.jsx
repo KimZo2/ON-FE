@@ -25,7 +25,7 @@ export default function BaseModal({ title, subtitle, children, onClose, size = '
       onClick={handleOverlayClick}
     >
       {/* 모달 콘텐츠 영역 */}
-      <div className={`bg-black border border-gray-600 rounded-2xl p-6 relative ${size}`}>
+      <div className={`bg-black border border-gray-600 rounded-2xl p-10 relative ${size}`}>
         {/* 닫기 버튼 */}
         <button
           onClick={onClose}
@@ -35,8 +35,8 @@ export default function BaseModal({ title, subtitle, children, onClose, size = '
         </button>
 
         {/* 모달 헤더 (제목 및 부제목) */}
-        <div className="text-center mb-6">
-          <h1 href="" className="text-white text-center font-press-start text-[36px]">{title}</h1>
+        <div className="text-center mb-8">
+          <h1 href="" className="whitespace-nowrap text-white text-center font-press-start text-[30px]">{title}</h1>
           {subtitle && <p className="text-gray-400 text-sm">{subtitle}</p>}
         </div>
 
