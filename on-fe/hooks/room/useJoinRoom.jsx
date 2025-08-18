@@ -2,6 +2,7 @@ import { useState, useCallback,useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { backendApiInstance } from '@/apis/instance'
 import { useModal } from '../useModal'
+import { usePagination } from './usePagination';
 
 export function useJoinRoom() {
   const router = useRouter()
@@ -9,10 +10,7 @@ export function useJoinRoom() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [searchTerm, setSearchTerm] = useState(''); 
   const { isOpen: showCodeModal, openModal: handleOpenCodeModal, closeModal: handleCloseCodeModal } = useModal(); 
-
-  // 페이지네이션 관련 상태
-  const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 번호
-  const itemsPerPage = 6; //  페이지당 보여줄 방의 개수 (예: 3열 * 2행 = 6개)
+  const itemsPerPage = 6;
 
   // 가짜 방 목록 데이터 (실제 API에서 가져올 데이터)
   const allRooms = useMemo(() => [
@@ -42,34 +40,22 @@ export function useJoinRoom() {
     );
   }, [allRooms, searchTerm]);
 
-  // 필터링된 방 목록을 기반으로 현재 페이지에 보여줄 방 목록 계산
-  const paginatedRooms = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return filteredRooms.slice(startIndex, endIndex);
-  }, [currentPage, filteredRooms, itemsPerPage]);
-
-  // 필터링된 방 목록을 기반으로 총 페이지 수 계산
-  const totalPages = Math.ceil(filteredRooms.length / itemsPerPage);
-
-  // 페이지 변경 핸들러
-  const goToNextPage = () => {
-      setCurrentPage(prev => Math.min(prev + 1, totalPages));
-  };
-  const goToPrevPage = () => {
-      setCurrentPage(prev => Math.max(prev - 1, 1));
-  };
-
-  // 특정 페이지로 이동하는 함수 추가 (점 페이지네이션에서 유용)
-  const goToPage = useCallback((pageNumber) => {
-    setCurrentPage(Math.max(1, Math.min(pageNumber, totalPages)));
-  }, [totalPages]);
+  const {
+    currentPage,
+    totalPages,
+    paginatedItems: paginatedRooms,
+    goToNextPage,
+    goToPrevPage,
+    goToPage,
+    resetPage, 
+  } = usePagination(filteredRooms, itemsPerPage); 
 
   // 검색어 변경 핸들러
   const handleSearchChange = useCallback((e) => {
     setSearchTerm(e.target.value);
-    setCurrentPage(1); // 검색어가 변경되면 첫 페이지로 리셋
-  }, []);
+    resetPage();
+  }, [resetPage]); 
+
 
   // 코드로 방 입장 처리 (실제 API 호출 필요)
   const handleJoinByCode = useCallback(async (code) => {
@@ -115,20 +101,20 @@ export function useJoinRoom() {
   }, [router]);
 
   return {
-    searchTerm, // 검색어
-    handleSearchChange, // 검색어 변경 핸들러
-    showCodeModal, // 코드 입력 모달 표시 여부
-    handleOpenCodeModal, // 코드 입력 모달 열기
-    handleCloseCodeModal, // 코드 입력 모달 닫기
-    handleJoinByCode, // 코드로 방 입장
-    availableRooms: paginatedRooms, // 현재 페이지의 필터링된 방 목록
+    searchTerm, 
+    handleSearchChange, 
+    showCodeModal, 
+    handleOpenCodeModal, 
+    handleCloseCodeModal, 
+    handleJoinByCode, 
+    availableRooms: paginatedRooms,
     isSubmitting,
-    handleJoinExistingRoom, // 기존 방 입장 함수
+    handleJoinExistingRoom, 
     currentPage,
-    totalPages,
+    totalPages, 
     goToNextPage,
     goToPrevPage,
-    goToPage, // 특정 페이지로 이동
+    goToPage,    
   };
 
 }
