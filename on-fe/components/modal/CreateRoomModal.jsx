@@ -14,7 +14,8 @@ export default function CreateRoomModal({ onClose, onStartLoading, onStopLoading
 
   return (
     <BaseModal
-      title="Create Room!"                      
+      title="Create Room!"     
+      subtitle='입장하기 전, 새로운 방을 생성해 주세요!'                 
       onClose={onClose}                         
       size="w-[15dvw]"
     >
