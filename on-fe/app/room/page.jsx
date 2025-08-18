@@ -1,29 +1,52 @@
-'use client'
+'use client';
 
-import React from 'react'
+import React, { useState } from 'react';
 import TextType from '@/components/text/TextType';
 import LampOn from '@/components/image/LampOn';
 import LampOff from '@/components/image/LampOff';
 import StarBorderButton from '@/components/button/StarBorderButton';
-import { useState } from 'react';
-import Link from 'next/link';
 import DefaultPageFrame from '@/components/DefaultPageFrame';
+import CreateRoomModal from '@/components/modal/CreateRoomModal';
+import JoinRoomModal from '@/components/modal/JoinRoomModal';
+import LoadingSpinner from '@/components/loading/LoadingSpinner'; 
 
+const page = () => { 
 
-const page = () => {
+    // 램프 마우스오버 상태
+    const [onMouse, setOnMouse] = useState([false, false]); 
 
-    const [onMouse, setOnMouse] = useState([false, false]);
+    // 모달 표시 상태 관리
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [showJoinModal, setShowJoinModal] = useState(false); 
+    const [showLoadingSpinner, setShowLoadingSpinner] = useState(false); 
 
-    const onMouseOver = (index) => {
+    // 램프 마우스 이벤트 핸들러
+    const handleMouseOver = (index) => { 
         const newObj = [...onMouse];
         newObj[index] = true;
         setOnMouse(newObj);
     }
-    const onMouseLeave = (index) => {
+    const handleMouseLeave = (index) => { 
         const newObj = [...onMouse];
         newObj[index] = false;
         setOnMouse(newObj);
     }
+
+    // '방 생성' 모달을 여는 함수
+    const openCreateModal = () => setShowCreateModal(true);
+    // '방 입장' 모달을 여는 함수
+    const openJoinModal = () => setShowJoinModal(true);
+
+    // 모든 모달을 닫는 공통 함수
+    const closeModal = () => {
+        setShowCreateModal(false);
+        setShowJoinModal(false); 
+        setShowLoadingSpinner(false);
+    };
+
+    // 로딩 스피너 시작/중지 함수
+    const startLoading = () => setShowLoadingSpinner(true);
+    const stopLoading = () => setShowLoadingSpinner(false);
 
     return (
         <DefaultPageFrame>
@@ -33,38 +56,53 @@ const page = () => {
                     <div className='flex flex-row justify-between w-[50dvw]'>
                         <div className='flex flex-col justify-between'>
                             {onMouse[0] ? <LampOn /> : <LampOff />}
-                            <div onMouseOver={() => onMouseOver(0)} onMouseLeave={() => onMouseLeave(0)}>
-                                <Link href="/room/create">
-                                    <RoomButton text={"Create Room!"} />
-                                </Link>
+                            <div onMouseOver={() => handleMouseOver(0)} onMouseLeave={() => handleMouseLeave(0)}>
+                                <RoomButton text={"Create Room!"} onClick={openCreateModal} />
                             </div>
                         </div>
-                         <div className='flex flex-col justify-between'>
+                        <div className='flex flex-col justify-between'>
                             {onMouse[1] ? <LampOn /> : <LampOff />}
-                            <div onMouseOver={() => onMouseOver(1)} onMouseLeave={() => onMouseLeave(1)}>
-                                <Link href="/room/join">
-                                    <RoomButton text={"Join Room!"} />
-                                </Link>
+                            <div onMouseOver={() => handleMouseOver(1)} onMouseLeave={() => handleMouseLeave(1)}>
+                                <RoomButton text={"Join Room!"} onClick={openJoinModal} />
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </DefaultPageFrame>
-    )
-}
 
-const RoomButton = ({ text }) => {
+            {/* 모달 조건부 렌더링 */}
+            {showCreateModal && (
+                <CreateRoomModal
+                    onClose={closeModal}
+                    onStartLoading={startLoading}
+                    onStopLoading={stopLoading}
+                />
+            )}
+            {showJoinModal && (
+                <JoinRoomModal
+                    onClose={closeModal}
+                    onStartLoading={startLoading}
+                    onStopLoading={stopLoading}
+                />
+            )}
+
+            {showLoadingSpinner && <LoadingSpinner />}
+        </DefaultPageFrame>
+    );
+};
+
+const RoomButton = ({ text, onClick }) => {
     return (
         <StarBorderButton
             as="button"
             className="custom-class text-xs"
             speed="5s"
+            onClick={onClick}
         >
             {text}
         </StarBorderButton>
     );
-}
+};
 
 const StudyTogether = () => {
     return (
@@ -76,7 +114,7 @@ const StudyTogether = () => {
             cursorCharacter="|"
             className='text-3xl'
         />
-    )
-}
+    );
+};
 
-export default page
+export default page;

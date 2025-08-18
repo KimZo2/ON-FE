@@ -12,8 +12,6 @@ const CreateRoomForm = ({className}) => {
 
     return (
         <form onSubmit={handleSubmit} className={`${className}`}>
-            <Link href="" className="text-white text-center font-press-start text-[36px]">Create Room!</Link>
-
             <FormField
                 className=""
                 label="*방 이름"
