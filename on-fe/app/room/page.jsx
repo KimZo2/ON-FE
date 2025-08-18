@@ -9,16 +9,12 @@ import DefaultPageFrame from '@/components/DefaultPageFrame';
 import CreateRoomModal from '@/components/modal/CreateRoomModal';
 import JoinRoomModal from '@/components/modal/JoinRoomModal';
 import LoadingSpinner from '@/components/loading/LoadingSpinner'; 
+import { useModal } from '@/hooks/useModal';
 
 const page = () => { 
 
     // 램프 마우스오버 상태
-    const [onMouse, setOnMouse] = useState([false, false]); 
-
-    // 모달 표시 상태 관리
-    const [showCreateModal, setShowCreateModal] = useState(false);
-    const [showJoinModal, setShowJoinModal] = useState(false); 
-    const [showLoadingSpinner, setShowLoadingSpinner] = useState(false); 
+    const [onMouse, setOnMouse] = useState([false, false]);
 
     // 램프 마우스 이벤트 핸들러
     const handleMouseOver = (index) => { 
@@ -32,20 +28,12 @@ const page = () => {
         setOnMouse(newObj);
     }
 
-    // '방 생성' 모달을 여는 함수
-    const openCreateModal = () => setShowCreateModal(true);
-    // '방 입장' 모달을 여는 함수
-    const openJoinModal = () => setShowJoinModal(true);
+    // useModal 훅을 사용하여 각 모달의 상태를 관리
+    const { isOpen: isCreateModalOpen, openModal: openCreateModal, closeModal: closeCreateModal } = useModal();
+    const { isOpen: isJoinModalOpen, openModal: openJoinModal, closeModal: closeJoinModal } = useModal();
 
-    // 모든 모달을 닫는 공통 함수
-    const closeModal = () => {
-        setShowCreateModal(false);
-        setShowJoinModal(false); 
-        setShowLoadingSpinner(false);
-    };
-
-    // 로딩 스피너 시작/중지 함수
-    const startLoading = () => setShowLoadingSpinner(true);
+    const [showLoadingSpinner, setShowLoadingSpinner] = useState(false); // 로딩 스피너 상태
+    const startLoading = () => setShowLoadingSpinner(true); // 로딩 스피너 시작/중지 함수
     const stopLoading = () => setShowLoadingSpinner(false);
 
     return (
@@ -73,16 +61,16 @@ const page = () => {
             </div>
 
             {/* 모달 조건부 렌더링 */}
-            {showCreateModal && (
+            {isCreateModalOpen && (
                 <CreateRoomModal
-                    onClose={closeModal}
+                    onClose={closeCreateModal}
                     onStartLoading={startLoading}
                     onStopLoading={stopLoading}
                 />
             )}
-            {showJoinModal && (
+            {isJoinModalOpen && (
                 <JoinRoomModal
-                    onClose={closeModal}
+                    onClose={closeJoinModal}
                     onStartLoading={startLoading}
                     onStopLoading={stopLoading}
                 />

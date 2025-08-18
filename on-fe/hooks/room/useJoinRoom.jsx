@@ -1,13 +1,14 @@
 import { useState, useCallback,useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { backendApiInstance } from '@/apis/instance'
+import { useModal } from '../useModal'
 
 export function useJoinRoom() {
   const router = useRouter()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [searchTerm, setSearchTerm] = useState(''); // 검색어 state 추가
-  const [showCodeModal, setShowCodeModal] = useState(false); // code 입력 모달 표시 상태
+  const { isOpen: showCodeModal, openModal: handleOpenCodeModal, closeModal: handleCloseCodeModal } = useModal(); 
 
   // 페이지네이션 관련 상태
   const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 번호
@@ -68,16 +69,6 @@ export function useJoinRoom() {
   const handleSearchChange = useCallback((e) => {
     setSearchTerm(e.target.value);
     setCurrentPage(1); // 검색어가 변경되면 첫 페이지로 리셋
-  }, []);
-
-  // 'code' 버튼 클릭 핸들러 (코드 입력 모달 띄우기)
-  const handleOpenCodeModal = useCallback(() => {
-    setShowCodeModal(true);
-  }, []);
-
-  // 코드 입력 모달 닫기 핸들러
-  const handleCloseCodeModal = useCallback(() => {
-    setShowCodeModal(false);
   }, []);
 
   // 코드로 방 입장 처리 (실제 API 호출 필요)
