@@ -12,6 +12,12 @@ const JoinRoomForm = ({className}) => {
     return (
         <form onSubmit={handleSubmit} className={`${className}`}>
 
+            {/* TODO: 검색창 추가 */}
+
+            {/* TODO: 코드로 입장하기 위한 코드 버튼 추가 */}
+
+            {/* TODO: 현재 존재하는 방 목록 보여주는 부분 추가 */}
+
             <FormField
                 className=""
                 label="*방 이름"
