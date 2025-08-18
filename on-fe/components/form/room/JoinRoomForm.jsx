@@ -3,6 +3,9 @@
 import React from 'react';
 import { useJoinRoom } from '@/hooks/room/useJoinRoom';
 import CodeRoomModal from '@/components/modal/CodeRoomModal'; 
+import JoinRoomHeaderForm from '../room/JoinRoomHeaderForm';
+import RoomListDisplay from '../room/RoomListDisplay';
+import PaginationDots from '../../button/PaginationDots';
 
 const JoinRoomForm = ({className, onFormSubmissionStart, onFormSubmissionComplete}) => {
 
@@ -12,8 +15,7 @@ const JoinRoomForm = ({className, onFormSubmissionStart, onFormSubmissionComplet
         showCodeModal, 
         handleOpenCodeModal, 
         handleCloseCodeModal, 
-        handleJoinByCode, 
-        isSubmitting, 
+        isSubmitting,
         availableRooms, 
         handleJoinExistingRoom, 
         currentPage,
@@ -21,7 +23,6 @@ const JoinRoomForm = ({className, onFormSubmissionStart, onFormSubmissionComplet
         goToNextPage,
         goToPrevPage,
         goToPage, 
-
         } = useJoinRoom(onFormSubmissionStart, onFormSubmissionComplete); 
 
     // '공개방 목록'에서 방 클릭 핸들러
@@ -34,115 +35,29 @@ const JoinRoomForm = ({className, onFormSubmissionStart, onFormSubmissionComplet
     return (
         <div className={`${className}`}>
 
-            <div className="flex items-center justify-between mb-8 gap-4"> 
-                <div className="relative flex-grow"> 
-                    {/* 검색창 */}
-                    <input
-                        type="search"
-                        id="site-search"
-                        name="searchRoom"
-                        placeholder="검색하기"
-                        value={searchTerm} 
-                        onChange={handleSearchChange}
-                        className="
-                            w-full h-14 rounded-xl
-                            bg-transparent
-                            text-white placeholder:text-white/50
-                            border border-white/50
-                            px-12 outline-none
-                            focus:border-white focus:ring-1 focus:ring-white
-                        "
-                    />
-                    <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                </div>
-                {/* 코드로 입장하기 위한 코드 버튼 */}
-                <button 
-                    onClick={handleOpenCodeModal}
-                    className="bg-transparent border border-white text-white px-4 py-2 rounded">
-                    code
-                </button>  
-            </div>
+            <JoinRoomHeaderForm 
+                searchTerm={searchTerm}
+                onSearchChange={handleSearchChange}
+                onOpenCodeModal={handleOpenCodeModal}
+            />
 
-            
+            <RoomListDisplay
+                availableRooms={availableRooms}
+                isSubmitting={isSubmitting}
+                onRoomSelect={handleRoomSelect}
+                goToPrevPage={goToPrevPage}
+                goToNextPage={goToNextPage}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                searchTerm={searchTerm}
+            />
 
-            {/* 현재 존재하는 방 목록 보여주는 부분 */}
-            <div>
-                {availableRooms && availableRooms.length > 0 ? (
-                    // 방 목록과 양 옆 화살표 버튼을 위한 flex 컨테이너
-                    <div className="flex items-center justify-between gap-4">
-                        <button
-                            onClick={goToPrevPage}
-                            disabled={currentPage === 1 || isSubmitting}
-                            className="bg-gray-700 hover:bg-gray-600 text-white p-2 rounded-full disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
-                            aria-label="Previous page"
-                        >
-                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                            </svg>
-                        </button>
-
-                        <div className="grid grid-cols-3 gap-4 pb-4 flex-grow"> {/* 방 목록 그리드 */}
-                            {availableRooms.map(room => (
-                                <div
-                                    key={room.id}
-                                    onClick={() => !isSubmitting && handleRoomSelect(room.id)}
-                                    className={`bg-white text-gray-900 rounded-lg cursor-pointer transition-colors duration-200 p-4
-                                                ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'} flex flex-col justify-between`}
-                                >
-                                    {/* 방 이름: 상단에 크게 표시 */}
-                                    <div className="mb-2">
-                                        <h4 className="font-medium text-base">{room.name}</h4>
-                                    </div>
-                                    {/* 참여 인원 정보: 하단 오른쪽에 아이콘과 함께 표시 */}
-                                    <div className="flex items-center justify-end text-sm text-gray-600">
-                                        {/* 사람 아이콘 SVG */}
-                                        <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                        </svg>
-                                        {/* 현재 인원 / 최대 인원 */}
-                                        <span>{room.participants}/{room.maxParticipants}</span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-
-                        <button
-                            onClick={goToNextPage}
-                            disabled={currentPage === totalPages || isSubmitting}
-                            className="bg-gray-700 hover:bg-gray-600 text-white p-2 rounded-full disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
-                            aria-label="Next page"
-                        >
-                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                            </svg>
-                        </button>
-                    </div>
-                ) : (
-                    <p className="text-gray-400 text-sm text-center py-8">
-                        {/* 검색어 유무에 따라 메시지 변경 */}
-                        {searchTerm ? `'${searchTerm}'에 해당하는 방이 없습니다.\n새롭게 방을 생성하거나 입장해 보세요!` : '현재 참여 가능한 공개방이 없습니다.'}
-                    </p>
-                )}
-
-                {/* 페이지네이션 UI*/}
-                {totalPages > 1 && (
-                    <div className="flex justify-center items-center space-x-2 mt-8"> 
-                        {Array.from({ length: totalPages }, (_, i) => (
-                            <button
-                                key={i}
-                                onClick={() => goToPage(i + 1)}
-                                disabled={isSubmitting}
-                                className={`w-3 h-3 rounded-full transition-colors duration-200
-                                            ${currentPage === i + 1 ? 'bg-white' : 'bg-gray-500 hover:bg-gray-400'}
-                                            ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                aria-label={`Go to page ${i + 1}`}
-                            />
-                        ))}
-                    </div>
-                )}
-            </div>
+            <PaginationDots
+                currentPage={currentPage}
+                totalPages={totalPages}
+                goToPage={goToPage}
+                isSubmitting={isSubmitting}
+            />
 
             {showCodeModal && (
                 <CodeRoomModal
