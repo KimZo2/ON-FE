@@ -16,7 +16,7 @@ const AuthValidation = ({ loginRequired = true, children }) => {
                 router.replace("/login");
             }
         }
-    });
+    }, []);
 
     return <>{children}</>
 }

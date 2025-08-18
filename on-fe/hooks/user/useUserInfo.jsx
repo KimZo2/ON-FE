@@ -10,8 +10,8 @@ const useUserInfo = () => {
         if (isLoggedIn()) {
             const n = getNickName();
             setNickName(n);
-        };
-    })
+        }
+    }, [])
 
     return [nickName];
 }
