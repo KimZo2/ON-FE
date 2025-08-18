@@ -1,23 +1,20 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback,useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { backendApiInstance } from '@/apis/instance'
-import { useMemo } from 'react'
 
 export function useJoinRoom() {
   const router = useRouter()
 
-  const [form, setForm] = useState({
-    roomName: '',
-    password: '',
-  })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [searchTerm, setSearchTerm] = useState(''); // 검색어 state 추가
+  const [showCodeModal, setShowCodeModal] = useState(false); // code 입력 모달 표시 상태
 
-  // 페이지네이션 관련 상태 추가
+  // 페이지네이션 관련 상태
   const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 번호
-  const itemsPerPage = 6; // ✨ 페이지당 보여줄 방의 개수 (예: 2열 * 2행 = 4개)
+  const itemsPerPage = 6; //  페이지당 보여줄 방의 개수 (예: 3열 * 2행 = 6개)
 
   // 가짜 방 목록 데이터 (실제 API에서 가져올 데이터)
-  const allAvailableRooms = [ // 모든 방 데이터를 별도 변수로 저장
+  const allRooms = useMemo(() => [
       { id: 1, name: 'JavaScript 스터디', participants: 8, maxParticipants: 15, isPrivate: false },
       { id: 2, name: 'React 프로젝트', participants: 5, maxParticipants: 10, isPrivate: false },
       { id: 3, name: '알고리즘 문제풀이', participants: 12, maxParticipants: 20, isPrivate: false },
@@ -29,72 +26,118 @@ export function useJoinRoom() {
       { id: 9, name: 'TypeScript 고급', participants: 2, maxParticipants: 8, isPrivate: false },
       { id: 10, name: 'iOS 앱 개발', participants: 10, maxParticipants: 12, isPrivate: false },
       { id: 11, name: 'Android 앱 개발', participants: 8, maxParticipants: 10, isPrivate: false },
-  ];
+      { id: 12, name: 'Unity 게임 개발', participants: 1, maxParticipants: 5, isPrivate: false },
+      { id: 13, name: '블록체인 스터디', participants: 3, maxParticipants: 7, isPrivate: true },
+  ], []); 
 
-  // 현재 페이지에 보여줄 방 목록 계산
-    const paginatedRooms = useMemo(() => {
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        return allAvailableRooms.slice(startIndex, endIndex);
-    }, [currentPage, allAvailableRooms, itemsPerPage]);
-
-    // 총 페이지 수 계산
-    const totalPages = Math.ceil(allAvailableRooms.length / itemsPerPage);
-
-    // 페이지 변경 핸들러
-    const goToNextPage = () => {
-        setCurrentPage(prev => Math.min(prev + 1, totalPages));
-    };
-    const goToPrevPage = () => {
-        setCurrentPage(prev => Math.max(prev - 1, 1));
-    };
-
-  const handleChange = useCallback((e) => {
-    const { name, value } = e.target
-    setForm(prev => ({ ...prev, [name]: value }))
-  }, [])
-
-  const handleSubmit = useCallback(async (e) => {
-    e.preventDefault()
-
-    const roomName = form.roomName.trim()
-    const password = form.password.trim()
-
-    if (!roomName || !password) {
-      alert('방 이름과 비밀번호를 입력해 주세요.')
-      return
+  // 검색어에 따라 필터링된 방 목록
+  const filteredRooms = useMemo(() => {
+    if (!searchTerm) {
+      return allRooms;
     }
+    const lowercasedSearchTerm = searchTerm.toLowerCase();
+    return allRooms.filter(room =>
+      room.name.toLowerCase().includes(lowercasedSearchTerm)
+    );
+  }, [allRooms, searchTerm]);
 
-    setIsSubmitting(true)
+  // 필터링된 방 목록을 기반으로 현재 페이지에 보여줄 방 목록 계산
+  const paginatedRooms = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredRooms.slice(startIndex, endIndex);
+  }, [currentPage, filteredRooms, itemsPerPage]);
+
+  // 필터링된 방 목록을 기반으로 총 페이지 수 계산
+  const totalPages = Math.ceil(filteredRooms.length / itemsPerPage);
+
+  // 페이지 변경 핸들러
+  const goToNextPage = () => {
+      setCurrentPage(prev => Math.min(prev + 1, totalPages));
+  };
+  const goToPrevPage = () => {
+      setCurrentPage(prev => Math.max(prev - 1, 1));
+  };
+
+  // 특정 페이지로 이동하는 함수 추가 (점 페이지네이션에서 유용)
+  const goToPage = useCallback((pageNumber) => {
+    setCurrentPage(Math.max(1, Math.min(pageNumber, totalPages)));
+  }, [totalPages]);
+
+  // 검색어 변경 핸들러
+  const handleSearchChange = useCallback((e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // 검색어가 변경되면 첫 페이지로 리셋
+  }, []);
+
+  // 'code' 버튼 클릭 핸들러 (코드 입력 모달 띄우기)
+  const handleOpenCodeModal = useCallback(() => {
+    setShowCodeModal(true);
+  }, []);
+
+  // 코드 입력 모달 닫기 핸들러
+  const handleCloseCodeModal = useCallback(() => {
+    setShowCodeModal(false);
+  }, []);
+
+  // 코드로 방 입장 처리 (실제 API 호출 필요)
+  const handleJoinByCode = useCallback(async (code) => {
+    setIsSubmitting(true);
     try {
-      const payload = { roomName, password }
-      const res = await backendApiInstance.post('/room', payload) // TODO: API URI 수정하기
+      // TODO: 코드로 방 입장 API 엔드포인트로 변경하세요.
+      const res = await backendApiInstance.post('/api/rooms/join-by-code', { code });
 
-      if (res.status === 201) {
-        alert('방 입장 성공!')
-        router.push('/')  // TODO: 입장하려는 방(res.data.id)으로 이동
+      if (res.status === 200) {
+        alert('코드로 방 입장 성공!');
+        router.push(`/room/${res.data.roomId}`); // 예시
       } else {
-        throw new Error('서버 응답 오류')
+        throw new Error(`서버 응답 오류: ${res.status}`);
       }
     } catch (err) {
-      console.error(err)
-      alert('방 입장에 실패하였습니다.')
+      console.error('코드로 방 입장 실패:', err);
+      alert(`코드로 방 입장에 실패하였습니다. ${err.response?.data?.message || err.message}`);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
+      setShowCodeModal(false); // 입장 성공/실패 후 모달 닫기
     }
-  }, [form, router])
+  }, [router]);
 
-  return { 
-    form, 
-    availableRooms: paginatedRooms, // 분리된 방 목록을 반환
-    isSubmitting, 
-    handleChange, 
-    handleSubmit,
-    // 페이지네이션 관련 반환 값 추가
+  // 기존 방 목록에서 방을 클릭하여 입장하는 함수
+  const handleJoinExistingRoom = useCallback(async (roomId) => {
+    setIsSubmitting(true);
+    try {
+      // TODO: 기존 방 입장 API 엔드포인트로 변경하세요.
+      const res = await backendApiInstance.post(`/api/rooms/${roomId}/join`);
+
+      if (res.status === 200) {
+        alert('방 입장 성공!');
+        router.push(`/room/${roomId}`);
+      } else {
+        throw new Error(`서버 응답 오류: ${res.status}`);
+      }
+    } catch (err) {
+      console.error('기존 방 입장 실패:', err);
+      alert(`방 입장에 실패하였습니다. ${err.response?.data?.message || err.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [router]);
+
+  return {
+    searchTerm, // 검색어
+    handleSearchChange, // 검색어 변경 핸들러
+    showCodeModal, // 코드 입력 모달 표시 여부
+    handleOpenCodeModal, // 코드 입력 모달 열기
+    handleCloseCodeModal, // 코드 입력 모달 닫기
+    handleJoinByCode, // 코드로 방 입장
+    availableRooms: paginatedRooms, // 현재 페이지의 필터링된 방 목록
+    isSubmitting,
+    handleJoinExistingRoom, // 기존 방 입장 함수
     currentPage,
     totalPages,
     goToNextPage,
     goToPrevPage,
-  
-  }
+    goToPage, // 특정 페이지로 이동
+  };
+
 }

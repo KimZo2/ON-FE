@@ -6,18 +6,22 @@ import { useJoinRoom } from '@/hooks/JoinRoomFormHook';
 const JoinRoomForm = ({className, onFormSubmissionStart, onFormSubmissionComplete}) => {
 
     const { 
-        form, 
+        searchTerm, 
+        handleSearchChange, 
+        showCodeModal, 
+        handleOpenCodeModal, 
+        handleCloseCodeModal, 
+        handleJoinByCode, 
         isSubmitting, 
-        handleSubmit,
-        availableRooms, // 현재 존재하는 공개방 목록
-        handleJoinExistingRoom, // 기존 방 목록에서 입장하는 함수
+        availableRooms, 
+        handleJoinExistingRoom, 
         currentPage,
         totalPages,
         goToNextPage,
         goToPrevPage,
+        goToPage, 
 
-
-        } = useJoinRoom(onFormSubmissionStart, onFormSubmissionComplete); // 훅에 콜백 함수 전달
+        } = useJoinRoom(onFormSubmissionStart, onFormSubmissionComplete); 
 
     // '공개방 목록'에서 방 클릭 핸들러
     const handleRoomSelect = async (roomId) => {
@@ -27,16 +31,18 @@ const JoinRoomForm = ({className, onFormSubmissionStart, onFormSubmissionComplet
     };
 
     return (
-        <form onSubmit={handleSubmit} className={`${className}`}>
+        <div className={`${className}`}>
 
             <div className="flex items-center justify-between mb-8 gap-4"> 
                 <div className="relative flex-grow"> 
-                    {/* TODO: 검색창 추가 */}
+                    {/* 검색창 */}
                     <input
                         type="search"
                         id="site-search"
-                        name="q"
+                        name="searchRoom"
                         placeholder="검색하기"
+                        value={searchTerm} 
+                        onChange={handleSearchChange}
                         className="
                             w-full h-14 rounded-xl
                             bg-transparent
@@ -50,15 +56,17 @@ const JoinRoomForm = ({className, onFormSubmissionStart, onFormSubmissionComplet
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </div>
-                {/* TODO: 코드로 입장하기 위한 코드 버튼 추가 */}
-                <button className="bg-transparent border border-white text-white px-4 py-2 rounded">
+                {/* 코드로 입장하기 위한 코드 버튼 */}
+                <button 
+                    onClick={handleOpenCodeModal}
+                    className="bg-transparent border border-white text-white px-4 py-2 rounded">
                     code
                 </button>  
             </div>
 
             
 
-            {/* TODO: 현재 존재하는 방 목록 보여주는 부분 추가 */}
+            {/* 현재 존재하는 방 목록 보여주는 부분 */}
             <div>
                 {availableRooms && availableRooms.length > 0 ? (
                     // 방 목록과 양 옆 화살표 버튼을 위한 flex 컨테이너
@@ -105,29 +113,19 @@ const JoinRoomForm = ({className, onFormSubmissionStart, onFormSubmissionComplet
                         </button>
                     </div>
                 ) : (
-                    <p className="text-gray-400 text-sm text-center py-8">현재 참여 가능한 공개방이 없습니다.</p>
+                    <p className="text-gray-400 text-sm text-center py-8">
+                        {/* 검색어 유무에 따라 메시지 변경 */}
+                        {searchTerm ? `'${searchTerm}'에 해당하는 방이 없습니다.\n새롭게 방을 생성하거나 입장해 보세요!` : '현재 참여 가능한 공개방이 없습니다.'}
+                    </p>
                 )}
 
-                {/* 기존의 점 페이지네이션 UI는 그대로 유지 */}
+                {/* 페이지네이션 UI*/}
                 {totalPages > 1 && (
-                    <div className="flex justify-center items-center space-x-2 mt-8"> {/* Increased margin-top */}
+                    <div className="flex justify-center items-center space-x-2 mt-8"> 
                         {Array.from({ length: totalPages }, (_, i) => (
                             <button
                                 key={i}
-                                // goToNextPage/goToPrevPage 대신 직접 특정 페이지로 이동하는 로직이 필요할 수 있습니다.
-                                // 현재는 점 클릭 시 goToPrevPage/goToNextPage가 발동하도록 되어있는데,
-                                // 이 부분은 페이지네이션 훅에서 `goToPage(i + 1)` 같은 함수를 제공하면 더 좋습니다.
-                                // 임시로 현재 로직을 유지합니다.
-                                onClick={() => {
-                                    if (i + 1 < currentPage) {
-                                        // 이전 페이지로 여러 칸 이동해야 할 경우, goToPage(i + 1)이 더 효율적
-                                        // 현재는 goToPrevPage를 여러번 호출해야 할 수도 있음.
-                                        goToPrevPage(); // 이 부분은 실제 페이지네이션 로직에 따라 수정 필요
-                                    } else if (i + 1 > currentPage) {
-                                        // 다음 페이지로 여러 칸 이동해야 할 경우
-                                        goToNextPage(); // 이 부분도 수정 필요
-                                    }
-                                }}
+                                onClick={() => goToPage(i + 1)}
                                 disabled={isSubmitting}
                                 className={`w-3 h-3 rounded-full transition-colors duration-200
                                             ${currentPage === i + 1 ? 'bg-white' : 'bg-gray-500 hover:bg-gray-400'}
@@ -138,7 +136,7 @@ const JoinRoomForm = ({className, onFormSubmissionStart, onFormSubmissionComplet
                     </div>
                 )}
             </div>
-        </form>
+        </div>
     )
 }
 
