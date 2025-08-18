@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useJoinRoom } from '@/hooks/JoinRoomFormHook';
+import CodeRoomModal from '@/components/modal/CodeRoomModal'; 
 
 const JoinRoomForm = ({className, onFormSubmissionStart, onFormSubmissionComplete}) => {
 
@@ -136,6 +137,14 @@ const JoinRoomForm = ({className, onFormSubmissionStart, onFormSubmissionComplet
                     </div>
                 )}
             </div>
+
+            {showCodeModal && (
+                <CodeRoomModal
+                    onClose={handleCloseCodeModal} 
+                    onStartLoading={onFormSubmissionStart} // 로딩 시작 콜백 (선택 사항, 모달 내부에서 처리 가능)
+                    onStopLoading={onFormSubmissionComplete} // 로딩 중지 콜백 (선택 사항, 모달 내부에서 처리 가능)
+                />
+            )}
         </div>
     )
 }
