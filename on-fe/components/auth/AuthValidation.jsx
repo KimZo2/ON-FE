@@ -11,7 +11,7 @@ const AuthValidation = ({ loginRequired = true, children }) => {
 
     useEffect(() => {
         if (loginRequired) {
-            if (loginStatus == false) {
+            if (loginStatus === false) {
                 alert("로그인이 필요합니다.");
                 router.replace("/login");
             }
