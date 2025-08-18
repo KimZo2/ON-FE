@@ -14,6 +14,10 @@ const JoinRoomForm = ({className, onFormSubmissionStart, onFormSubmissionComplet
         handleSubmit,
         availableRooms, // 현재 존재하는 공개방 목록
         handleJoinExistingRoom, // 기존 방 목록에서 입장하는 함수
+        currentPage,
+        totalPages,
+        goToNextPage,
+        goToPrevPage,
 
 
         } = useJoinRoom(onFormSubmissionStart, onFormSubmissionComplete); // 훅에 콜백 함수 전달
@@ -48,28 +52,48 @@ const JoinRoomForm = ({className, onFormSubmissionStart, onFormSubmissionComplet
             {/* TODO: 현재 존재하는 방 목록 보여주는 부분 추가 */}
             <div>
                 <h3 className="text-lg font-medium mb-4 text-white">공개방 목록</h3>
-                {/* availableRooms 배열이 있고 비어있지 않을 때만 목록을 보여줍니다. */}
                 {availableRooms && availableRooms.length > 0 ? (
-                    <div className="grid grid-cols-2 gap-3 max-h-64 overflow-y-auto pr-2"> {/* 스크롤바를 위한 pr-2 */}
+                    <div className="grid grid-cols-2 gap-3 pb-4"> {/* 하단 패딩 추가 */}
                         {availableRooms.map(room => (
                             <div
                                 key={room.id}
-                                onClick={() => !isSubmitting && handleRoomSelect(room.id)} // 제출 중에는 클릭 비활성화
-                                className={`bg-white text-gray-900 p-4 rounded-lg cursor-pointer transition-colors 
+                                onClick={() => !isSubmitting && handleRoomSelect(room.id)}
+                                className={`bg-white text-gray-900 p-4 rounded-lg cursor-pointer transition-colors
                                             ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'}`}
                             >
                                 <h4 className="font-medium text-sm mb-1">{room.name}</h4>
                                 <p className="text-xs text-gray-600">
                                     {room.participants}/{room.maxParticipants}명 참여중
                                 </p>
-                                {/* 비공개방이라면 자물쇠 아이콘 등을 추가할 수 있습니다. */}
                                 {room.isPrivate && <span className="text-xs text-gray-500 float-right">🔒</span>}
                             </div>
                         ))}
                     </div>
                 ) : (
-                    // 공개방이 없을 때 표시될 메시지
                     <p className="text-gray-400 text-sm text-center">현재 참여 가능한 공개방이 없습니다.</p>
+                )}
+
+                {/* 페이지네이션 UI 추가 */}
+                {totalPages > 1 && ( // 총 페이지가 1보다 클 때만 페이지네이션 표시
+                    <div className="flex justify-center items-center space-x-4 mt-4">
+                        <button
+                            onClick={goToPrevPage}
+                            disabled={currentPage === 1 || isSubmitting}
+                            className="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            이전
+                        </button>
+                        <span className="text-white text-sm">
+                            {currentPage} / {totalPages}
+                        </span>
+                        <button
+                            onClick={goToNextPage}
+                            disabled={currentPage === totalPages || isSubmitting}
+                            className="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            다음
+                        </button>
+                    </div>
                 )}
             </div>
 
@@ -95,9 +119,9 @@ const JoinRoomForm = ({className, onFormSubmissionStart, onFormSubmissionComplet
                 labelClass={`text-white ${prompt.className}`}
             /> */}
 
-            <button type="submit" className="bg-[#444] rounded-xl w-full h-[3rem] text-white" disabled={isSubmitting}>
+            {/* <button type="submit" className="bg-[#444] rounded-xl w-full h-[3rem] text-white" disabled={isSubmitting}>
                 {isSubmitting ? '제출 중…' : '입장하기'}
-            </button>
+            </button> */}
         </form>
     )
 }
