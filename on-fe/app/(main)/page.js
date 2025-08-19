@@ -1,6 +1,6 @@
 'use client'
 
-import { React, useState, useEffect } from 'react';
+import { React } from 'react';
 import Link from 'next/link.js';
 import Image from 'next/image.js';
 import { isLoggedIn } from '@/util/AuthUtil.js';
@@ -9,9 +9,7 @@ import ROUTES from '@/constants/ROUTES.js';
 
 const Main = () => {
 
-  const isLogin = isLoggedIn();
-  console.log(isLogin);
-  
+  const isLogin = isLoggedIn();    
 
   const title = "ON";
   const sub_title = "Learn Together, Live Together";
