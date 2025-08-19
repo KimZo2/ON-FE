@@ -2,14 +2,14 @@
 
 import useAuth from "@/hooks/auth/useAuth"
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 
 const AuthValidation = ({ loginRequired = true, children }) => {
 
     const [loginStatus] = useAuth();
     const router = useRouter();
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (loginRequired) {
             if (loginStatus === false) {
                 alert("로그인이 필요합니다.");
