@@ -18,14 +18,18 @@ export default function AdditionalInfoForm({className}) {
                 name="name"
                 value={form.name}
                 onChange={handleChange}
-                required
+                required={true}
+                labelClass="text-white"
+                inputClass="!h-[3rem]"
             />
             <FormField
                 label="*닉네임"
                 name="nickname"
                 value={form.nickname}
                 onChange={handleChange}
-                required
+                required={true}
+                labelClass="text-white"
+                inputClass="!h-[3rem]"
             />
             <FormField
                 label="*생년월일 (8자리)"
@@ -33,7 +37,9 @@ export default function AdditionalInfoForm({className}) {
                 value={form.birthday}
                 onChange={handleChange}
                 maxLength={8}
-                required
+                required={true}
+                labelClass="text-white"
+                inputClass="!h-[3rem]"
             />
 
             <CheckboxField
