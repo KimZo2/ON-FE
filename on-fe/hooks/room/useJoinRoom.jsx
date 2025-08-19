@@ -75,7 +75,7 @@ export function useJoinRoom() {
       alert(`코드로 방 입장에 실패하였습니다. ${err.response?.data?.message || err.message}`);
     } finally {
       setIsSubmitting(false);
-      handleCloseCodeModal(false); // 입장 성공/실패 후 모달 닫기
+      handleCloseCodeModal(); // 입장 성공/실패 후 모달 닫기
     }
   }, [router]);
 
