@@ -3,5 +3,7 @@
  */
 
 const ROUTES = {
-    LOGIN : "/login"
+    LOGIN : "/login",
+    MAIN : "/",
+    ADDITIONAL_INFO : "/login/additional-info"
 }

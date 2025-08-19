@@ -12,7 +12,7 @@ const Header = () => {
   const handleLogout = () => {
     removeAccessToken();   // 토큰 삭제
     removeNickName();      // 닉네임 삭제
-    router.replace('/');   // 홈으로 이동
+    router.replace(ROUTES.MAIN);   // 홈으로 이동
   };
 
   return (

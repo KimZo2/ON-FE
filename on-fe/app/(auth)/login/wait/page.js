@@ -23,8 +23,8 @@ export default function OAuthCallbackPage() {
   // 로그인 페이지로 넘어온 이후, 로직
   useEffect(() => {
     if (!code || !oauthType) {
-      router.replace('/login')
-      return
+      router.replace(ROUTES.LOGIN);
+      return;
     }
 
     ;(async () => {
@@ -32,16 +32,16 @@ export default function OAuthCallbackPage() {
         const { token, nickname } = await getAccessTokenByType(oauthType, code)
         saveAccessToken(token);
         saveNickName(nickname);
-        router.replace('/') // main page로 이동
+        router.replace(ROUTES.MAIN) // main page로 이동
 
       } catch (err) {
         if (err?.status === 428) { // 회원 정보가 없을 경우, 추가 정보 입력 페이지로 이동
           const { provider, providerId } = err.response.data
           const query = new URLSearchParams({ provider, providerId }).toString()
-          router.replace(`/login/additional-info?${query}`)
+          router.replace(`${ROUTES.ADDITIONAL_INFO}?${query}`)
         } else {                  // 그 외 경우, 에러 발생 후 다시 로그인 페이지로 이동 
           console.error(err)
-          router.replace('/login')
+          router.replace(ROUTES.LOGIN)
         }
       }
     })()
