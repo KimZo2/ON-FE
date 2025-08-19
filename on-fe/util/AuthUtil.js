@@ -87,23 +87,17 @@ export function removeNickName(){
 }
 
 export function getAccessToken(){
-  if(typeof window !== 'undefined'){
-    localStorage.getItem("accessToken");
-  }
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('accessToken');
 }
 
 export function getNickName(){
-  if(typeof window !== 'undefined'){
-    localStorage.getItem("nickName");
-  }
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('nickName');
 }
 
-export function isLoggedIn(){
-    const accessToken = getAccessToken();
-    const nickName = getNickName();
-    
-    if(accessToken && nickName) return true;
-    else return false;
+export function isLoggedIn() {
+  return !!getAccessToken() && !!getNickName();
 }
 
 // TODO: 서버에서 만료 시간 넘겨주면 저장하기
