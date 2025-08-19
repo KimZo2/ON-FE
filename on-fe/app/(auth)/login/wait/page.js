@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import LoadingSpinner from '@/components/loading/LoadingSpinner'
 import { saveAccessToken, saveNickName } from '@/util/AuthUtil'
 import { goLogin } from '@/apis/auth'
+import ROUTES from '@/constants/ROUTES'
 
 export default function OAuthCallbackPage() {
   const router = useRouter()

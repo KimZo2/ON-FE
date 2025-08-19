@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation'
 import { getNickName, isLoggedIn, removeAccessToken, removeNickName } from '@/util/AuthUtil';
+import ROUTES from '@/constants/ROUTES';
 
 const Header = () => {
   const router = useRouter();
