@@ -39,7 +39,7 @@ export function useCreateRoom() {
     try {
       const payload = { ...form }
       const res = await backendApiInstance.post( // TODO: axios 객체 커스텀 하기
-        `/room`, // TODO: API URI 수정하기
+        `/room/create`, 
         payload
       )
       if (res.status===201) {
