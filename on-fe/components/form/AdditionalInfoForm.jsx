@@ -2,7 +2,7 @@
 import React from 'react'
 import FormField from '@/components/form/FormField'
 import CheckboxField from '@/components/form/CheckboxField'
-import { useAdditionalInfoForm } from '@/hooks/auth/useAdditionalInfoForm'
+import { useAdditionalInfoForm } from '@/hooks/useAdditionalInfoForm'
 import Link from 'next/link'
 
 export default function AdditionalInfoForm({className}) {
