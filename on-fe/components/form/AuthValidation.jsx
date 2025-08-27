@@ -17,7 +17,7 @@ const AuthValidation = ({ loginRequired = true, children }) => {
             router.replace(ROUTES.LOGIN);
         }
     }, [loginStatus, loginRequired, router]);
-
+    
     return <>{children}</>
 }
 
