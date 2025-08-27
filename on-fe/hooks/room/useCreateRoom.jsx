@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { backendApiInstance } from '@/apis/instance'
+import ROUTES from '@/constants/ROUTES'
 
 export function useCreateRoom() {
   const router = useRouter()
@@ -39,12 +40,12 @@ export function useCreateRoom() {
     try {
       const payload = { ...form }
       const res = await backendApiInstance.post( // TODO: axios 객체 커스텀 하기
-        `/room/create`, 
+        ROUTES.ROOM, 
         payload
       )
       if (res.status===201) {
         alert('방 생성 성공!')
-        router.push('/') // TODO: 생성한 방으로 이동하기
+        router.push(ROUTES.MAIN) // TODO: 생성한 방으로 이동하기
       } else {
         throw new Error('서버 응답 오류')
       }
