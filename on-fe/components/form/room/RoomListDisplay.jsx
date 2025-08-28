@@ -74,7 +74,7 @@ export default function RoomListDisplay({
           </button>
         </div>
       ) : (
-        <p className="text-gray-400 text-sm text-center py-8">
+        <p className="text-gray-400 text-sm text-center py-8 whitespace-pre-line">
             {searchTerm ? `'${searchTerm}'에 해당하는 방이 없습니다.\n새롭게 방을 생성하거나 입장해 보세요!` : '현재 참여 가능한 공개방이 없습니다.'}
         </p>
       )}
