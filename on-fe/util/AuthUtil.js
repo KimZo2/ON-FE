@@ -52,7 +52,7 @@ export function handleGoogle() {
 }
 
 
-export async function handleGithub() {
+export function handleGithub() {
   const state = cryptoRandom();
   sessionStorage.setItem('gh_state', state);
 
