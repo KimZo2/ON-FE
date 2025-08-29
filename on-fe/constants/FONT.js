@@ -18,7 +18,7 @@ export const pressStart2P = Press_Start_2P({
 
 // Pretendard 폰트 추가
 export const pretendard = localFont({
-  src: '../../public/fonts/Pretendard-Medium.otf',
+  src: '../public/fonts/Pretendard-Medium.otf',
   display: 'swap',
   variable: '--font-pretendard', // CSS 변수명 지정 (선택 사항)
 });
