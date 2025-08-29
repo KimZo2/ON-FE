@@ -2,10 +2,9 @@
 
 import { useCreateRoom } from '@/hooks/room/useCreateRoom';
 import React from 'react'
-import Link from 'next/link';
 import FormField from '../FormField';
 import CheckboxField from '../CheckboxField';
-import { prompt } from '@/constants/FONT';
+import { prompt, pressStart2P } from '@/constants/FONT';
 
 const CreateRoomForm = ({className}) => {
     const { form, isSubmitting, handleChange, handleSubmit } = useCreateRoom();

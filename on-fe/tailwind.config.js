@@ -8,7 +8,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        pretendard: ['Pretendard', 'sans-serif'],
+        'pretendard': ['Pretendard', 'sans-serif'],
         'press-start': ['Press Start 2P', 'cursive'],
       },
       animation: {

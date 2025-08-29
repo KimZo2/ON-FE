@@ -1,5 +1,6 @@
 'use client';
 
+import { pressStart2P } from '@/constants/FONT';
 import React from 'react';
 
 /**
@@ -36,7 +37,7 @@ export default function BaseModal({ title, subtitle, children, onClose, size = '
 
         {/* 모달 헤더 (제목 및 부제목) */}
         <div className="text-center mb-8">
-          <h1 className="whitespace-nowrap text-white text-center font-press-start text-[30px]">{title}</h1>
+          <h1 className={`${pressStart2P.className} whitespace-nowrap text-white text-center text-[30px]`}>{title}</h1>
           {subtitle && <p className="text-gray-400 text-sm">{subtitle}</p>}
         </div>
 
