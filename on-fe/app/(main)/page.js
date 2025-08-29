@@ -1,16 +1,16 @@
 'use client'
 
-import { React, useState, useEffect } from 'react';
-import FlyingStar from '../../components/background/FlyingStar.jsx';
+import { React } from 'react';
 import Link from 'next/link.js';
 import Image from 'next/image.js';
-import Header from '../../components/Header.jsx';
 import { isLoggedIn } from '@/util/AuthUtil.js';
 import DefaultPageFrame from '@/components/DefaultPageFrame.jsx';
+import ROUTES from '@/constants/ROUTES.js';
+
 
 const Main = () => {
 
-  const isLogin = isLoggedIn();
+  const isLogin = isLoggedIn();    
 
   const title = "ON";
   const sub_title = "Learn Together, Live Together";
@@ -31,7 +31,7 @@ const Main = () => {
           <div className="text-[2rem] font-black leading-[1.1] font-press-start bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">{title}</div>
           <div className="text-gray-300 text-base leading-relaxed max-w-[32rem]">{slogan}</div>
           <Link
-            href={isLogin ? "/room" : "/login"}
+            href={isLogin ? ROUTES.ROOM : ROUTES.LOGIN}
             className="px-8 py-4 text-base text-white rounded-md bg-gray-700/70 shadow-[0_10px_15px_rgba(255,255,255,0.1)] transition-all duration-300 ease-in-out cursor-pointer overflow-hidden
                 hover:-translate-y-0.5 hover:shadow-[0_20px_25px_rgba(0,0,0,0.15)]"
           >시작하기</Link>

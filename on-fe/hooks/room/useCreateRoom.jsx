@@ -1,8 +1,7 @@
-// hooks/useAdditionalInfoForm.js
 import { useState } from 'react'
-import axios from 'axios'
 import { useRouter } from 'next/navigation'
 import { backendApiInstance } from '@/apis/instance'
+import ROUTES from '@/constants/ROUTES'
 
 export function useCreateRoom() {
   const router = useRouter()
@@ -40,13 +39,13 @@ export function useCreateRoom() {
     setIsSubmitting(true)
     try {
       const payload = { ...form }
-      const res = backendApiInstance.post( // TODO: axios 객체 커스텀 하기
-        `/room`, // TODO: API URI 수정하기
+      const res = await backendApiInstance.post( // TODO: axios 객체 커스텀 하기
+        ROUTES.ROOM, 
         payload
       )
       if (res.status===201) {
         alert('방 생성 성공!')
-        router.push('/') // TODO: 생성한 방으로 이동하거나, 메인페이지로 이동하거나 
+        router.push(ROUTES.MAIN) // TODO: 생성한 방으로 이동하기
       } else {
         throw new Error('서버 응답 오류')
       }

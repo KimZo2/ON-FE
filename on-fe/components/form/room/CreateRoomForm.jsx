@@ -1,10 +1,10 @@
 'use client'
 
-import { useCreateRoom } from '@/hooks/CreateRoomFormHook';
+import { useCreateRoom } from '@/hooks/room/useCreateRoom';
 import React from 'react'
 import Link from 'next/link';
-import FormField from './FormField';
-import CheckboxField from './CheckboxField';
+import FormField from '../FormField';
+import CheckboxField from '../CheckboxField';
 import { prompt } from '@/constants/FONT';
 
 const CreateRoomForm = ({className}) => {
@@ -12,8 +12,6 @@ const CreateRoomForm = ({className}) => {
 
     return (
         <form onSubmit={handleSubmit} className={`${className}`}>
-            <Link href="" className="text-white text-center font-press-start text-[36px]">Create Room!</Link>
-
             <FormField
                 className=""
                 label="*방 이름"
@@ -54,16 +52,19 @@ const CreateRoomForm = ({className}) => {
                 labelClass={prompt.className}
             />
 
-            <FormField
-                label="방 비밀번호"
-                name="password"
-                value={form.password}
-                onChange={handleChange}
-                maxLength={4}
-                required={false}
-                inputClass={`text-white ${prompt.className} !bg-black !border-white border-1`}
-                labelClass={`text-white ${prompt.className}`}
-            />
+            {form.visibility && (
+                <FormField
+                    label="방 비밀번호"
+                    name="password"
+                    value={form.password}
+                    onChange={handleChange}
+                    maxLength={4}
+                    required={form.visibility} 
+                    disabled={isSubmitting} 
+                    inputClass={`text-white ${prompt.className} !bg-black !border-white border-1`}
+                    labelClass={`text-white ${prompt.className}`}
+                />
+            )}
 
             <button type="submit" className="bg-[#444] rounded-xl w-full h-[3rem] text-white" disabled={isSubmitting}>
                 {isSubmitting ? '제출 중…' : '생성하기'}

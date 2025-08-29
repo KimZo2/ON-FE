@@ -1,5 +1,5 @@
 import React from 'react'
-import { handleGithub, handleGoogle, handleKakao } from '@/util/AuthUtil'
+import { handleGithub, handleGoogle, handleKakao, handleNaver } from '@/util/AuthUtil'
 import Link from 'next/link'
 
 const LoginForm = () => {
@@ -34,6 +34,7 @@ const LoginForm = () => {
         className="flex items-center justify-center w-full px-6 py-6 gap-5
                    rounded-[12px] bg-[#04C75B] text-[1dvw]
                    hover:bg-[#2DB400] hover:text-white cursor-pointer transition-colors"
+        onClick={handleNaver}
       >
         <div className="w-[35px] h-[35px] bg-[url('/assets/naver_icon.svg')] bg-center bg-cover bg-no-repeat" />
         네이버 로그인

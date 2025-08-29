@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation'
 import { getNickName, isLoggedIn, removeAccessToken, removeNickName } from '@/util/AuthUtil';
+import ROUTES from '@/constants/ROUTES';
 
 const Header = () => {
   const router = useRouter();
@@ -12,7 +13,7 @@ const Header = () => {
   const handleLogout = () => {
     removeAccessToken();   // 토큰 삭제
     removeNickName();      // 닉네임 삭제
-    router.replace('/');   // 홈으로 이동
+    router.replace(ROUTES.MAIN);   // 홈으로 이동
   };
 
   return (

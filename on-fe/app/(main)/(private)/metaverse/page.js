@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import MetaverseContainer from '../../../components/metaverse/MetaverseContainer';
-import { isLoggedIn, getNickName } from '../../../util/AuthUtil';
+import MetaverseContainer from '../../../../components/metaverse/MetaverseContainer';
+import { isLoggedIn, getNickName } from '../../../../util/AuthUtil';
 
 export default function MetaversePage() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -29,7 +29,7 @@ export default function MetaversePage() {
     }, []);
 
     const handleLoginRedirect = () => {
-        router.push('/login');
+        router.push(ROUTES.LOGIN);
     };
 
     if (isLoading) {
