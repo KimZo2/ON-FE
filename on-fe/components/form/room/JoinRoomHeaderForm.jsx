@@ -11,7 +11,7 @@ import React from 'react';
  */
 export default function JoinRoomHeaderForm({ searchTerm, onSearchChange, onOpenCodeModal }) {
   return (
-    <div className="flex items-center justify-between ml-13 mr-14 mb-8 gap-4"> 
+    <div className="flex items-center justify-between mx-14 mb-8 gap-4"> 
       <div className="relative flex-grow"> 
         {/* 검색창 */}
         <input
