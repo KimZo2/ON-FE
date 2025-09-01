@@ -11,7 +11,7 @@ import React from 'react';
  */
 export default function JoinRoomHeaderForm({ searchTerm, onSearchChange, onOpenCodeModal }) {
   return (
-    <div className="flex items-center justify-between mb-8 gap-4"> 
+    <div className="flex items-center justify-between mx-14 mb-8 gap-4"> 
       <div className="relative flex-grow"> 
         {/* 검색창 */}
         <input
@@ -37,7 +37,7 @@ export default function JoinRoomHeaderForm({ searchTerm, onSearchChange, onOpenC
       {/* 코드로 입장하기 위한 코드 버튼 */}
       <button 
           onClick={onOpenCodeModal}
-          className="bg-transparent border border-white text-white px-4 py-2 rounded">
+          className="h-14 bg-transparent border border-white text-white px-4 py-2 rounded-xl">
           code
       </button>  
     </div>

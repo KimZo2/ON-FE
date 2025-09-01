@@ -4,13 +4,14 @@ import FormField from '@/components/form/FormField'
 import CheckboxField from '@/components/form/CheckboxField'
 import { useAdditionalInfoForm } from '@/hooks/auth/useAdditionalInfoForm'
 import Link from 'next/link'
+import { pressStart2P } from '@/constants/FONT'
 
 export default function AdditionalInfoForm({className}) {
     const { form, isSubmitting, handleChange, handleSubmit } = useAdditionalInfoForm();
 
     return (
         <form onSubmit={handleSubmit} className={`inputs ${className}`}>
-            <Link href="/" className="text-white text-center font-press-start text-[36px]">ON</Link>
+            <Link href="/" className={`${pressStart2P.className} text-white text-center text-[36px]`}>ON</Link>
 
             <FormField
                 className=""

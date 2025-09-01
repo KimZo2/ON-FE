@@ -1,11 +1,12 @@
 import React from 'react'
 import { handleGithub, handleGoogle, handleKakao, handleNaver } from '@/util/AuthUtil'
 import Link from 'next/link'
+import { pressStart2P } from '@/constants/FONT'
 
 const LoginForm = () => {
   return (
     <div className="flex flex-col gap-8 w-[20dvw] items-center bg-black">
-      <Link href="/" className="text-white text-center font-press-start text-[36px]">ON</Link>
+      <Link href="/" className={`${pressStart2P.className} text-white text-center text-[36px]`}>ON</Link>
 
       {/* 카카오 로그인 */}
       <div

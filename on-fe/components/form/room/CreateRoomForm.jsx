@@ -2,7 +2,6 @@
 
 import { useCreateRoom } from '@/hooks/room/useCreateRoom';
 import React from 'react'
-import Link from 'next/link';
 import FormField from '../FormField';
 import CheckboxField from '../CheckboxField';
 import { prompt } from '@/constants/FONT';

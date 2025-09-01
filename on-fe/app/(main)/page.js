@@ -6,6 +6,7 @@ import Image from 'next/image.js';
 import { isLoggedIn } from '@/util/AuthUtil.js';
 import DefaultPageFrame from '@/components/DefaultPageFrame.jsx';
 import ROUTES from '@/constants/ROUTES.js';
+import { pressStart2P } from '@/constants/FONT';
 
 
 const Main = () => {
@@ -27,8 +28,8 @@ const Main = () => {
           height={300}
           alt='on' />
         <div className="flex flex-col gap-8 items-center max-w-[800px]">
-          <div className="font-press-start text-white text-[0.8rem] font-semibold tracking-wider uppercase">{sub_title}</div>
-          <div className="text-[2rem] font-black leading-[1.1] font-press-start bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">{title}</div>
+          <div className={`${pressStart2P.className} antialiased text-white text-[0.8rem] font-semibold tracking-wider uppercase`}>{sub_title}</div>
+          <div className={`${pressStart2P.className} text-[2rem] font-black leading-[1.1] bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent`}>{title}</div>
           <div className="text-gray-300 text-base leading-relaxed max-w-[32rem]">{slogan}</div>
           <Link
             href={isLogin ? ROUTES.ROOM : ROUTES.LOGIN}

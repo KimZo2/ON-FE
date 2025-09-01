@@ -31,7 +31,7 @@ export default function RoomListDisplay({
           <button
             onClick={goToPrevPage}
             disabled={currentPage === 1 || isSubmitting}
-            className="bg-gray-700 hover:bg-gray-600 text-white p-2 rounded-full disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+            className="bg-black hover:bg-gray-600 text-white p-2 rounded-full disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
             aria-label="Previous page"
           >
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -65,7 +65,7 @@ export default function RoomListDisplay({
           <button
             onClick={goToNextPage}
             disabled={currentPage === totalPages || isSubmitting}
-            className="bg-gray-700 hover:bg-gray-600 text-white p-2 rounded-full disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+            className="bg-black hover:bg-gray-600 text-white p-2 rounded-full disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
             aria-label="Next page"
           >
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
