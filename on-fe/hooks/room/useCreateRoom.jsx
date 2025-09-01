@@ -2,16 +2,19 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { backendApiInstance } from '@/apis/instance'
 import ROUTES from '@/constants/ROUTES'
+import { getNickName } from '@/util/AuthUtil'
 
 export function useCreateRoom() {
   const router = useRouter()
 
   const [form, setForm] = useState({
-    roomName: '',
-    capacity: '',
-    duration: '',
-    visibility: false,
-    password : ''
+    name: '',
+    creatorNickname: getNickName(),
+    maxParticipants: '',
+    isPrivate: false,
+    password : '',
+    roomTime: '',
+
   })
   
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -26,12 +29,16 @@ export function useCreateRoom() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!form.roomName || !form.capacity || !form.duration) {
+    if (!form.name || !form.maxParticipants || !form.roomTime) {
+      console.log(form.name);
+      console.log(form.maxParticipants);
+      console.log(form.roomTime);
+      
       alert('필수 항목을 올바르게 입력해 주세요.')
       return
     }
 
-    if(form.visibility && !form.password){
+    if(form.isPrivate && !form.password){
       alert("비밀번호를 입력하세요.")
       return
     }

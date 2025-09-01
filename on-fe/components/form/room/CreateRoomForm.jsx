@@ -14,8 +14,8 @@ const CreateRoomForm = ({className}) => {
             <FormField
                 className=""
                 label="*방 이름"
-                name="roomName"
-                value={form.roomName}
+                name="name"
+                value={form.name}
                 onChange={handleChange}
                 required
                 inputClass={`text-white ${prompt.className} !bg-black !border-white border-1`}
@@ -23,8 +23,8 @@ const CreateRoomForm = ({className}) => {
             />
             <FormField
                 label="*인원 수"
-                name="capacity"
-                value={form.capacity}
+                name="maxParticipants"
+                value={form.maxParticipants}
                 onChange={handleChange}
                 required
                 type="number"
@@ -33,8 +33,8 @@ const CreateRoomForm = ({className}) => {
             />
             <FormField
                 label="*방 유지 시간 (시간)"
-                name="duration"
-                value={form.duration}
+                name="roomTime"
+                value={form.roomTime}
                 onChange={handleChange}
                 maxLength={8}
                 type="number"
@@ -45,20 +45,20 @@ const CreateRoomForm = ({className}) => {
 
             <CheckboxField
                 label="비공개 방 (비공개시 비밀번호를 입력해주세요.)"
-                name="visibility"
-                checked={form.visibility}
+                name="isPrivate"
+                checked={form.isPrivate}
                 onChange={handleChange}
                 labelClass={prompt.className}
             />
 
-            {form.visibility && (
+            {form.isPrivate && (
                 <FormField
                     label="방 비밀번호"
                     name="password"
                     value={form.password}
                     onChange={handleChange}
                     maxLength={4}
-                    required={form.visibility} 
+                    required={form.isPrivate} 
                     disabled={isSubmitting} 
                     inputClass={`text-white ${prompt.className} !bg-black !border-white border-1`}
                     labelClass={`text-white ${prompt.className}`}
