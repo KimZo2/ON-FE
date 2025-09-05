@@ -1,72 +1,93 @@
-import { useState, useCallback,useMemo } from 'react'
-import { useRouter } from 'next/navigation'
-import { backendApiInstance } from '@/apis/instance'
-import { useModal } from '../useModal'
-import { usePagination } from './usePagination';
+import { useState, useCallback, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { backendApiInstance } from '@/apis/instance';
+import { useModal } from '../useModal';
 
 export function useJoinRoom() {
-  const router = useRouter()
+  const router = useRouter();
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [searchTerm, setSearchTerm] = useState(''); 
-  const { isOpen: showCodeModal, openModal: handleOpenCodeModal, closeModal: handleCloseCodeModal } = useModal(); 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [rooms, setRooms] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1); 
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalElements, setTotalElements] = useState(0);
+  const [hasNext, setHasNext] = useState(false);
   const itemsPerPage = 6;
+  
+  const { isOpen: showCodeModal, openModal: handleOpenCodeModal, closeModal: handleCloseCodeModal } = useModal();
 
-  // 가짜 방 목록 데이터 (실제 API에서 가져올 데이터)
-  const allRooms = useMemo(() => [
-      { id: 1, name: 'JavaScript 스터디', participants: 8, maxParticipants: 15, isPrivate: false },
-      { id: 2, name: 'React 프로젝트', participants: 5, maxParticipants: 10, isPrivate: false },
-      { id: 3, name: '알고리즘 문제풀이', participants: 12, maxParticipants: 20, isPrivate: false },
-      { id: 4, name: 'Python 기초', participants: 3, maxParticipants: 8, isPrivate: false },
-      { id: 5, name: 'CS 면접 준비', participants: 7, maxParticipants: 12, isPrivate: false },
-      { id: 6, name: '데이터베이스 공부', participants: 4, maxParticipants: 10, isPrivate: false },
-      { id: 7, name: 'Vue.js 학습', participants: 6, maxParticipants: 10, isPrivate: false },
-      { id: 8, name: 'Node.js 백엔드', participants: 9, maxParticipants: 15, isPrivate: false },
-      { id: 9, name: 'TypeScript 고급', participants: 2, maxParticipants: 8, isPrivate: false },
-      { id: 10, name: 'iOS 앱 개발', participants: 10, maxParticipants: 12, isPrivate: false },
-      { id: 11, name: 'Android 앱 개발', participants: 8, maxParticipants: 10, isPrivate: false },
-      { id: 12, name: 'Unity 게임 개발', participants: 1, maxParticipants: 5, isPrivate: false },
-      { id: 13, name: '블록체인 스터디', participants: 3, maxParticipants: 7, isPrivate: true },
-  ], []); 
+  // API 호출 함수: 페이지, 개수를 쿼리 파라미터로 보냄
+  const fetchRooms = useCallback(async (page, size) => {
+    setIsLoading(true);
+    
+    try {
+      const res = await backendApiInstance.get(`/room?page=${page}&size=${size}`);
+      
+      const {
+        rooms,
+        totalElement,
+        hasNext,
+      } = res.data;
 
-  // 검색어에 따라 필터링된 방 목록
-  const filteredRooms = useMemo(() => {
-    if (!searchTerm) {
-      return allRooms;
+      setRooms(rooms);
+      setTotalElements(totalElement);
+      setHasNext(hasNext);
+      
+      // 총 페이지 수 계산
+      setTotalPages(Math.ceil(totalElement / itemsPerPage));
+
+    } catch (err) {
+      console.error("방 목록을 가져오는 데 실패했습니다:", err);
+      setRooms([]);
+      setTotalElements(0);
+      setHasNext(false);
+      setTotalPages(0);
+    } finally {
+      setIsLoading(false);
     }
-    const lowercasedSearchTerm = searchTerm.toLowerCase();
-    return allRooms.filter(room =>
-      room.name.toLowerCase().includes(lowercasedSearchTerm)
-    );
-  }, [allRooms, searchTerm]);
+  }, [itemsPerPage]);
 
-  const {
-    currentPage,
-    totalPages,
-    paginatedItems: paginatedRooms,
-    goToNextPage,
-    goToPrevPage,
-    goToPage,
-    resetPage, 
-  } = usePagination(filteredRooms, itemsPerPage); 
+  // currentPage나 searchTerm이 변경될 때마다 데이터 다시 불러오기
+  useEffect(() => {
+    fetchRooms(currentPage, itemsPerPage, searchTerm);
+  }, [currentPage, searchTerm, fetchRooms, itemsPerPage]);
+
+  // 다음 페이지로 이동
+  const goToNextPage = useCallback(() => {
+    if (hasNext) {
+      setCurrentPage(prevPage => prevPage + 1);
+    }
+  }, [hasNext]);
+
+  // 이전 페이지로 이동
+  const goToPrevPage = useCallback(() => {
+    if (currentPage > 0) {
+      setCurrentPage(prevPage => prevPage - 1);
+    }
+  }, [currentPage]);
+
+  // 특정 페이지로 이동
+  const goToPage = useCallback((pageNumber) => {
+    setCurrentPage(pageNumber);
+  }, []);
 
   // 검색어 변경 핸들러
   const handleSearchChange = useCallback((e) => {
     setSearchTerm(e.target.value);
-    resetPage();
-  }, [resetPage]); 
-
-
-  // 코드로 방 입장 처리 (실제 API 호출 필요)
+    setCurrentPage(0); // 새 검색 시 첫 페이지로 리셋
+  }, []);
+  
+  // 코드로 방 입장
   const handleJoinByCode = useCallback(async (code) => {
     setIsSubmitting(true);
     try {
-      // TODO: 코드로 방 입장 시, API 엔드포인트로 변경
       const res = await backendApiInstance.post('/api/rooms/join-by-code', { code });
 
       if (res.status === 200) {
         alert('코드로 방 입장 성공!');
-        router.push(`/room/${res.data.roomId}`); // 예시
+        router.push(`/room/${res.data.roomId}`);
       } else {
         throw new Error(`서버 응답 오류: ${res.status}`);
       }
@@ -75,16 +96,15 @@ export function useJoinRoom() {
       alert(`코드로 방 입장에 실패하였습니다. ${err.response?.data?.message || err.message}`);
     } finally {
       setIsSubmitting(false);
-      handleCloseCodeModal(); // 입장 성공/실패 후 모달 닫기
+      handleCloseCodeModal();
     }
   }, [router]);
 
-  // 기존 방 목록에서 방을 클릭하여 입장하는 함수
+  // 기존 방 목록에서 방 입장
   const handleJoinExistingRoom = useCallback(async (roomId) => {
     setIsSubmitting(true);
     try {
-      // TODO: 기존 방 입장 API 엔드포인트로 변경
-      const res = await backendApiInstance.post(`/api/rooms/${roomId}/join`);
+      const res = await backendApiInstance.post(`/room/${roomId}`);
 
       if (res.status === 200) {
         alert('방 입장 성공!');
@@ -101,20 +121,22 @@ export function useJoinRoom() {
   }, [router]);
 
   return {
-    searchTerm, 
-    handleSearchChange, 
-    showCodeModal, 
-    handleOpenCodeModal, 
-    handleCloseCodeModal, 
-    handleJoinByCode, 
-    availableRooms: paginatedRooms,
+    searchTerm,
+    handleSearchChange,
+    showCodeModal,
+    handleOpenCodeModal,
+    handleCloseCodeModal,
+    handleJoinByCode,
+    availableRooms: rooms,
     isSubmitting,
-    handleJoinExistingRoom, 
+    isLoading,
+    handleJoinExistingRoom,
     currentPage,
-    totalPages, 
+    totalPages,
+    totalElements,
+    hasNext,
     goToNextPage,
     goToPrevPage,
-    goToPage,    
+    goToPage,
   };
-
 }
