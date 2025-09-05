@@ -99,7 +99,7 @@ export function useJoinRoom() {
   const handleJoinExistingRoom = useCallback(async (roomId) => {
     setIsSubmitting(true);
     try {
-      const res = await backendApiInstance.post(`/room/${roomId}`);
+      const res = await backendApiInstance.post(`/room/${roomId}`); // TODO: 방 입장 API 수정 필요
 
       if (res.status === 200) {
         alert('방 입장 성공!');
