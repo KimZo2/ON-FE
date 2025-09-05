@@ -21,6 +21,7 @@ const JoinRoomForm = ({className, onFormSubmissionStart, onFormSubmissionComplet
         totalPages,
         goToNextPage,
         goToPrevPage,
+        hasNext,
         } = useJoinRoom(onFormSubmissionStart, onFormSubmissionComplete); 
 
     // '공개방 목록'에서 방 클릭 핸들러
@@ -48,6 +49,7 @@ const JoinRoomForm = ({className, onFormSubmissionStart, onFormSubmissionComplet
                 currentPage={currentPage}
                 totalPages={totalPages}
                 searchTerm={searchTerm}
+                hasNext={hasNext}
             />
 
             {showCodeModal && (

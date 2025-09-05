@@ -22,7 +22,8 @@ export default function RoomListDisplay({
   goToNextPage,
   currentPage,
   totalPages,
-  searchTerm
+  searchTerm,
+  hasNext
 }) {
 
   console.log(availableRooms);
@@ -67,7 +68,7 @@ export default function RoomListDisplay({
 
           <button
             onClick={goToNextPage}
-            disabled={currentPage === totalPages || isSubmitting}
+            disabled={! hasNext || isSubmitting}
             className="bg-black hover:bg-gray-600 text-white p-2 rounded-full disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
             aria-label="Next page"
           >
