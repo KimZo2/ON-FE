@@ -68,11 +68,6 @@ export function useJoinRoom() {
     }
   }, [currentPage]);
 
-  // 특정 페이지로 이동
-  const goToPage = useCallback((pageNumber) => {
-    setCurrentPage(pageNumber);
-  }, []);
-
   // 검색어 변경 핸들러
   const handleSearchChange = useCallback((e) => {
     setSearchTerm(e.target.value);
