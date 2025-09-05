@@ -132,6 +132,5 @@ export function useJoinRoom() {
     hasNext,
     goToNextPage,
     goToPrevPage,
-    goToPage,
   };
 }

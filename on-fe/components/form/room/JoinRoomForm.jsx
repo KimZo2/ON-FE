@@ -5,7 +5,6 @@ import { useJoinRoom } from '@/hooks/room/useJoinRoom';
 import CodeRoomModal from '@/components/modal/CodeRoomModal'; 
 import JoinRoomHeaderForm from '../room/JoinRoomHeaderForm';
 import RoomListDisplay from '../room/RoomListDisplay';
-import PaginationDots from '../../button/PaginationDots';
 
 const JoinRoomForm = ({className, onFormSubmissionStart, onFormSubmissionComplete}) => {
 
@@ -22,7 +21,6 @@ const JoinRoomForm = ({className, onFormSubmissionStart, onFormSubmissionComplet
         totalPages,
         goToNextPage,
         goToPrevPage,
-        goToPage, 
         } = useJoinRoom(onFormSubmissionStart, onFormSubmissionComplete); 
 
     // '공개방 목록'에서 방 클릭 핸들러
@@ -50,13 +48,6 @@ const JoinRoomForm = ({className, onFormSubmissionStart, onFormSubmissionComplet
                 currentPage={currentPage}
                 totalPages={totalPages}
                 searchTerm={searchTerm}
-            />
-
-            <PaginationDots
-                currentPage={currentPage}
-                totalPages={totalPages}
-                goToPage={goToPage}
-                isSubmitting={isSubmitting}
             />
 
             {showCodeModal && (
