@@ -83,7 +83,7 @@ export function useJoinRoom() {
   const handleJoinByCode = useCallback(async (code) => {
     setIsSubmitting(true);
     try {
-      const res = await backendApiInstance.post('/api/rooms/join-by-code', { code });
+      const res = await backendApiInstance.post('/api/rooms/join-by-code', { code }); // TODO: 코드 입장 API 수정 필요
 
       if (res.status === 200) {
         alert('코드로 방 입장 성공!');
