@@ -11,7 +11,6 @@ export function useJoinRoom() {
   const [rooms, setRooms] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1); 
-  const [totalPages, setTotalPages] = useState(1);
   const [totalElements, setTotalElements] = useState(0);
   const [hasNext, setHasNext] = useState(false);
   const itemsPerPage = 6;
@@ -34,16 +33,12 @@ export function useJoinRoom() {
       setRooms(rooms);
       setTotalElements(totalElement);
       setHasNext(hasNext);
-      
-      // 총 페이지 수 계산
-      setTotalPages(Math.ceil(totalElement / itemsPerPage));
 
     } catch (err) {
       console.error("방 목록을 가져오는 데 실패했습니다:", err);
       setRooms([]);
       setTotalElements(0);
       setHasNext(false);
-      setTotalPages(0);
     } finally {
       setIsLoading(false);
     }
@@ -127,7 +122,6 @@ export function useJoinRoom() {
     isLoading,
     handleJoinExistingRoom,
     currentPage,
-    totalPages,
     totalElements,
     hasNext,
     goToNextPage,
