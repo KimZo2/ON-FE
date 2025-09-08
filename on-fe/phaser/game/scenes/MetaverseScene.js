@@ -11,13 +11,12 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
         super('MetaverseScene');
         this.players = new Map();
         this.currentPlayer = null;
-        this.socket = null;
-        this.chatMessages = [];
-        this.lastSentMoving = false; // 이동 상태 추적 변수
+        this.metaverseService = null;
+        this.lastSentMoving = false;
     }
 
     init(data) {
-        this.socket = data.socket;
+        this.metaverseService = data.metaverseService;
         this.playerId = data.playerId;
         this.playerName = data.playerName || `Player${Math.floor(Math.random() * 1000)}`;
     }
@@ -56,14 +55,14 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
         // 맵 생성
         this.createMap();
 
+        // 소켓 이벤트 리스너 설정 (플레이어 생성 전에 먼저 설정)
+        this.setupSocketListeners();
+
         // 현재 플레이어 생성
         this.createCurrentPlayer();
 
         // 키보드 입력 설정 (화살표 키만 사용)
         this.cursors = this.input.keyboard.createCursorKeys();
-
-        // 소켓 이벤트 리스너 설정
-        this.setupSocketListeners();
 
         // 카메라가 플레이어를 따라가도록 설정
         this.cameras.main.startFollow(this.currentPlayer);
@@ -76,6 +75,11 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
         this.createUI();
 
         EventBus.emit('current-scene-ready', this);
+        
+        // 온라인 카운트 업데이트 리스너 (EventBus를 통해)
+        EventBus.on('onlineCount', (count) => {
+            this.onlineCountText.setText(`온라인: ${count}명`);
+        });
     }
 
     createPlayerAnimations() {
@@ -220,13 +224,14 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
         this.physics.add.collider(this.currentPlayer, this.walls);
 
         // 플레이어 정보를 서버에 전송
-        if (this.socket) {
-            this.socket.emit('playerJoined', {
+        if (this.metaverseService) {
+            const playerData = {
                 id: this.playerId,
                 name: this.playerName,
                 x: startX,
                 y: startY
-            });
+            };
+                this.metaverseService.sendPlayerJoined(playerData);
         }
     }
 
@@ -253,48 +258,45 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
     }
 
     setupSocketListeners() {
-        if (!this.socket) return;
+        if (!this.metaverseService) {
+            return;
+        }
 
-        // 다른 플레이어 참가
-        this.socket.on('playerJoined', (playerData) => {
+        // EventBus를 통한 이벤트 리스너 등록
+        EventBus.on('player:joined', (playerData) => {
             if (playerData.id !== this.playerId) {
                 this.addOtherPlayer(playerData);
             }
         });
 
-        // 플레이어 이동
-        this.socket.on('playerMoved', (playerData) => {
+        EventBus.on('player:moved', (playerData) => {
             if (playerData.id !== this.playerId) {
                 this.updateOtherPlayer(playerData);
             }
         });
 
-        // 플레이어 퇴장
-        this.socket.on('playerLeft', (playerId) => {
+        EventBus.on('player:left', (playerId) => {
             this.removeOtherPlayer(playerId);
         });
 
-        // 채팅 메시지 수신
-        this.socket.on('chatMessage', (messageData) => {
-            this.addChatMessage(messageData);
-        });
-
-        // 온라인 플레이어 수 업데이트
-        this.socket.on('onlineCount', (count) => {
-            this.onlineCountText.setText(`온라인: ${count}명`);
-        });
-
-        // 기존 플레이어들 정보 수신
-        this.socket.on('existingPlayers', (players) => {
-            players.forEach(player => {
-                if (player.id !== this.playerId) {
-                    this.addOtherPlayer(player);
-                }
-            });
+        // 기존 플레이어들 정보 수신 핸들러
+        EventBus.on('players:existing', (players) => {
+            if (Array.isArray(players)) {
+                players.forEach(player => {
+                    if (player.id !== this.playerId) {
+                        this.addOtherPlayer(player);
+                    }
+                });
+            }
         });
     }
 
     addOtherPlayer(playerData) {
+        // 이미 존재하는 플레이어인지 확인
+        if (this.players.has(playerData.id)) {
+            return;
+        }
+        
         const otherPlayer = this.physics.add.sprite(playerData.x, playerData.y, 'player');
         otherPlayer.setTint(0xff6b6b); // 다른 플레이어는 다른 색상
         otherPlayer.setScale(0.7); // 스프라이트 크기 조정 (현재 플레이어와 동일)
@@ -354,22 +356,6 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
         }
     }
 
-    addChatMessage(messageData) {
-        this.chatMessages.push(messageData);
-        
-        // 최근 5개 메시지만 표시
-        const recentMessages = this.chatMessages.slice(-5);
-        const displayText = recentMessages.map(msg => 
-            `${msg.playerName}: ${msg.message}`
-        ).join('\n');
-        
-        this.chatDisplayText.setText(displayText);
-
-        // 메시지가 표시된 후 5초 후에 페이드 아웃
-        this.time.delayedCall(5000, () => {
-            this.chatDisplayText.setAlpha(0.5);
-        });
-    }
 
     update() {
         if (!this.currentPlayer) return;
@@ -438,8 +424,8 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
         );
 
         // 이동 상태 변화가 있을 때만 서버에 전송
-        if (moved && this.socket && direction) {
-            this.socket.emit('playerMove', {
+        if (moved && this.metaverseService && direction) {
+            this.metaverseService.sendPlayerMove({
                 id: this.playerId,
                 x: this.currentPlayer.x,
                 y: this.currentPlayer.y,
@@ -447,9 +433,9 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
                 isMoving: true
             });
             this.lastSentMoving = true;
-        } else if (this.socket && this.lastSentMoving === true) {
+        } else if (this.metaverseService && this.lastSentMoving === true) {
             // 이전에 이동 중이었는데 지금 정지한 경우
-            this.socket.emit('playerMove', {
+            this.metaverseService.sendPlayerMove({
                 id: this.playerId,
                 x: this.currentPlayer.x,
                 y: this.currentPlayer.y,
@@ -462,8 +448,8 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
 
     // 채팅 메시지 전송 (외부에서 호출)
     sendChatMessage(message) {
-        if (this.socket && message.trim()) {
-            this.socket.emit('chatMessage', {
+        if (this.metaverseService && message.trim()) {
+            this.metaverseService.sendChatMessage({
                 playerId: this.playerId,
                 playerName: this.playerName,
                 message: message.trim()
@@ -473,8 +459,14 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
 
     // 씬 종료시 정리
     shutdown() {
-        if (this.socket) {
-            this.socket.emit('playerLeft', this.playerId);
+        if (this.metaverseService) {
+            this.metaverseService.sendPlayerLeft(this.playerId);
         }
+        // EventBus 리스너 정리
+        EventBus.off('onlineCount');
+        EventBus.off('player:joined');
+        EventBus.off('player:moved');
+        EventBus.off('player:left');
+        EventBus.off('players:existing');
     }
 }
