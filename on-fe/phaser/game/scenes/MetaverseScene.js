@@ -142,64 +142,93 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
     }
 
     createMap() {
-        const mapWidth = 20;
-        const mapHeight = 15;
+        const mapWidth = 25;  // 강의실 너비 증가
+        const mapHeight = 18; // 강의실 높이 증가
         const tileSize = 32;
+        
+        // 월드 크기 설정
+        this.physics.world.setBounds(0, 0, mapWidth * tileSize, mapHeight * tileSize);
 
-        // 맵 데이터 (0: 땅, 1: 벽, 2: 물)
+        // 강의실 맵 데이터 (0: 바닥, 1: 벽, 3: 책상, 4: 칠판)
         const mapData = [
-            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,1],
-            [1,0,0,0,1,2,1,0,0,0,0,0,1,2,1,0,0,0,0,1],
-            [1,0,0,0,1,2,1,0,0,0,0,0,1,2,1,0,0,0,0,1],
-            [1,0,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,2,2,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,2,2,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,1],
-            [1,0,0,0,1,2,1,0,0,0,0,0,1,2,1,0,0,0,0,1],
-            [1,0,0,0,1,2,1,0,0,0,0,0,1,2,1,0,0,0,0,1],
-            [1,0,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+            // 외벽
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            // 칠판 앞 공간
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,1], // 칠판
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            // 첫 번째 줄 (4+4)
+            [1,0,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            // 두 번째 줄 (4+4)
+            [1,0,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            // 세 번째 줄 (4+4)
+            [1,0,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            // 네 번째 줄 (4+4)
+            [1,0,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            // 다섯 번째 줄 (2+2)
+            [1,0,0,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]  // 외벽
         ];
 
         this.map = this.add.group();
         this.walls = this.physics.add.staticGroup();
+        this.desks = this.physics.add.staticGroup();
 
         for (let y = 0; y < mapHeight; y++) {
             for (let x = 0; x < mapWidth; x++) {
                 const tileType = mapData[y][x];
                 let tileName = 'ground';
+                let tileColor = 0xf5f5dc; // 베이지 색 바닥
 
                 switch (tileType) {
-                    case 1:
+                    case 1: // 벽
                         tileName = 'wall';
+                        tileColor = 0x8b4513; // 갈색 벽
                         break;
-                    case 2:
-                        tileName = 'water';
+                    case 3: // 책상
+                        tileName = 'desk';
+                        tileColor = 0xdeb887; // 나무색 책상
+                        break;
+                    case 4: // 칠판
+                        tileName = 'blackboard';
+                        tileColor = 0x2f4f2f; // 어두운 초록색 칠판
                         break;
                     default:
                         tileName = 'ground';
+                        tileColor = 0xf5f5dc; // 베이지 색 바닥
                 }
 
-                const tile = this.add.image(x * tileSize + 16, y * tileSize + 16, tileName);
+                // 타일 생성 (색상으로 구분)
+                const tile = this.add.rectangle(x * tileSize + 16, y * tileSize + 16, tileSize, tileSize, tileColor);
+                tile.setStrokeStyle(1, 0x000000, 0.3); // 경계선 추가
                 this.map.add(tile);
 
-                // 벽은 충돌 객체로 추가
-                if (tileType === 1) {
+                // 충돌 객체 추가
+                if (tileType === 1) { // 벽
                     const wall = this.physics.add.staticSprite(x * tileSize + 16, y * tileSize + 16, 'wall');
+                    wall.setVisible(false); // 보이지 않게 설정 (색상으로 표현)
                     this.walls.add(wall);
+                } else if (tileType === 3) { // 책상
+                    const desk = this.physics.add.staticSprite(x * tileSize + 16, y * tileSize + 16, 'desk');
+                    desk.setVisible(false); // 보이지 않게 설정 (색상으로 표현)
+                    this.desks.add(desk);
                 }
             }
         }
     }
 
     createCurrentPlayer() {
-        // 플레이어 시작 위치 (맵 중앙)
-        const startX = 320;
-        const startY = 240;
+        // 플레이어 시작 위치 (강의실 뒤쪽 중앙 통로)
+        const startX = 400; // 강의실 중앙 통로
+        const startY = 480; // 강의실 뒤쪽
 
         this.currentPlayer = this.physics.add.sprite(startX, startY, 'player');
         this.currentPlayer.setCollideWorldBounds(true);
@@ -222,6 +251,9 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
 
         // 벽과 충돌 설정
         this.physics.add.collider(this.currentPlayer, this.walls);
+        
+        // 책상과 충돌 설정
+        this.physics.add.collider(this.currentPlayer, this.desks);
 
         // 플레이어 정보를 서버에 전송
         if (this.metaverseService) {
