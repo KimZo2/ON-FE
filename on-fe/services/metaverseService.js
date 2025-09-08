@@ -2,6 +2,7 @@ import { StompConnectionManager } from './connection/StompConnectionManager';
 import { MetaverseEventManager } from './metaverse/MetaverseEventManager';
 import { PlayerManager } from './metaverse/PlayerManager';
 import { EventBus } from '../phaser/game/EventBus';
+import API from '@/constants/API';
 
 class MetaverseService {
     constructor() {
@@ -57,9 +58,9 @@ class MetaverseService {
     }
 
     // 플레이어 참가 전송
-    sendPlayerJoined(playerData) {
+    sendPlayerJoined(roomId, playerData) {
         try {
-            this.connectionManager.publish('/app/playerJoined', playerData);
+            this.connectionManager.publish(API.METAVERSE.JOIN(roomId), playerData);
             this.playerManager.setCurrentPlayer(playerData.id, playerData);
         } catch (error) {
             console.error('Failed to send player joined:', error);
@@ -68,9 +69,9 @@ class MetaverseService {
     }
 
     // 플레이어 이동 전송
-    sendPlayerMove(playerData) {
+    sendPlayerMove(roomId, playerData) {
         try {
-            this.connectionManager.publish('/app/playerMove', playerData);
+            this.connectionManager.publish(API.METAVERSE.MOVE(roomId), playerData);
             this.playerManager.updatePlayerPosition(playerData.id, 
                 { x: playerData.x, y: playerData.y }, 
                 playerData.direction
