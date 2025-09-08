@@ -30,10 +30,6 @@ export function useCreateRoom() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!form.name || !form.maxParticipants || !form.roomTime) {
-      console.log(form.name);
-      console.log(form.maxParticipants);
-      console.log(form.roomTime);
-      
       alert('필수 항목을 올바르게 입력해 주세요.')
       return
     }

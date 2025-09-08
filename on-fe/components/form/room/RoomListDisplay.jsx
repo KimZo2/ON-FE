@@ -25,8 +25,6 @@ export default function RoomListDisplay({
   searchTerm,
   hasNext
 }) {
-
-  console.log(availableRooms);
   
   return (
     <div>
