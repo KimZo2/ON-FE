@@ -21,4 +21,4 @@ const METAVERSE = {
     SYNC : (roomId) => `/app/room/${roomId}.sync`,
 }
 
-export default {AUTH, KAKAO_AUTH, METAVERSE, WEBSOCKET};
+export default {AUTH, METAVERSE, WEBSOCKET};
