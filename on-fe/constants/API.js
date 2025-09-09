@@ -10,4 +10,15 @@ const AUTH = {
     GOOGLE_LOGIN : "/auth/login/google"
 };
 
-export default {AUTH, KAKAO_AUTH};
+const WEBSOCKET = {
+    WS : "/ws"
+}
+
+const METAVERSE = {
+    JOIN : (roomId) => `/app/room/${roomId}/join`,
+    PING : (roomId) => `/app/room/${roomId}.ping`,
+    MOVE : (roomId) => `/app/room/${roomId}.move`,
+    SYNC : (roomId) => `/app/room/${roomId}.sync`,
+}
+
+export default {AUTH, METAVERSE, WEBSOCKET};

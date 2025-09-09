@@ -8,9 +8,12 @@
     "dev": "nodemon server.js"
   },
   "dependencies": {
+    "@stomp/stompjs": "^7.1.1",
+    "cors": "^2.8.5",
     "express": "^4.18.2",
     "socket.io": "^4.7.2",
-    "cors": "^2.8.5"
+    "sockjs": "^0.3.24",
+    "ws": "^8.18.3"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"

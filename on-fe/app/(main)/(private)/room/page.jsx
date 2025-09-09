@@ -10,7 +10,6 @@ import CreateRoomModal from '@/components/modal/CreateRoomModal';
 import JoinRoomModal from '@/components/modal/JoinRoomModal';
 import LoadingSpinner from '@/components/loading/LoadingSpinner'; 
 import { useModal } from '@/hooks/useModal';
-import { pressStart2P } from '@/constants/FONT';
 
 const page = () => { 
 
@@ -48,13 +47,13 @@ const page = () => {
                         <div className='flex flex-col justify-between'>
                             {onMouse[0] ? <LampOn /> : <LampOff />}
                             <div onMouseOver={() => handleMouseOver(0)} onMouseLeave={() => handleMouseLeave(0)}>
-                                <RoomButton text={"Create Room"} onClick={openCreateModal} />
+                                <RoomButton text={"Create Room!"} onClick={openCreateModal} />
                             </div>
                         </div>
                         <div className='flex flex-col justify-between'>
                             {onMouse[1] ? <LampOn /> : <LampOff />}
                             <div onMouseOver={() => handleMouseOver(1)} onMouseLeave={() => handleMouseLeave(1)}>
-                                <RoomButton text={"Join Room"} onClick={openJoinModal} />
+                                <RoomButton text={"Join Room!"} onClick={openJoinModal} />
                             </div>
                         </div>
                     </div>
@@ -86,7 +85,7 @@ const RoomButton = ({ text, onClick }) => {
     return (
         <StarBorderButton
             as="button"
-            className={`${pressStart2P.className} custom-class text-xs`}
+            className="custom-class text-xs"
             speed="5s"
             onClick={onClick}
         >
