@@ -1,6 +1,5 @@
 import { getAccessToken } from "@/util/AuthUtil";
 import axios from "axios";
-import { getAccessToken } from "@/util/AuthUtil"
 
 // TODO: withCredentials 처리해주기
 
