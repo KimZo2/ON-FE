@@ -1,4 +1,5 @@
 import { EventBus } from '../EventBus';
+import { v4 as uuidv4 } from "uuid";
 
 // Dynamic import for Phaser to avoid SSR issues
 let Phaser = null;
@@ -255,7 +256,7 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
         // 책상과 충돌 설정
         this.physics.add.collider(this.currentPlayer, this.desks);
 
-        // 플레이어 정보를 서버에 전송
+        // 방 입장 요청 (roomId는 기본값으로 uuid 사용)
         if (this.metaverseService) {
             const playerData = {
                 id: this.playerId,
@@ -263,7 +264,7 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
                 x: startX,
                 y: startY
             };
-                this.metaverseService.sendPlayerJoined(playerData);
+            this.metaverseService.joinRoom(uuidv4(), playerData);
         }
     }
 
@@ -295,37 +296,62 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
         }
 
         // EventBus를 통한 이벤트 리스너 등록
-        EventBus.on('player:joined', (playerData) => {
-            if (playerData.id !== this.playerId) {
-                this.addOtherPlayer(playerData);
-            }
+        
+        // 방 입장 관련 이벤트
+        EventBus.on('room:joined', (response) => {
+            console.log('방 입장 성공:', response);
         });
 
+        EventBus.on('room:already', (response) => {
+            console.log('이미 방에 존재:', response);
+        });
+
+        EventBus.on('room:full', (response) => {
+            console.log('방이 꽉 참:', response);
+        });
+
+        EventBus.on('room:notfound', (response) => {
+            console.log('방을 찾을 수 없음:', response);
+        });
+
+        EventBus.on('room:error', (response) => {
+            console.log('방 입장 에러:', response);
+        });
+
+        // 플레이어 움직임 (방 브로드캐스트)
         EventBus.on('player:moved', (playerData) => {
-            if (playerData.id !== this.playerId) {
+            if (playerData.playerId !== this.playerId) {
                 this.updateOtherPlayer(playerData);
             }
         });
 
-        EventBus.on('player:left', (playerId) => {
-            this.removeOtherPlayer(playerId);
-        });
-
-        // 기존 플레이어들 정보 수신 핸들러
-        EventBus.on('players:existing', (players) => {
-            if (Array.isArray(players)) {
-                players.forEach(player => {
-                    if (player.id !== this.playerId) {
-                        this.addOtherPlayer(player);
+        // 위치 스냅샷 (전체 플레이어 상태)
+        EventBus.on('players:snapshot', (snapshot) => {
+            if (Array.isArray(snapshot)) {
+                snapshot.forEach(player => {
+                    if (player.playerId !== this.playerId) {
+                        if (this.players.has(player.playerId)) {
+                            this.updateOtherPlayer(player);
+                        } else {
+                            this.addOtherPlayer(player);
+                        }
                     }
                 });
             }
         });
+
+        // 이동 확인
+        EventBus.on('move:ack', (ack) => {
+            console.log('이동 확인:', ack);
+        });
     }
 
     addOtherPlayer(playerData) {
+        const playerId = playerData.playerId || playerData.id;
+        const playerName = playerData.playerName || playerData.name;
+        
         // 이미 존재하는 플레이어인지 확인
-        if (this.players.has(playerData.id)) {
+        if (this.players.has(playerId)) {
             return;
         }
         
@@ -341,18 +367,20 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
         otherPlayer.play('idle-down');
 
         // 플레이어 이름 표시
-        otherPlayer.nameText = this.add.text(playerData.x, playerData.y - 30, playerData.name, {
+        otherPlayer.nameText = this.add.text(playerData.x, playerData.y - 30, playerName, {
             fontSize: '12px',
             fill: '#ffff00',
             stroke: '#000000',
             strokeThickness: 2
         }).setOrigin(0.5);
 
-        this.players.set(playerData.id, otherPlayer);
+        this.players.set(playerId, otherPlayer);
     }
 
     updateOtherPlayer(playerData) {
-        const otherPlayer = this.players.get(playerData.id);
+        const playerId = playerData.playerId || playerData.id;
+        const otherPlayer = this.players.get(playerId);
+        
         if (otherPlayer) {
             otherPlayer.setPosition(playerData.x, playerData.y);
             otherPlayer.nameText.setPosition(playerData.x, playerData.y - 30);
@@ -492,13 +520,18 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
     // 씬 종료시 정리
     shutdown() {
         if (this.metaverseService) {
-            this.metaverseService.sendPlayerLeft(this.playerId);
+            this.metaverseService.disconnect();
         }
+        
         // EventBus 리스너 정리
         EventBus.off('onlineCount');
-        EventBus.off('player:joined');
+        EventBus.off('room:joined');
+        EventBus.off('room:already');
+        EventBus.off('room:full');
+        EventBus.off('room:notfound');
+        EventBus.off('room:error');
         EventBus.off('player:moved');
-        EventBus.off('player:left');
-        EventBus.off('players:existing');
+        EventBus.off('players:snapshot');
+        EventBus.off('move:ack');
     }
 }

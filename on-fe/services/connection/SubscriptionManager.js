@@ -4,7 +4,7 @@ export class SubscriptionManager {
         this.handlers = new Map();
     }
 
-    subscribe(topic, handler, stompClient) {
+    subscribe(topic, handler, stompClient, headers = {}) {
         if (!stompClient || !stompClient.connected) {
             throw new Error('STOMP client is not connected');
         }
@@ -24,7 +24,7 @@ export class SubscriptionManager {
                 }
             };
 
-            const subscription = stompClient.subscribe(topic, wrappedCallback);
+            const subscription = stompClient.subscribe(topic, wrappedCallback, headers);
             this.subscriptions.set(topic, subscription);
             this.handlers.set(topic, handler);
             

@@ -1,9 +1,10 @@
 import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 import { ReconnectionStrategy } from './ReconnectionStrategy';
 import { SubscriptionManager } from './SubscriptionManager';
 import { MetaverseErrorHandler } from '../../util/ErrorHandler';
 
-const DEFAULT_URL = process.env.NEXT_PUBLIC_BE_STOMP_SERVER_URL || 'ws://localhost:3001/ws';
+const DEFAULT_URL = process.env.NEXT_PUBLIC_BE_STOMP_SERVER_URL || 'http://localhost:3001/ws';
 
 export class StompConnectionManager {
     constructor() {
@@ -18,13 +19,13 @@ export class StompConnectionManager {
         if (this.client && this.isConnected) {
             return this.client;
         }
-        
+
         if (this.connectionPromise) {
             return this.connectionPromise;
         }
 
         this.connectionPromise = this._establishConnection(serverUrl, options);
-        
+
         try {
             return await this.connectionPromise;
         } finally {
@@ -33,8 +34,11 @@ export class StompConnectionManager {
     }
 
     async _establishConnection(serverUrl, options) {
+        // localStorage에서 accessToken 추출
+        const accessToken = this._getAccessToken();
+        
         const config = {
-            brokerURL: serverUrl,
+            webSocketFactory: () => new SockJS(serverUrl),
             debug: function (str) {
                 if (options.debug) {
                     console.log('🔧 STOMP 디버그:', str);
@@ -44,6 +48,10 @@ export class StompConnectionManager {
             heartbeatIncoming: options.heartbeatIncoming || 0,
             heartbeatOutgoing: options.heartbeatOutgoing || 0,
             connectionTimeout: options.connectionTimeout || 30000,
+            connectHeaders: {
+                ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+                ...(options.connectHeaders || {})
+            },
             ...options
         };
 
@@ -53,10 +61,10 @@ export class StompConnectionManager {
 
                 this.client.onConnect = (frame) => {
                     this.isConnected = true;
-                    
+
                     // STOMP 7.1.1 호환성 문제로 인한 수동 파싱 설정
                     this._setupManualMessageParsing();
-                    
+
                     resolve(this.client);
                 };
 
@@ -88,12 +96,19 @@ export class StompConnectionManager {
         });
     }
 
-    subscribe(topic, handler) {
+    subscribe(topic, handler, headers = {}) {
         if (!this.isConnected || !this.client) {
             throw new Error('STOMP client is not connected. Call connect() first.');
         }
 
-        return this.subscriptionManager.subscribe(topic, handler, this.client);
+        // localStorage에서 accessToken 추출하여 헤더에 추가
+        const accessToken = this._getAccessToken();
+        const subscribeHeaders = {
+            ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+            ...headers
+        };
+
+        return this.subscriptionManager.subscribe(topic, handler, this.client, subscribeHeaders);
     }
 
     unsubscribe(topic) {
@@ -105,11 +120,18 @@ export class StompConnectionManager {
             throw new Error('STOMP client is not connected');
         }
 
+        // localStorage에서 accessToken 추출하여 헤더에 추가
+        const accessToken = this._getAccessToken();
+        const publishHeaders = {
+            ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+            ...headers
+        };
+
         try {
             this.client.publish({
                 destination,
                 body: typeof body === 'string' ? body : JSON.stringify(body),
-                headers
+                headers: publishHeaders
             });
         } catch (error) {
             throw new Error(`Failed to publish to ${destination}: ${error.message}`);
@@ -164,19 +186,19 @@ export class StompConnectionManager {
         webSocket.onmessage = (event) => {
             try {
                 const message = event.data;
-                
+
                 // STOMP 프레임 파싱
                 const lines = message.split('\n');
                 const command = lines[0];
-                
+
                 if (command === 'MESSAGE') {
                     let destination = '';
                     let body = '';
                     let bodyStarted = false;
-                    
+
                     for (let i = 1; i < lines.length; i++) {
                         const line = lines[i];
-                        
+
                         if (line.startsWith('destination:')) {
                             destination = line.substring('destination:'.length);
                         } else if (line === '') {
@@ -192,23 +214,23 @@ export class StompConnectionManager {
                             }
                         }
                     }
-                    
+
                     // 전체 body에서도 null terminator 제거
                     body = body.replace(/\0/g, '');
-                    
+
                     if (destination && body.trim()) {
                         // 빈 배열이나 빈 객체는 스킵
                         if (body.trim() === '[]' || body.trim() === '{}') {
                             return;
                         }
-                        
+
                         this._handleManualMessage(destination, body);
                     }
                 }
             } catch (error) {
                 // 에러 무시 (원본 핸들러가 처리할 수 있도록)
             }
-            
+
             // 원본 핸들러도 호출 (STOMP 내부 처리를 위해)
             if (originalOnMessage) {
                 originalOnMessage.call(webSocket, event);
@@ -220,7 +242,7 @@ export class StompConnectionManager {
         try {
             // 등록된 핸들러 찾기
             const handlers = this.subscriptionManager.getHandlerForTopic(destination);
-            
+
             if (handlers && handlers.length > 0) {
                 let parsedBody;
                 try {
@@ -228,7 +250,7 @@ export class StompConnectionManager {
                 } catch (e) {
                     parsedBody = body;
                 }
-                
+
                 handlers.forEach(handler => {
                     try {
                         handler(parsedBody);
@@ -239,6 +261,15 @@ export class StompConnectionManager {
             }
         } catch (error) {
             // 에러 무시
+        }
+    }
+
+    _getAccessToken() {
+        try {
+            return localStorage.getItem('accessToken');
+        } catch (error) {
+            console.warn('Failed to get accessToken from localStorage:', error);
+            return null;
         }
     }
 }
