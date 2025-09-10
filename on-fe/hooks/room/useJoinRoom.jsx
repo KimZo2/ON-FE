@@ -94,14 +94,9 @@ export function useJoinRoom() {
   const handleJoinExistingRoom = useCallback(async (roomId) => {
     setIsSubmitting(true);
     try {
-      const res = await backendApiInstance.post(`/room/${roomId}`); // TODO: 방 입장 API 수정 필요
-
-      if (res.status === 200) {
+      // const res = await backendApiInstance.post(`/room/${roomId}`); // TODO: 방 입장 API 수정 필요
         alert('방 입장 성공!');
         router.push(`/room/${roomId}`);
-      } else {
-        throw new Error(`서버 응답 오류: ${res.status}`);
-      }
     } catch (err) {
       console.error('기존 방 입장 실패:', err);
       alert(`방 입장에 실패하였습니다. ${err.response?.data?.message || err.message}`);

@@ -44,8 +44,8 @@ export default function RoomListDisplay({
           <div className="grid grid-cols-3 gap-4 pb-4 flex-grow">
             {availableRooms.map(room => (
               <div
-                key={room.id}
-                onClick={() => !isSubmitting && onRoomSelect(room.id)}
+                key={room.roomId}
+                onClick={() => !isSubmitting && onRoomSelect(room.roomId)}
                 className={`bg-white text-gray-900 rounded-lg cursor-pointer transition-colors duration-200 p-4
                             ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'} flex flex-col justify-between`}
               >
