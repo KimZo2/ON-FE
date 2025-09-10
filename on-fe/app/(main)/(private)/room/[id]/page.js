@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import MetaverseContainer from '@/components/metaverse/MetaverseContainer';
 import FlyingStar from '@/components/background/FlyingStar';
@@ -8,7 +8,11 @@ import { isLoggedIn, getNickName } from '@/util/AuthUtil';
 import LoadingSpinner from '@/components/loading/LoadingSpinner';
 import ROUTES from '@/constants/ROUTES';
 
-export default function MetaversePage() {
+export default function MetaversePage({ params }) {
+    // Next.js 최신 버전에서 params를 Promise로 처리
+    const resolvedParams = use(params);
+    const roomId = resolvedParams.id;
+    
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [userNickName, setUserNickName] = useState('');
@@ -49,7 +53,7 @@ export default function MetaversePage() {
 
     return (
         <div className="w-full h-screen">
-            <MetaverseContainer userNickName={userNickName} />
+            <MetaverseContainer userNickName={userNickName} roomId={roomId} />
         </div>
     );
 }
