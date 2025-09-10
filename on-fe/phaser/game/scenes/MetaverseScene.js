@@ -23,8 +23,9 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
     }
 
     preload() {
+        this.load.setPath('/assets');
         // 플레이어 스프라이트시트 로드 (girl1.png)
-        this.load.spritesheet('player', '/assets/girl1.png', {
+        this.load.spritesheet('player', '/girl1.png', {
             frameWidth: 64,  // 각 프레임의 가로 크기 (4x4 그리드이므로 전체 이미지를 4로 나눈 크기)
             frameHeight: 64  // 각 프레임의 세로 크기
         });
