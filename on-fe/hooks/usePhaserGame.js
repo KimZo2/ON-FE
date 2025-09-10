@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
 import StartGame from '../phaser/game/main';
-import metaverseService from '../services/metaverseService';
 
 export default function usePhaserGame(playerId, playerName, onGameReady, onSceneReady) {
     const gameContainerRef = useRef(null);
@@ -32,28 +31,8 @@ export default function usePhaserGame(playerId, playerName, onGameReady, onScene
                 onGameReady(phaserGame);
             }
             
-            // 게임이 준비되면 메타버스 씬으로 전환
-            const initializeScene = () => {
-                try {
-                    phaserGame.scene.start('MetaverseScene', {
-                        metaverseService: metaverseService,
-                        playerId: playerId,
-                        playerName: playerName
-                    });
-                    
-                    const scene = phaserGame.scene.getScene('MetaverseScene');
-                    if (onSceneReady) {
-                        onSceneReady(scene);
-                    }
-                } catch (sceneError) {
-                    console.error('Scene initialization error:', sceneError);
-                } finally {
-                    isInitializingRef.current = false;
-                }
-            };
-            
-            // DOM 렌더링 완료를 기다린 후 씬 초기화
-            setTimeout(initializeScene, 1000);
+            // Boot 씬이 자동으로 시작되므로 별도 초기화 불필요
+            isInitializingRef.current = false;
             
             return phaserGame;
             

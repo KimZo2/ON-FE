@@ -7,8 +7,8 @@ import MetaverseGameView from './MetaverseGameView';
 import FlyingStar from '../background/FlyingStar';
 import LoadingSpinner from '../loading/LoadingSpinner';
 
-function MetaverseContent({ userNickName }) {
-    const metaverse = useMetaverse(userNickName);
+function MetaverseContent({ userNickName, roomId }) {
+    const metaverse = useMetaverse(userNickName, roomId);
     const phaserGame = usePhaserGame(
         metaverse.playerId,
         metaverse.playerName,
@@ -28,9 +28,11 @@ function MetaverseContent({ userNickName }) {
         return (
             <div className="relative flex items-center justify-center w-full h-screen bg-black overflow-hidden">
                 <FlyingStar />
-                <div className="w-[10dvw] relative z-10 bg-black bg-opacity-50 backdrop-blur-sm border border-white border-opacity-20 rounded-xl p-8 text-center">
+                <div className="relative z-10 bg-black bg-opacity-50 backdrop-blur-sm border border-white border-opacity-20 rounded-xl p-8 text-center">
                     <LoadingSpinner message='메타버스에 연결 중..' color='white'/>
-                    {/* TODO: STOMP 연결 예외 발생 시 에러 처리 어떻게 할 건지? */}
+                    <p className="text-gray-300 text-sm mt-4">
+                        {metaverse.error ? `연결 오류: ${metaverse.error}` : '잠시만 기다려주세요'}
+                    </p>
                     {metaverse.error && (
                         <button
                             onClick={metaverse.connect}
@@ -44,7 +46,7 @@ function MetaverseContent({ userNickName }) {
         );
     }
 
-    // 메타버스가 연결되었으면 게임 뷰 표시
+    // STOMP 연결 완료 후 게임 뷰 표시
     return (
         <MetaverseGameView
             gameContainerRef={phaserGame.gameContainerRef}
@@ -57,10 +59,10 @@ function MetaverseContent({ userNickName }) {
     );
 }
 
-export default function MetaverseContainer({ userNickName }) {
+export default function MetaverseContainer({ userNickName, roomId }) {
     return (
         <MetaverseProvider>
-            <MetaverseContent userNickName={userNickName} />
+            <MetaverseContent userNickName={userNickName} roomId={roomId} />
         </MetaverseProvider>
     );
 }

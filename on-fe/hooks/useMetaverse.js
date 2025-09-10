@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useMetaverseContext } from '../contexts/MetaverseContext';
 import metaverseService from '../services/metaverseService';
 
-export default function useMetaverse(userNickName) {
+export default function useMetaverse(userNickName, roomId) {
     const { state, actions } = useMetaverseContext();
     const playerIdRef = useRef(uuidv4());
     const playerNameRef = useRef(userNickName || '');
@@ -44,6 +44,11 @@ export default function useMetaverse(userNickName) {
                 id: playerIdRef.current,
                 name: playerNameRef.current
             };
+
+            // 방 입장
+            if (roomId) {
+                await metaverseService.joinRoom(roomId, playerData);
+            }
 
             actions.connectSuccess(playerData);
             return true;
