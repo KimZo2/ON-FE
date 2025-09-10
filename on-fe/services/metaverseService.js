@@ -144,25 +144,28 @@ class MetaverseService {
                 EventBus.emit('room:already', { roomId, message, count });
                 break;
             case 'FULL':
+                this.currentRoomId = null;
                 if (typeof window !== 'undefined') {
                     alert('방이 가득찼습니다.');
                 }
                 EventBus.emit('room:full', { roomId, message, count });
                 break;
             case 'CLOSED_OR_NOT_FOUND':
+                this.currentRoomId = null;
                 if (typeof window !== 'undefined') {
                     alert('방이 종료되었거나 존재하지 않습니다.');
                 }
                 EventBus.emit('room:notfound', { roomId, message, count });
                 break;
             case 'ERROR':
+                this.currentRoomId = null;
                 if (typeof window !== 'undefined') {
                     alert('알 수 없는 에러가 발생하였습니다.');
                 }
                 EventBus.emit('room:error', { roomId, message, count });
                 break;
             default:
-                console.log('알 수 없는 응답:', message);
+                console.log('❓ 알 수 없는 응답:', message);
         }
     }
 

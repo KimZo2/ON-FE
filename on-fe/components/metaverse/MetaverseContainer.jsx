@@ -12,6 +12,7 @@ function MetaverseContent({ userNickName, roomId }) {
     const phaserGame = usePhaserGame(
         metaverse.playerId,
         metaverse.playerName,
+        roomId,
         // onGameReady callback
         (gameInstance) => {
             metaverse.setGameInstance(gameInstance);

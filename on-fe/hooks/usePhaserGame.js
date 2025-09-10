@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import StartGame from '@/phaser/game/main';
 
-export default function usePhaserGame(playerId, playerName, onGameReady, onSceneReady) {
+export default function usePhaserGame(playerId, playerName, roomId, onGameReady, onSceneReady) {
     const gameContainerRef = useRef(null);
     const gameInstanceRef = useRef(null);
     const isInitializingRef = useRef(false);
@@ -11,8 +11,8 @@ export default function usePhaserGame(playerId, playerName, onGameReady, onScene
             return null;
         }
 
-        if (!playerId || !playerName) {
-            console.warn('Player ID and name are required for game initialization');
+        if (!playerId || !playerName || !roomId) {
+            console.warn('Player ID, name, and room ID are required for game initialization');
             return null;
         }
 
@@ -31,11 +31,16 @@ export default function usePhaserGame(playerId, playerName, onGameReady, onScene
                 onGameReady(phaserGame);
             }
             
-            // MetaverseScene에 플레이어 데이터 설정
+            // MetaverseScene에 데이터 전달하며 재시작
             const metaverseScene = phaserGame.scene.getScene('MetaverseScene');
             if (metaverseScene) {
-                metaverseScene.playerId = playerId;
-                metaverseScene.playerName = playerName;
+                // 씬을 데이터와 함께 재시작
+                const sceneData = {
+                    playerId,
+                    playerName,
+                    roomId
+                };
+                metaverseScene.scene.restart(sceneData);
                 
                 if (onSceneReady) {
                     onSceneReady(metaverseScene);
@@ -45,8 +50,12 @@ export default function usePhaserGame(playerId, playerName, onGameReady, onScene
                 phaserGame.events.once('ready', () => {
                     const scene = phaserGame.scene.getScene('MetaverseScene');
                     if (scene) {
-                        scene.playerId = playerId;
-                        scene.playerName = playerName;
+                        const sceneData = {
+                            playerId,
+                            playerName,
+                            roomId
+                        };
+                        scene.scene.restart(sceneData);
                         
                         if (onSceneReady) {
                             onSceneReady(scene);
@@ -64,7 +73,7 @@ export default function usePhaserGame(playerId, playerName, onGameReady, onScene
             isInitializingRef.current = false;
             throw error;
         }
-    }, [playerId, playerName, onGameReady, onSceneReady]);
+    }, [playerId, playerName, roomId, onGameReady, onSceneReady]);
 
     const destroyGame = useCallback(() => {
         if (gameInstanceRef.current) {
