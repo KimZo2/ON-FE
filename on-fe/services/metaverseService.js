@@ -1,8 +1,7 @@
 import { StompConnectionManager } from './connection/StompConnectionManager';
 import { MetaverseEventManager } from './metaverse/MetaverseEventManager';
 import { PlayerManager } from './metaverse/PlayerManager';
-import { EventBus } from '../phaser/game/EventBus';
-import API from '@/constants/API';
+import { GameEventBus } from '../phaser/game/GameEventBus';
 
 class MetaverseService {
     constructor() {
@@ -52,10 +51,10 @@ class MetaverseService {
         
         // 2. 개인 위치 스냅샷 구독
         this.connectionManager.subscribe('/user/queue/pos-snapshot', (snapshot) => {
-            if (EventBus && EventBus.emit) {
-                EventBus.emit('players:snapshot', snapshot);
+            if (GameEventBus && GameEventBus.updateAllPlayers) {
+                GameEventBus.updateAllPlayers(snapshot);
             } else {
-                console.warn('EventBus not available for players:snapshot');
+                console.warn('GameEventBus not available for players:snapshot');
             }
         });
         
@@ -82,21 +81,9 @@ class MetaverseService {
     }
 
     setupEventHandlers() {
-        // EventBus를 통한 이벤트 처리
-        
-        // 온라인 카운트 처리
-        EventBus.on('online:count', (count) => {
-            if (this.onlineCountCallback) {
-                this.onlineCountCallback(count);
-            }
-        });
-
-        // 채팅 메시지 처리
-        EventBus.on('chat:message', (messageData) => {
-            if (this.chatMessageCallback) {
-                this.chatMessageCallback(messageData);
-            }
-        });
+        // 서버에서 받은 이벤트를 React 콜백과 GameEventBus로 전달
+        // 이 메서드는 현재 서버에서 직접 오는 이벤트가 없으므로 비워둠
+        // 필요시 추가 이벤트 처리 로직 구현
     }
 
     // 방 입장 요청
@@ -137,32 +124,32 @@ class MetaverseService {
             case 'JOIN':
                 this.setupRoomSubscriptions();
                 this.startPingInterval();
-                EventBus.emit('room:joined', { roomId, message, count });
+                // React는 useMetaverse에서 직접 처리하므로 GameEventBus 이벤트 불필요
                 break;
             case 'ALREADY':
                 this.setupRoomSubscriptions();
-                EventBus.emit('room:already', { roomId, message, count });
+                // React는 useMetaverse에서 직접 처리하므로 GameEventBus 이벤트 불필요
                 break;
             case 'FULL':
                 this.currentRoomId = null;
                 if (typeof window !== 'undefined') {
                     alert('방이 가득찼습니다.');
                 }
-                EventBus.emit('room:full', { roomId, message, count });
+                // React는 useMetaverse에서 직접 처리하므로 GameEventBus 이벤트 불필요
                 break;
             case 'CLOSED_OR_NOT_FOUND':
                 this.currentRoomId = null;
                 if (typeof window !== 'undefined') {
                     alert('방이 종료되었거나 존재하지 않습니다.');
                 }
-                EventBus.emit('room:notfound', { roomId, message, count });
+                // React는 useMetaverse에서 직접 처리하므로 GameEventBus 이벤트 불필요
                 break;
             case 'ERROR':
                 this.currentRoomId = null;
                 if (typeof window !== 'undefined') {
                     alert('알 수 없는 에러가 발생하였습니다.');
                 }
-                EventBus.emit('room:error', { roomId, message, count });
+                // React는 useMetaverse에서 직접 처리하므로 GameEventBus 이벤트 불필요
                 break;
             default:
                 console.log('❓ 알 수 없는 응답:', message);
@@ -175,17 +162,17 @@ class MetaverseService {
 
         // 방 브로드캐스트 구독
         this.connectionManager.subscribe(`/topic/room/${this.currentRoomId}/pos`, (data) => {
-            EventBus.emit('player:moved', data);
+            GameEventBus.updatePlayer(data);
         });
 
         // 개인 위치 스냅샷 구독
         this.connectionManager.subscribe('/user/queue/pos-snapshot', (snapshot) => {
-            EventBus.emit('players:snapshot', snapshot);
+            GameEventBus.updateAllPlayers(snapshot);
         });
 
-        // 이동 확인 구독 (선택적)
+        // 이동 확인 구독 (선택적) - 현재 GameEventBus에서는 처리하지 않음
         this.connectionManager.subscribe('/user/queue/move-ack', (ack) => {
-            EventBus.emit('move:ack', ack);
+            // 필요시 GameEventBus 이벤트 추가
         });
 
         // 초기 동기화 요청

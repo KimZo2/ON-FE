@@ -1,4 +1,4 @@
-import { EventBus } from '../../phaser/game/EventBus';
+import { GameEventBus } from '../../phaser/game/GameEventBus';
 
 export class MetaverseEventManager {
     constructor(connectionManager) {
@@ -61,8 +61,31 @@ export class MetaverseEventManager {
     }
 
     emit(eventType, data) {
-        // EventBus로 이벤트 발생
-        EventBus.emit(eventType, data);
+        // GameEventBus로 이벤트 발생 - 서버 이벤트를 게임 렌더링 이벤트로 변환
+        switch (eventType) {
+            case 'players:existing':
+            case 'players:snapshot':
+                GameEventBus.updateAllPlayers(data);
+                break;
+            case 'player:joined':
+                GameEventBus.addPlayer(data);
+                break;
+            case 'player:moved':
+                GameEventBus.updatePlayer(data);
+                break;
+            case 'player:left':
+                GameEventBus.removePlayer(data);
+                break;
+            case 'online:count':
+                GameEventBus.updateOnlineCount(data);
+                break;
+            case 'chat:message':
+                GameEventBus.displayChatMessage(data);
+                break;
+            default:
+                console.warn('Unknown event type:', eventType, data);
+                break;
+        }
         
         // 추가적인 내부 이벤트 처리 로직이 필요하면 여기에
         this.handleInternalEvent(eventType, data);
