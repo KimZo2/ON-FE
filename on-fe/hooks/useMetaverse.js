@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
 import { useMetaverseContext } from '../contexts/MetaverseContext';
 import metaverseService from '../services/metaverseService';
 
 export default function useMetaverse(userNickName, roomId) {
     const { state, actions } = useMetaverseContext();
+    const router = useRouter();
     const playerIdRef = useRef(uuidv4());
     const playerNameRef = useRef(userNickName || '');
 
@@ -37,6 +39,20 @@ export default function useMetaverse(userNickName, roomId) {
                     playerName: messageData.playerName,
                     isOwn: messageData.playerId === playerIdRef.current
                 });
+            });
+
+            // 에러 콜백 등록 (MetaverseError 발생 시 라우팅)
+            metaverseService.setErrorCallback(({ code, message }) => {
+                console.error(`에러 - 코드: ${code}, 메시지: ${message}`);
+                
+                // 사용자에게 에러 알림
+                if (typeof window !== 'undefined') {
+                    alert(`${message}\n방 목록으로 이동합니다.`);
+                }
+                
+                // 방 나가기 후 /room으로 리다이렉트
+                metaverseService.disconnect();
+                router.push('/room');
             });
 
             // 플레이어 데이터 설정

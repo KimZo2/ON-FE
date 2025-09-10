@@ -12,6 +12,7 @@ class MetaverseService {
         this.playerManager = new PlayerManager(this.eventManager);
         this.onlineCountCallback = null;
         this.chatMessageCallback = null;
+        this.errorCallback = null;
         this.currentRoomId = null;
         this.joinStatus = null;
         this.sequenceNumber = 0;
@@ -57,6 +58,27 @@ class MetaverseService {
                 console.warn('EventBus not available for players:snapshot');
             }
         });
+        
+        // 3. 에러 큐 구독
+        this.connectionManager.subscribe('/user/queue/errors', (errorData) => {
+            this.handleError(errorData);
+        });
+    }
+
+    // 에러 처리 메서드
+    handleError(errorData) {
+        const { code, message } = errorData;
+        
+        // 에러 콜백이 등록되어 있다면 호출
+        if (this.errorCallback) {
+            this.errorCallback({ code, message });
+        }
+        
+        // MetaverseError 던지기 (상위 컴포넌트에서 처리)
+        const error = new Error(message);
+        error.code = code;
+        error.name = 'MetaverseError';
+        throw error;
     }
 
     setupEventHandlers() {
@@ -292,10 +314,15 @@ class MetaverseService {
         this.chatMessageCallback = callback;
     }
 
+    setErrorCallback(callback) {
+        this.errorCallback = callback;
+    }
+
     // UI 콜백 해제 메서드
     clearUICallbacks() {
         this.onlineCountCallback = null;
         this.chatMessageCallback = null;
+        this.errorCallback = null;
     }
 
     // localStorage 접근 헬퍼 메서드들
