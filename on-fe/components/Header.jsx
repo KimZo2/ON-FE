@@ -9,7 +9,11 @@ import { pressStart2P } from '@/constants/FONT'
 
 const Header = () => {
   const router = useRouter();
-  const isLogin = isLoggedIn();
+  const [isLogin, setIsLogin] = useState(false);
+
+  useEffect(() => {
+    setIsLogin(isLoggedIn());
+  }, []);
 
   const handleLogout = () => {
     removeAccessToken();   // 토큰 삭제
