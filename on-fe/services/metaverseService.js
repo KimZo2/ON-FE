@@ -51,7 +51,11 @@ class MetaverseService {
         
         // 2. 개인 위치 스냅샷 구독
         this.connectionManager.subscribe('/user/queue/pos-snapshot', (snapshot) => {
-            EventBus.emit('players:snapshot', snapshot);
+            if (EventBus && EventBus.emit) {
+                EventBus.emit('players:snapshot', snapshot);
+            } else {
+                console.warn('EventBus not available for players:snapshot');
+            }
         });
     }
 
