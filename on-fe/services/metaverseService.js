@@ -123,34 +123,46 @@ class MetaverseService {
 
     // 방 입장 응답 처리
     handleJoinResponse(response) {
-        this.joinStatus = response.status;
+        const { roomId, message, count } = response;
+        this.joinStatus = message;
         
-        switch (response.status) {
+        // 방 인원 수 업데이트 (성공한 경우에만)
+        if (message === 'JOIN' || message === 'ALREADY') {
+            if (this.onlineCountCallback && count !== undefined) {
+                this.onlineCountCallback(count);
+            }
+        }
+        
+        switch (message) {
             case 'JOIN':
-                console.log('🎉 방 입장 성공');
                 this.setupRoomSubscriptions();
                 this.startPingInterval();
-                EventBus.emit('room:joined', response);
+                EventBus.emit('room:joined', { roomId, message, count });
                 break;
             case 'ALREADY':
-                console.log('⚠️ 이미 방에 존재');
                 this.setupRoomSubscriptions();
-                EventBus.emit('room:already', response);
+                EventBus.emit('room:already', { roomId, message, count });
                 break;
             case 'FULL':
-                console.log('❌ 방이 꽉 참');
-                EventBus.emit('room:full', response);
+                if (typeof window !== 'undefined') {
+                    alert('방이 가득찼습니다.');
+                }
+                EventBus.emit('room:full', { roomId, message, count });
                 break;
             case 'CLOSED_OR_NOT_FOUND':
-                console.log('❌ 방을 찾을 수 없음');
-                EventBus.emit('room:notfound', response);
+                if (typeof window !== 'undefined') {
+                    alert('방이 종료되었거나 존재하지 않습니다.');
+                }
+                EventBus.emit('room:notfound', { roomId, message, count });
                 break;
             case 'ERROR':
-                console.log('❌ 방 입장 에러');
-                EventBus.emit('room:error', response);
+                if (typeof window !== 'undefined') {
+                    alert('알 수 없는 에러가 발생하였습니다.');
+                }
+                EventBus.emit('room:error', { roomId, message, count });
                 break;
             default:
-                console.log('❓ 알 수 없는 응답:', response.status);
+                console.log('알 수 없는 응답:', message);
         }
     }
 
@@ -181,7 +193,7 @@ class MetaverseService {
     requestSync() {
         if (!this.currentRoomId) return;
         
-        this.connectionManager.publish(`/app/room/${this.currentRoomId}.sync`, {});
+        this.connectionManager.publish(`/app/room/${this.currentRoomId}/sync`, {});
     }
 
     // 핑 간격 시작
@@ -199,7 +211,7 @@ class MetaverseService {
     sendPing() {
         if (!this.currentRoomId) return;
         
-        this.connectionManager.publish(`/app/room/${this.currentRoomId}.ping`, {});
+        this.connectionManager.publish(`/app/room/${this.currentRoomId}/ping`, {});
     }
 
     // 플레이어 이동 전송 (시퀀스 번호 포함)
@@ -220,7 +232,7 @@ class MetaverseService {
                 isMoving: playerData.isMoving
             };
 
-            this.connectionManager.publish(`/app/room/${this.currentRoomId}.move`, moveData);
+            this.connectionManager.publish(`/app/room/${this.currentRoomId}/move`, moveData);
             
             this.playerManager.updatePlayerPosition(playerData.id, 
                 { x: playerData.x, y: playerData.y }, 

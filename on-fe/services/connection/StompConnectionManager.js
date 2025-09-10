@@ -123,6 +123,7 @@ export class StompConnectionManager {
         // localStorage에서 accessToken 추출하여 헤더에 추가
         const accessToken = this._getAccessToken();
         const publishHeaders = {
+            'content-type': 'application/json',
             ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
             ...headers
         };
