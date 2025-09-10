@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
-import StartGame from '../phaser/game/main';
+import StartGame from '@/phaser/game/main';
 
 export default function usePhaserGame(playerId, playerName, onGameReady, onSceneReady) {
     const gameContainerRef = useRef(null);
@@ -31,7 +31,30 @@ export default function usePhaserGame(playerId, playerName, onGameReady, onScene
                 onGameReady(phaserGame);
             }
             
-            // Boot 씬이 자동으로 시작되므로 별도 초기화 불필요
+            // MetaverseScene에 플레이어 데이터 설정
+            const metaverseScene = phaserGame.scene.getScene('MetaverseScene');
+            if (metaverseScene) {
+                metaverseScene.playerId = playerId;
+                metaverseScene.playerName = playerName;
+                
+                if (onSceneReady) {
+                    onSceneReady(metaverseScene);
+                }
+            } else {
+                // 씬이 아직 준비되지 않았다면 씬 이벤트 리스너 등록
+                phaserGame.events.once('ready', () => {
+                    const scene = phaserGame.scene.getScene('MetaverseScene');
+                    if (scene) {
+                        scene.playerId = playerId;
+                        scene.playerName = playerName;
+                        
+                        if (onSceneReady) {
+                            onSceneReady(scene);
+                        }
+                    }
+                });
+            }
+            
             isInitializingRef.current = false;
             
             return phaserGame;
