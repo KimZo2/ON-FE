@@ -3,7 +3,9 @@ import { useRouter } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
 import { useMetaverseContext } from '../contexts/MetaverseContext';
 import metaverseService from '../services/metaverseService';
-import { EventBus } from '../phaser/game/EventBus';
+import { ServerEventBus } from '../phaser/game/ServerEventBus';
+import { InputEventBus } from '../phaser/game/InputEventBus';
+import { GameEventBus } from '../phaser/game/GameEventBus';
 
 export default function useMetaverse(userNickName, roomId) {
     const { state, actions } = useMetaverseContext();
@@ -32,6 +34,8 @@ export default function useMetaverse(userNickName, roomId) {
             // UI 콜백 등록
             metaverseService.setOnlineCountCallback((count) => {
                 actions.updateOnlineCount(count);
+                // Phaser로 온라인 수 업데이트 전달
+                GameEventBus.updateOnlineCount(count);
             });
 
             metaverseService.setChatMessageCallback((messageData) => {
@@ -40,6 +44,8 @@ export default function useMetaverse(userNickName, roomId) {
                     playerName: messageData.playerName,
                     isOwn: messageData.playerId === playerIdRef.current
                 });
+                // Phaser로 채팅 메시지 표시 전달
+                GameEventBus.displayChatMessage(messageData);
             });
 
             // 에러 콜백 등록 (MetaverseError 발생 시 라우팅)
@@ -132,29 +138,64 @@ export default function useMetaverse(userNickName, roomId) {
         }
     }, [userNickName, state.connectionStatus, connect]);
 
-    // EventBus 이벤트 리스너 설정
+    // InputEventBus 이벤트 리스너 설정 (Phaser → React)
     useEffect(() => {
-        // 플레이어 이동 이벤트 리스너
+        // 플레이어 이동 입력 처리
         const handlePlayerMove = (moveData) => {
             if (metaverseService.currentRoomId && state.connectionStatus === 'connected') {
                 metaverseService.sendPlayerMove(moveData);
             }
         };
 
-        // 채팅 메시지 이벤트 리스너
+        // 채팅 메시지 입력 처리
         const handleChatSend = (chatData) => {
             if (metaverseService.currentRoomId && state.connectionStatus === 'connected') {
                 metaverseService.sendChatMessage(chatData);
             }
         };
 
-        EventBus.on('player:move', handlePlayerMove);
-        EventBus.on('chat:send', handleChatSend);
+        InputEventBus.onPlayerMove(handlePlayerMove);
+        InputEventBus.onChatSend(handleChatSend);
 
         return () => {
-            EventBus.off('player:move', handlePlayerMove);
-            EventBus.off('chat:send', handleChatSend);
+            InputEventBus.offPlayerMove(handlePlayerMove);
+            InputEventBus.offChatSend(handleChatSend);
         };
+    }, [state.connectionStatus]);
+
+    // 서버 이벤트 처리 (Server → React → Phaser)
+    useEffect(() => {
+        // 서버에서 받은 플레이어 관련 이벤트를 Phaser로 전달
+        const setupServerCallbacks = () => {
+            // 다른 플레이어 이동 정보를 GameEventBus로 전달
+            if (metaverseService.client) {
+                // 기존 콜백들 외에 추가로 GameEventBus 이벤트 발송
+                const originalPlayerMovedCallback = metaverseService.playerMovedCallback;
+                metaverseService.setPlayerMovedCallback = (callback) => {
+                    metaverseService.playerMovedCallback = (playerData) => {
+                        if (originalPlayerMovedCallback) originalPlayerMovedCallback(playerData);
+                        if (callback) callback(playerData);
+                        // GameEventBus로 Phaser에 전달
+                        GameEventBus.updatePlayer(playerData);
+                    };
+                };
+
+                // 플레이어 스냅샷을 GameEventBus로 전달
+                const originalSnapshotCallback = metaverseService.snapshotCallback;
+                metaverseService.setSnapshotCallback = (callback) => {
+                    metaverseService.snapshotCallback = (snapshot) => {
+                        if (originalSnapshotCallback) originalSnapshotCallback(snapshot);
+                        if (callback) callback(snapshot);
+                        // GameEventBus로 Phaser에 전달
+                        GameEventBus.updateAllPlayers(snapshot);
+                    };
+                };
+            }
+        };
+
+        if (state.connectionStatus === 'connected') {
+            setupServerCallbacks();
+        }
     }, [state.connectionStatus]);
 
     // 정리 작업

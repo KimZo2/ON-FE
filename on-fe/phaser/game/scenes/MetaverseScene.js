@@ -1,5 +1,5 @@
-import { EventBus } from '../EventBus';
-import { v4 as uuidv4 } from "uuid";
+import { InputEventBus } from '../InputEventBus';
+import { GameEventBus } from '../GameEventBus';
 
 // Dynamic import for Phaser to avoid SSR issues
 let Phaser = null;
@@ -12,14 +12,14 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
         super('MetaverseScene');
         this.players = new Map();
         this.currentPlayer = null;
-        this.metaverseService = null;
         this.lastSentMoving = false;
+        this.currentRoomId = null;
     }
 
     init(data) {
-        this.metaverseService = data.metaverseService;
         this.playerId = data.playerId;
-        this.playerName = data.playerName || `Player${Math.floor(Math.random() * 1000)}`;
+        this.playerName = data.playerName || `익명 사용자`;
+        this.currentRoomId = data.roomId;
     }
 
     preload() {
@@ -76,10 +76,10 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
         // UI 생성
         this.createUI();
 
-        EventBus.emit('current-scene-ready', this);
+        GameEventBus.notifySceneReady(this);
         
-        // 온라인 카운트 업데이트 리스너 (EventBus를 통해)
-        EventBus.on('onlineCount', (count) => {
+        // 온라인 카운트 업데이트 리스너 (GameEventBus를 통해)
+        GameEventBus.onOnlineCountUpdate((count) => {
             this.onlineCountText.setText(`온라인: ${count}명`);
         });
     }
@@ -256,17 +256,6 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
         
         // 책상과 충돌 설정
         this.physics.add.collider(this.currentPlayer, this.desks);
-
-        // 방 입장 요청 (roomId는 기본값으로 uuid 사용)
-        if (this.metaverseService) {
-            const playerData = {
-                id: this.playerId,
-                name: this.playerName,
-                x: startX,
-                y: startY
-            };
-            this.metaverseService.joinRoom(uuidv4(), playerData);
-        }
     }
 
     createUI() {
@@ -292,42 +281,17 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
     }
 
     setupSocketListeners() {
-        if (!this.metaverseService) {
-            return;
-        }
-
-        // EventBus를 통한 이벤트 리스너 등록
+        // GameEventBus를 통한 게임 렌더링 이벤트 리스너 등록
         
-        // 방 입장 관련 이벤트
-        EventBus.on('room:joined', (response) => {
-            console.log('방 입장 성공:', response);
-        });
-
-        EventBus.on('room:already', (response) => {
-            console.log('이미 방에 존재:', response);
-        });
-
-        EventBus.on('room:full', (response) => {
-            console.log('방이 꽉 참:', response);
-        });
-
-        EventBus.on('room:notfound', (response) => {
-            console.log('방을 찾을 수 없음:', response);
-        });
-
-        EventBus.on('room:error', (response) => {
-            console.log('방 입장 에러:', response);
-        });
-
-        // 플레이어 움직임 (방 브로드캐스트)
-        EventBus.on('player:moved', (playerData) => {
+        // 다른 플레이어 이동 렌더링
+        GameEventBus.onPlayerMoved((playerData) => {
             if (playerData.playerId !== this.playerId) {
                 this.updateOtherPlayer(playerData);
             }
         });
 
-        // 위치 스냅샷 (전체 플레이어 상태)
-        EventBus.on('players:snapshot', (snapshot) => {
+        // 전체 플레이어 상태 업데이트
+        GameEventBus.onPlayersSnapshot((snapshot) => {
             if (Array.isArray(snapshot)) {
                 snapshot.forEach(player => {
                     if (player.playerId !== this.playerId) {
@@ -341,9 +305,25 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
             }
         });
 
-        // 이동 확인
-        EventBus.on('move:ack', (ack) => {
-            console.log('이동 확인:', ack);
+        // 채팅 메시지 표시
+        GameEventBus.onChatReceived((messageData) => {
+            // 게임 내 채팅 UI 업데이트
+            const displayText = `${messageData.playerName}: ${messageData.message}`;
+            this.chatDisplayText.setText(displayText);
+            
+            // 3초 후 메시지 사라짐
+            this.time.delayedCall(3000, () => {
+                this.chatDisplayText.setText('');
+            });
+        });
+
+        // 플레이어 입장/퇴장
+        GameEventBus.onPlayerJoined((playerData) => {
+            this.addOtherPlayer(playerData);
+        });
+
+        GameEventBus.onPlayerLeft((playerId) => {
+            this.removeOtherPlayer(playerId);
         });
     }
 
@@ -425,15 +405,23 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
         let moved = false;
         let direction = null;
 
+        // 키 입력 상태 디버깅
+        const keyStates = {
+            left: this.cursors?.left?.isDown || false,
+            right: this.cursors?.right?.isDown || false,
+            up: this.cursors?.up?.isDown || false,
+            down: this.cursors?.down?.isDown || false
+        };
+        
         // 플레이어 이동과 애니메이션 (화살표 키만 사용)
         let horizontalDirection = null;
         let verticalDirection = null;
         
-        if (this.cursors.left.isDown) {
+        if (keyStates.left) {
             this.currentPlayer.setVelocityX(-speed);
             horizontalDirection = 'left';
             moved = true;
-        } else if (this.cursors.right.isDown) {
+        } else if (keyStates.right) {
             this.currentPlayer.setVelocityX(speed);
             horizontalDirection = 'right';
             moved = true;
@@ -441,11 +429,11 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
             this.currentPlayer.setVelocityX(0);
         }
 
-        if (this.cursors.up.isDown) {
+        if (keyStates.up) {
             this.currentPlayer.setVelocityY(-speed);
             verticalDirection = 'up';
             moved = true;
-        } else if (this.cursors.down.isDown) {
+        } else if (keyStates.down) {
             this.currentPlayer.setVelocityY(speed);
             verticalDirection = 'down';
             moved = true;
@@ -484,20 +472,20 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
             this.currentPlayer.y - 30
         );
 
-        // 이동 상태 변화가 있을 때만 서버에 전송
-        if (moved && this.metaverseService && direction) {
-            this.metaverseService.sendPlayerMove({
-                id: this.playerId,
+        
+        if (moved && direction) {
+            InputEventBus.sendPlayerMove({
+                playerId: this.playerId,
                 x: this.currentPlayer.x,
                 y: this.currentPlayer.y,
                 direction: direction,
                 isMoving: true
             });
             this.lastSentMoving = true;
-        } else if (this.metaverseService && this.lastSentMoving === true) {
+        } else if (this.lastSentMoving === true && !moved) {
             // 이전에 이동 중이었는데 지금 정지한 경우
-            this.metaverseService.sendPlayerMove({
-                id: this.playerId,
+            InputEventBus.sendPlayerMove({
+                playerId: this.playerId,
                 x: this.currentPlayer.x,
                 y: this.currentPlayer.y,
                 direction: this.currentPlayer.lastDirection || 'down',
@@ -509,8 +497,8 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
 
     // 채팅 메시지 전송 (외부에서 호출)
     sendChatMessage(message) {
-        if (this.metaverseService && message.trim()) {
-            this.metaverseService.sendChatMessage({
+        if (message.trim()) {
+            InputEventBus.sendChatMessage({
                 playerId: this.playerId,
                 playerName: this.playerName,
                 message: message.trim()
@@ -520,19 +508,8 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
 
     // 씬 종료시 정리
     shutdown() {
-        if (this.metaverseService) {
-            this.metaverseService.disconnect();
-        }
-        
-        // EventBus 리스너 정리
-        EventBus.off('onlineCount');
-        EventBus.off('room:joined');
-        EventBus.off('room:already');
-        EventBus.off('room:full');
-        EventBus.off('room:notfound');
-        EventBus.off('room:error');
-        EventBus.off('player:moved');
-        EventBus.off('players:snapshot');
-        EventBus.off('move:ack');
+        // GameEventBus 리스너 정리 (필요시)
+        // InputEventBus는 이 씬에서 발송만 하므로 정리할 리스너 없음
+        // GameEventBus.removeAllListeners(); // 전체 앱에서 사용하므로 개별적으로 off 처리 권장
     }
 }
