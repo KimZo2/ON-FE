@@ -51,8 +51,8 @@ export function handleGoogle() {
   window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
 }
 
-
 export function handleGithub() {
+
   const state = cryptoRandom();
   sessionStorage.setItem('gh_state', state);
 

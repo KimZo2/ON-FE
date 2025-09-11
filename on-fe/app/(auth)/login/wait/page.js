@@ -35,6 +35,7 @@ export default function OAuthCallbackPage() {
         saveNickName(nickname);
         router.replace(ROUTES.MAIN) // main page로 이동
 
+
       } catch (err) {
         if (err?.status === 428) { // 회원 정보가 없을 경우, 추가 정보 입력 페이지로 이동
           const { provider, providerId } = err.response.data

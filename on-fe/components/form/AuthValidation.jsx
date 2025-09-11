@@ -1,5 +1,4 @@
 'use client'
-
 import ROUTES from "@/constants/ROUTES";
 import useAuth from "@/hooks/auth/useAuth"
 import { useRouter } from "next/navigation";
