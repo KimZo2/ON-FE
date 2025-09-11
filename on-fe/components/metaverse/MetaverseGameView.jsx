@@ -1,0 +1,43 @@
+'use client';
+
+import ChatInterface from './ChatInterface';
+
+export default function MetaverseGameView({ 
+    gameContainerRef, 
+    onlineCount, 
+    playerName, 
+    messages, 
+    onSendMessage,
+    playerId 
+}) {
+    return (
+        <div className="relative w-full h-screen bg-gray-900">
+            {/* Phaser 게임 컨테이너 */}
+            <div
+                ref={gameContainerRef}
+                id="game-container"
+                className="w-full h-full"
+                style={{ width: '100%', height: '100%' }}
+            />
+
+            {/* 게임 상태 오버레이 */}
+            <div className="absolute top-4 right-4 bg-black bg-opacity-50 text-white p-2 rounded">
+                <div className="text-sm">온라인: {onlineCount}명</div>
+                <div className="text-xs text-gray-300">플레이어: {playerName}</div>
+            </div>
+
+            {/* 채팅 인터페이스 */}
+            <ChatInterface 
+                onSendMessage={onSendMessage} 
+                messages={messages}
+                currentPlayerId={playerId}
+            />
+
+            {/* 게임 컨트롤 안내 */}
+            <div className="absolute bottom-4 left-4 bg-black bg-opacity-50 text-white p-2 rounded text-sm">
+                <div>이동: 화살표 키</div>
+                <div>채팅: 하단 입력창 사용</div>
+            </div>
+        </div>
+    );
+}

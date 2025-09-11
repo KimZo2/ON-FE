@@ -1,31 +1,56 @@
-import { Boot } from './scenes/Boot';
-import { Game } from './scenes/Game';
-import { GameOver } from './scenes/GameOver';
-import { MainMenu } from './scenes/MainMenu';
-import Phaser from 'phaser';
-import { Preloader } from './scenes/Preloader';
+import { MetaverseScene } from './scenes/MetaverseScene';
+import { getOptimalSize } from '@/phaser/game/util/gameUtil';
 
-// Find out more information about the Game Config at:
-// https://docs.phaser.io/api-documentation/typedef/types-core#gameconfig
-const config = {
-    type: Phaser.AUTO,
-    width: 1024,
-    height: 768,
-    parent: 'game-container',
-    backgroundColor: '#028af8',
-    scene: [
-        Boot,
-        Preloader,
-        MainMenu,
-        Game,
-        GameOver
-    ]
+// Dynamic import for Phaser to avoid SSR issues
+const getPhaser = () => {
+    if (typeof window !== 'undefined') {
+        return require('phaser');
+    }
+    return null;
+};
+
+// Dynamic config creation to avoid SSR issues
+const createConfig = (Phaser) => {
+    const { width, height } = getOptimalSize();
+    
+    return {
+        type: Phaser.AUTO,
+        width,
+        height,
+        parent: 'game-container',
+        backgroundColor: '#028af8',
+        scale: {
+            mode: Phaser.Scale.FIT,
+            autoCenter: Phaser.Scale.CENTER_BOTH,
+            parent: 'game-container',
+            width,
+            height
+        },
+        physics: {
+            default: 'arcade',
+            arcade: {
+                gravity: { y: 0 },
+                debug: false
+            }
+        },
+        scene: [
+            MetaverseScene
+        ]
+    };
 };
 
 const StartGame = (parent) => {
+    const Phaser = getPhaser();
+    
+    if (!Phaser) {
+        console.error('Phaser is not available');
+        return null;
+    }
 
-    return new Phaser.Game({ ...config, parent });
+    const config = createConfig(Phaser);
+    const game = new Phaser.Game({ ...config, parent });
 
+    return game;
 }
 
 export default StartGame;

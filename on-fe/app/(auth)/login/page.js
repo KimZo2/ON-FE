@@ -1,7 +1,7 @@
 'use client';
-import LoginForm from '@/components/auth/LoginForm';
+import LoginForm from '@/components/form/LoginForm';
 import FormLayOut from '@/components/form/FormLayOut';
-import FlyingStar from '@/app/ui/background/FlyingStar';
+import FlyingStar from '@/components/background/FlyingStar';
 
 export default function LogInPage() {
 

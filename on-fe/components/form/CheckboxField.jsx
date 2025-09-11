@@ -1,7 +1,8 @@
 // components/CheckboxField.jsx
 import React from 'react'
 
-export default function CheckboxField({ label, checked, name, onChange }) {
+export default function CheckboxField({ label, checked, name, onChange, labelClass }) {
+
   return (
     <div className="checkbox-form text-white font-pretendard">
       <input
@@ -11,7 +12,7 @@ export default function CheckboxField({ label, checked, name, onChange }) {
         onChange={onChange}
         style={{ accentColor: '#ffd753', marginRight: 8 }}
       />
-      <span>{label}</span>
+      <span className={labelClass}>{label}</span>
     </div>
   )
 }

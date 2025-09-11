@@ -51,8 +51,8 @@ export function handleGoogle() {
   window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
 }
 
+export function handleGithub() {
 
-export async function handleGithub() {
   const state = cryptoRandom();
   sessionStorage.setItem('gh_state', state);
 
@@ -87,19 +87,17 @@ export function removeNickName(){
 }
 
 export function getAccessToken(){
-    return localStorage.getItem("accessToken");
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('accessToken');
 }
 
 export function getNickName(){
-    return localStorage.getItem("nickName");
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('nickName');
 }
 
-export function isLoggedIn(){
-    const accessToken = getAccessToken();
-    const nickName = getNickName();
-    
-    if(accessToken && nickName) return true;
-    else return false;
+export function isLoggedIn() {
+  return !!getAccessToken() && !!getNickName();
 }
 
 // TODO: 서버에서 만료 시간 넘겨주면 저장하기
