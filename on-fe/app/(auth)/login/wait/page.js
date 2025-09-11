@@ -11,24 +11,27 @@ export default function OAuthCallbackPage() {
   const params = useSearchParams()
   const code = params.get('code')
   const oauthType = params.get('oauthType')  // 'kakao', 'github', 'google', 'naver'
-  const SUPPORTED = new Set(['kakao','github','google','naver']);
+  const SUPPORTED = new Set(['kakao', 'github', 'google', 'naver']);
 
-  // 각 Oauth 제공자로부터 받은 code를 통해, 토큰 생성해주는 함수 호출 로직
-  const getAccessTokenByType = async (oauthType, code) => {
-  if (!SUPPORTED.has(oauthType)) {
-    throw new Error(`지원하지 않는 OAuth 타입입니다: ${oauthType}`);
-  }
-  return await goLogin({ oauthType, code });
-  };
+
 
   // 로그인 페이지로 넘어온 이후, 로직
   useEffect(() => {
+
+    // 각 Oauth 제공자로부터 받은 code를 통해, 토큰 생성해주는 함수 호출 로직
+    const getAccessTokenByType = async (oauthType, code) => {
+      if (!SUPPORTED.has(oauthType)) {
+        throw new Error(`지원하지 않는 OAuth 타입입니다: ${oauthType}`);
+      }
+      return await goLogin({ oauthType, code });
+    };
+
     if (!code || !oauthType) {
       router.replace(ROUTES.LOGIN);
       return;
     }
 
-    ;(async () => {
+    ; (async () => {
       try {
         const { token, nickname } = await getAccessTokenByType(oauthType, code)
         saveAccessToken(token);
@@ -47,7 +50,7 @@ export default function OAuthCallbackPage() {
         }
       }
     })()
-  }, [code, oauthType, router])
+  }, [SUPPORTED, code, oauthType, router])
 
   return (
     <div className="flex items-center justify-center h-screen">
