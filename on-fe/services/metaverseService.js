@@ -339,7 +339,7 @@ class MetaverseService {
 
     _getNickname() {
         try {
-            return localStorage.getItem('nickName') || localStorage.getItem('nickname') || 'Anonymous';
+            return localStorage.getItem('nickName') || 'Anonymous';
         } catch (error) {
             console.warn('Failed to get nickname from localStorage:', error);
             return 'Anonymous';
