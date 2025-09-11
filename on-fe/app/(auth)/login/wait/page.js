@@ -1,19 +1,18 @@
 'use client'
-import { useEffect } from 'react'
+import { useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import LoadingSpinner from '@/components/loading/LoadingSpinner'
 import { saveAccessToken, saveNickName } from '@/util/AuthUtil'
 import { goLogin } from '@/apis/auth'
 import ROUTES from '@/constants/ROUTES'
 
-export default function OAuthCallbackPage() {
+const SUPPORTED = new Set(['kakao', 'github', 'google', 'naver']);
+
+function OAuthCallbackContent() {
   const router = useRouter()
   const params = useSearchParams()
   const code = params.get('code')
   const oauthType = params.get('oauthType')  // 'kakao', 'github', 'google', 'naver'
-  const SUPPORTED = new Set(['kakao', 'github', 'google', 'naver']);
-
-
 
   // 로그인 페이지로 넘어온 이후, 로직
   useEffect(() => {
@@ -50,11 +49,19 @@ export default function OAuthCallbackPage() {
         }
       }
     })()
-  }, [SUPPORTED, code, oauthType, router])
+  }, [code, oauthType, router])
 
   return (
     <div className="flex items-center justify-center h-screen">
       <LoadingSpinner />
     </div>
+  )
+}
+
+export default function OAuthCallbackPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center h-screen"><LoadingSpinner /></div>}>
+      <OAuthCallbackContent />
+    </Suspense>
   )
 }
