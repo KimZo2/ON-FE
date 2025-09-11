@@ -11,7 +11,7 @@ import JoinRoomModal from '@/components/modal/JoinRoomModal';
 import LoadingSpinner from '@/components/loading/LoadingSpinner'; 
 import { useModal } from '@/hooks/useModal';
 
-const page = () => { 
+const Page = () => { 
 
     // 램프 마우스오버 상태
     const [onMouse, setOnMouse] = useState([false, false]);
@@ -107,4 +107,4 @@ const StudyTogether = () => {
     );
 };
 
-export default page;
+export default Page;
