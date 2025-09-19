@@ -1,8 +1,13 @@
 'use client';
 
 import { useState, useEffect, use } from 'react';
-import MetaverseContainer from '@/components/metaverse/MetaverseContainer';
+import dynamic from 'next/dynamic';
 import { isLoggedIn, getNickName } from '@/util/AuthUtil';
+
+const MetaverseContainer = dynamic(
+    () => import('@/components/metaverse/MetaverseContainer'),
+    { ssr: false }
+);
 
 
 export default function MetaversePage({ params }) {
