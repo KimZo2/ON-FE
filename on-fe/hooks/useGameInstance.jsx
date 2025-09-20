@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import StartGame from '../phaser/game/main';
 import metaverseService from '../services/metaverseService';
 
-export default function useGameInstance(playerId, playerName) {
+export default function useGameInstance(userId, playerName) {
     const [gameInstance, setGameInstance] = useState(null);
     const [currentScene, setCurrentScene] = useState(null);
     const [isGameReady, setIsGameReady] = useState(false);
@@ -26,7 +26,7 @@ export default function useGameInstance(playerId, playerName) {
                 try {
                     phaserGame.scene.start('MetaverseScene', {
                         metaverseService: metaverseService,
-                        playerId: playerId,
+                        userId: userId,
                         playerName: playerName
                     });
                     
@@ -45,7 +45,7 @@ export default function useGameInstance(playerId, playerName) {
             console.error('Game initialization error:', error);
             throw error;
         }
-    }, [gameInstance, playerId, playerName]);
+    }, [gameInstance, userId, playerName]);
 
     const destroyGame = useCallback(() => {
         if (gameInstance) {

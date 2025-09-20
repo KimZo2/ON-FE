@@ -8,7 +8,7 @@ export default function MetaverseGameView({
     playerName, 
     messages, 
     onSendMessage,
-    playerId 
+    userId 
 }) {
     return (
         <div className="relative w-full h-screen bg-gray-900">
@@ -30,7 +30,7 @@ export default function MetaverseGameView({
             <ChatInterface 
                 onSendMessage={onSendMessage} 
                 messages={messages}
-                currentPlayerId={playerId}
+                currentPlayerId={userId}
             />
 
             {/* 게임 컨트롤 안내 */}

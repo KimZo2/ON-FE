@@ -10,7 +10,7 @@ import { GameEventBus } from '../phaser/game/GameEventBus';
 export default function useMetaverse(userNickName, roomId) {
     const { state, actions } = useMetaverseContext();
     const router = useRouter();
-    const playerIdRef = useRef(uuidv4());
+    const userIdRef = useRef(uuidv4());
     const playerNameRef = useRef(userNickName || '');
 
     // 메타버스 연결
@@ -42,7 +42,7 @@ export default function useMetaverse(userNickName, roomId) {
                 actions.addChatMessage({
                     text: messageData.message,
                     playerName: messageData.playerName,
-                    isOwn: messageData.playerId === playerIdRef.current
+                    isOwn: messageData.userId === userIdRef.current
                 });
                 // Phaser로 채팅 메시지 표시 전달
                 GameEventBus.displayChatMessage(messageData);
@@ -64,7 +64,7 @@ export default function useMetaverse(userNickName, roomId) {
 
             // 플레이어 데이터 설정
             const playerData = {
-                id: playerIdRef.current,
+                id: userIdRef.current,
                 name: playerNameRef.current
             };
 
@@ -99,7 +99,7 @@ export default function useMetaverse(userNickName, roomId) {
 
         try {
             const messageData = {
-                playerId: state.player.id,
+                userId: state.player.id,
                 playerName: state.player.name,
                 message: message.trim(),
                 timestamp: new Date().toISOString()
@@ -219,7 +219,7 @@ export default function useMetaverse(userNickName, roomId) {
         // 편의 상태
         isConnected: state.connectionStatus === 'connected',
         isConnecting: state.connectionStatus === 'connecting',
-        playerId: playerIdRef.current,
+        userId: userIdRef.current,
         playerName: playerNameRef.current,
 
         // 액션

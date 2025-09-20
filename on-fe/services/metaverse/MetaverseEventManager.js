@@ -118,15 +118,15 @@ export class MetaverseEventManager {
             throw new Error('Player data is required');
         }
         
-        // ID 필드 정규화
-        if (data.playerId && !data.id) {
+        // ID 필드 정규화 - userId가 primary
+        if (data.userId && !data.id) {
+            data.id = data.userId;
+        } else if (data.playerId && !data.id) {
             data.id = data.playerId;
         } else if (data.playerid && !data.id) {
             data.id = data.playerid;
         } else if (data.player_id && !data.id) {
             data.id = data.player_id;
-        } else if (data.userId && !data.id) {
-            data.id = data.userId;
         }
         
         // 이름 필드 정규화
@@ -153,11 +153,11 @@ export class MetaverseEventManager {
         return this.validatePlayerData(data);
     }
 
-    validatePlayerId(playerId) {
-        if (!playerId || typeof playerId !== 'string') {
-            throw new Error('Player ID is required and must be a string');
+    validateUserId(userId) {
+        if (!userId || typeof userId !== 'string') {
+            throw new Error('User ID is required and must be a string');
         }
-        return playerId;
+        return userId;
     }
 
     validateOnlineCount(count) {
@@ -169,8 +169,8 @@ export class MetaverseEventManager {
     }
 
     validateChatMessage(data) {
-        if (!data.playerId || typeof data.playerId !== 'string') {
-            throw new Error('Chat message must have a valid player ID');
+        if (!data.userId || typeof data.userId !== 'string') {
+            throw new Error('Chat message must have a valid user ID');
         }
         if (!data.playerName || typeof data.playerName !== 'string') {
             throw new Error('Chat message must have a valid player name');

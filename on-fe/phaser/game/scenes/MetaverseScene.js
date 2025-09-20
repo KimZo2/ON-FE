@@ -17,7 +17,7 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
     }
 
     init(data) {
-        this.playerId = data.playerId;
+        this.userId = data.userId;
         this.playerName = data.playerName || `익명 사용자`;
         this.currentRoomId = data.roomId;
     }
@@ -285,7 +285,7 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
         
         // 다른 플레이어 이동 렌더링
         GameEventBus.onPlayerMoved((playerData) => {
-            if (playerData.playerId !== this.playerId) {
+            if (playerData.userId !== this.userId) {
                 this.updateOtherPlayer(playerData);
             }
         });
@@ -294,8 +294,8 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
         GameEventBus.onPlayersSnapshot((snapshot) => {
             if (Array.isArray(snapshot)) {
                 snapshot.forEach(player => {
-                    if (player.playerId !== this.playerId) {
-                        if (this.players.has(player.playerId)) {
+                    if (player.userId !== this.userId) {
+                        if (this.players.has(player.userId)) {
                             this.updateOtherPlayer(player);
                         } else {
                             this.addOtherPlayer(player);
@@ -322,28 +322,28 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
             this.addOtherPlayer(playerData);
         });
 
-        GameEventBus.onPlayerLeft((playerId) => {
-            this.removeOtherPlayer(playerId);
+        GameEventBus.onPlayerLeft((userId) => {
+            this.removeOtherPlayer(userId);
         });
     }
 
     addOtherPlayer(playerData) {
-        const playerId = playerData.playerId || playerData.id;
-        const playerName = playerData.playerName || playerData.name;
-        
+        const userId = playerData.userId || playerData.id;
+        const playerName = playerData.nickName || playerData.playerName || playerData.name;
+
         // 이미 존재하는 플레이어인지 확인
-        if (this.players.has(playerId)) {
+        if (this.players.has(userId)) {
             return;
         }
-        
+
         const otherPlayer = this.physics.add.sprite(playerData.x, playerData.y, 'player');
         otherPlayer.setTint(0xff6b6b); // 다른 플레이어는 다른 색상
         otherPlayer.setScale(0.7); // 스프라이트 크기 조정 (현재 플레이어와 동일)
-        
+
         // 충돌 박스 크기 조정 (현재 플레이어와 동일)
         otherPlayer.body.setSize(32, 40);
         otherPlayer.body.setOffset(16, 24);
-        
+
         // 기본 정지 애니메이션 설정
         otherPlayer.play('idle-down');
 
@@ -355,12 +355,12 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
             strokeThickness: 2
         }).setOrigin(0.5);
 
-        this.players.set(playerId, otherPlayer);
+        this.players.set(userId, otherPlayer);
     }
 
     updateOtherPlayer(playerData) {
-        const playerId = playerData.playerId || playerData.id;
-        const otherPlayer = this.players.get(playerId);
+        const userId = playerData.userId || playerData.id;
+        const otherPlayer = this.players.get(userId);
         
         if (otherPlayer) {
             otherPlayer.setPosition(playerData.x, playerData.y);
@@ -388,12 +388,12 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
         }
     }
 
-    removeOtherPlayer(playerId) {
-        const otherPlayer = this.players.get(playerId);
+    removeOtherPlayer(userId) {
+        const otherPlayer = this.players.get(userId);
         if (otherPlayer) {
             otherPlayer.nameText.destroy();
             otherPlayer.destroy();
-            this.players.delete(playerId);
+            this.players.delete(userId);
         }
     }
 
@@ -475,7 +475,7 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
         
         if (moved && direction) {
             InputEventBus.sendPlayerMove({
-                playerId: this.playerId,
+                userId: this.userId,
                 x: this.currentPlayer.x,
                 y: this.currentPlayer.y,
                 direction: direction,
@@ -485,7 +485,7 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
         } else if (this.lastSentMoving === true && !moved) {
             // 이전에 이동 중이었는데 지금 정지한 경우
             InputEventBus.sendPlayerMove({
-                playerId: this.playerId,
+                userId: this.userId,
                 x: this.currentPlayer.x,
                 y: this.currentPlayer.y,
                 direction: this.currentPlayer.lastDirection || 'down',
@@ -499,7 +499,7 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
     sendChatMessage(message) {
         if (message.trim()) {
             InputEventBus.sendChatMessage({
-                playerId: this.playerId,
+                userId: this.userId,
                 playerName: this.playerName,
                 message: message.trim()
             });

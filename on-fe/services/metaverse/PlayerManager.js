@@ -5,9 +5,9 @@ export class PlayerManager {
         this.currentPlayerId = null;
     }
 
-    setCurrentPlayer(playerId, playerData) {
-        this.currentPlayerId = playerId;
-        this.players.set(playerId, {
+    setCurrentPlayer(userId, playerData) {
+        this.currentPlayerId = userId;
+        this.players.set(userId, {
             ...playerData,
             isCurrentPlayer: true,
             lastUpdate: Date.now()
@@ -15,34 +15,40 @@ export class PlayerManager {
     }
 
     addPlayer(playerData) {
-        if (!playerData.id) {
-            throw new Error('Player data must have an ID');
+        if (!playerData.userId) {
+            throw new Error('Player data must have a userId');
         }
 
         const enrichedPlayer = {
-            ...playerData,
-            isCurrentPlayer: playerData.id === this.currentPlayerId,
+            userId: playerData.userId,
+            nickName: playerData.nickName || 'Unknown',
+            x: playerData.x || 0,
+            y: playerData.y || 0,
+            direction: playerData.direction || 'down',
+            isMoving: playerData.isMoving || false,
+            image: playerData.image || 'public/asset/girl1.png',
+            isCurrentPlayer: playerData.userId === this.currentPlayerId,
             lastUpdate: Date.now(),
             isOnline: true
         };
 
-        this.players.set(playerData.id, enrichedPlayer);
+        this.players.set(playerData.userId, enrichedPlayer);
         return enrichedPlayer;
     }
 
-    removePlayer(playerId) {
-        const player = this.players.get(playerId);
+    removePlayer(userId) {
+        const player = this.players.get(userId);
         if (player) {
-            this.players.delete(playerId);
+            this.players.delete(userId);
             return player;
         }
         return null;
     }
 
-    updatePlayerPosition(playerId, position, direction = null) {
-        const player = this.players.get(playerId);
+    updatePlayerPosition(userId, position, direction = null) {
+        const player = this.players.get(userId);
         if (!player) {
-            console.warn(`Player ${playerId} not found for position update`);
+            console.warn(`Player ${userId} not found for position update`);
             return null;
         }
 
@@ -55,26 +61,26 @@ export class PlayerManager {
             lastUpdate: Date.now()
         };
 
-        this.players.set(playerId, updatedPlayer);
+        this.players.set(userId, updatedPlayer);
         return updatedPlayer;
     }
 
-    stopPlayerMovement(playerId) {
-        const player = this.players.get(playerId);
+    stopPlayerMovement(userId) {
+        const player = this.players.get(userId);
         if (player) {
             const updatedPlayer = {
                 ...player,
                 isMoving: false,
                 lastUpdate: Date.now()
             };
-            this.players.set(playerId, updatedPlayer);
+            this.players.set(userId, updatedPlayer);
             return updatedPlayer;
         }
         return null;
     }
 
-    getPlayer(playerId) {
-        return this.players.get(playerId);
+    getPlayer(userId) {
+        return this.players.get(userId);
     }
 
     getCurrentPlayer() {
@@ -97,20 +103,20 @@ export class PlayerManager {
         return this.players.size;
     }
 
-    isPlayerOnline(playerId) {
-        const player = this.players.get(playerId);
+    isPlayerOnline(userId) {
+        const player = this.players.get(userId);
         return player ? player.isOnline : false;
     }
 
-    updatePlayerStatus(playerId, status) {
-        const player = this.players.get(playerId);
+    updatePlayerStatus(userId, status) {
+        const player = this.players.get(userId);
         if (player) {
             const updatedPlayer = {
                 ...player,
                 isOnline: status === 'online',
                 lastUpdate: Date.now()
             };
-            this.players.set(playerId, updatedPlayer);
+            this.players.set(userId, updatedPlayer);
             return updatedPlayer;
         }
         return null;
@@ -122,24 +128,25 @@ export class PlayerManager {
     }
 
     // 플레이어 데이터 직렬화 (저장이나 전송용)
-    serializePlayer(playerId) {
-        const player = this.players.get(playerId);
+    serializePlayer(userId) {
+        const player = this.players.get(userId);
         if (!player) return null;
 
         return {
-            id: player.id,
-            name: player.name,
+            userId: player.userId,
+            nickName: player.nickName,
             x: player.x,
             y: player.y,
             direction: player.direction,
-            isMoving: player.isMoving
+            isMoving: player.isMoving,
+            image: player.image
         };
     }
 
     // 현재 플레이어 상태를 서버로 전송하기 위한 데이터
     getCurrentPlayerData() {
         const currentPlayer = this.getCurrentPlayer();
-        return currentPlayer ? this.serializePlayer(currentPlayer.id) : null;
+        return currentPlayer ? this.serializePlayer(currentPlayer.userId) : null;
     }
 
     // 비활성 플레이어 정리 (일정 시간 이상 업데이트되지 않은 플레이어)
@@ -147,14 +154,14 @@ export class PlayerManager {
         const now = Date.now();
         const toRemove = [];
 
-        this.players.forEach((player, playerId) => {
+        this.players.forEach((player, userId) => {
             if (!player.isCurrentPlayer && (now - player.lastUpdate) > inactiveThreshold) {
-                toRemove.push(playerId);
+                toRemove.push(userId);
             }
         });
 
-        toRemove.forEach(playerId => {
-            this.removePlayer(playerId);
+        toRemove.forEach(userId => {
+            this.removePlayer(userId);
         });
 
         return toRemove.length;

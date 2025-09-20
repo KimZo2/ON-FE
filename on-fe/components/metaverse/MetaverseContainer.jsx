@@ -10,7 +10,7 @@ import LoadingSpinner from '../loading/LoadingSpinner';
 function MetaverseContent({ userNickName, roomId }) {
     const metaverse = useMetaverse(userNickName, roomId);
     const phaserGame = usePhaserGame(
-        metaverse.playerId,
+        metaverse.userId,
         metaverse.playerName,
         roomId,
         // onGameReady callback
@@ -55,7 +55,7 @@ function MetaverseContent({ userNickName, roomId }) {
             playerName={metaverse.player?.name || metaverse.playerName}
             messages={metaverse.chatMessages}
             onSendMessage={metaverse.sendChatMessage}
-            playerId={metaverse.playerId}
+            userId={metaverse.userId}
         />
     );
 }

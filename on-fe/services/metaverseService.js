@@ -235,10 +235,10 @@ class MetaverseService {
     }
 
     // 플레이어 퇴장 전송
-    sendPlayerLeft(playerId) {
+    sendPlayerLeft(userId) {
         try {
-            this.connectionManager.publish('/app/playerLeft', playerId);
-            this.playerManager.removePlayer(playerId);
+            this.connectionManager.publish('/app/playerLeft', userId);
+            this.playerManager.removePlayer(userId);
         } catch (error) {
             console.error('Failed to send player left:', error);
             throw error;

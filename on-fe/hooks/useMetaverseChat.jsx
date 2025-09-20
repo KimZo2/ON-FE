@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import metaverseService from '../services/metaverseService';
 
-export default function useMetaverseChat(playerId, playerName) {
+export default function useMetaverseChat(userId, playerName) {
     const [messages, setMessages] = useState([]);
 
     useEffect(() => {
@@ -12,7 +12,7 @@ export default function useMetaverseChat(playerId, playerName) {
                 text: messageData.message,
                 playerName: messageData.playerName,
                 timestamp: new Date(),
-                isOwn: messageData.playerId === playerId
+                isOwn: messageData.userId === userId
             };
             
             setMessages(prev => [...prev.slice(-19), newMessage]); // 최근 20개만 유지
@@ -23,20 +23,20 @@ export default function useMetaverseChat(playerId, playerName) {
         return () => {
             metaverseService.setChatMessageCallback(null);
         };
-    }, [playerId]);
+    }, [userId]);
 
     const sendMessage = useCallback((message) => {
         if (!message || !message.trim()) return;
         
         const messageData = {
-            playerId,
+            userId,
             playerName,
             message: message.trim(),
             timestamp: new Date().toISOString()
         };
 
         metaverseService.sendChatMessage(messageData);
-    }, [playerId, playerName]);
+    }, [userId, playerName]);
 
     const clearMessages = useCallback(() => {
         setMessages([]);
