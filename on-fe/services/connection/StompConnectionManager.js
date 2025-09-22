@@ -128,6 +128,14 @@ export class StompConnectionManager {
             ...headers
         };
 
+        // 개발 환경에서만 로깅
+        if (process.env.NODE_ENV === 'development') {
+            console.group(`📤 STOMP SEND: ${destination}`);
+            console.log('Headers:', publishHeaders);
+            console.log('Body:', typeof body === 'object' ? JSON.stringify(body, null, 2) : body);
+            console.groupEnd();
+        }
+
         try {
             this.client.publish({
                 destination,
@@ -250,6 +258,14 @@ export class StompConnectionManager {
                     parsedBody = JSON.parse(body);
                 } catch (e) {
                     parsedBody = body;
+                }
+
+                // 개발 환경에서만 로깅
+                if (process.env.NODE_ENV === 'development') {
+                    console.group(`📥 STOMP RECEIVE: ${destination}`);
+                    console.log('Raw Body:', body);
+                    console.log('Parsed Body:', parsedBody);
+                    console.groupEnd();
                 }
 
                 handlers.forEach(handler => {

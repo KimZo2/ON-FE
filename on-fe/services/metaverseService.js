@@ -224,7 +224,7 @@ class MetaverseService {
 
             this.connectionManager.publish(`/app/room/${this.currentRoomId}/move`, moveData);
             
-            this.playerManager.updatePlayerPosition(playerData.id, 
+            this.playerManager.updatePlayerPosition(playerData.userId, 
                 { x: playerData.x, y: playerData.y }, 
                 playerData.direction
             );
