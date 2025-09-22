@@ -40,9 +40,7 @@ export class StompConnectionManager {
         const config = {
             webSocketFactory: () => new SockJS(serverUrl),
             debug: function (str) {
-                if (options.debug) {
-                    console.log('🔧 STOMP 디버그:', str);
-                }
+                // STOMP debug disabled
             },
             reconnectDelay: options.reconnectDelay || 5000,
             heartbeatIncoming: options.heartbeatIncoming || 0,
@@ -128,13 +126,7 @@ export class StompConnectionManager {
             ...headers
         };
 
-        // 개발 환경에서만 로깅
-        if (process.env.NODE_ENV === 'development') {
-            console.group(`📤 STOMP SEND: ${destination}`);
-            console.log('Headers:', publishHeaders);
-            console.log('Body:', typeof body === 'object' ? JSON.stringify(body, null, 2) : body);
-            console.groupEnd();
-        }
+        // Development logging disabled
 
         try {
             this.client.publish({
@@ -260,13 +252,7 @@ export class StompConnectionManager {
                     parsedBody = body;
                 }
 
-                // 개발 환경에서만 로깅
-                if (process.env.NODE_ENV === 'development') {
-                    console.group(`📥 STOMP RECEIVE: ${destination}`);
-                    console.log('Raw Body:', body);
-                    console.log('Parsed Body:', parsedBody);
-                    console.groupEnd();
-                }
+                // Development logging disabled
 
                 handlers.forEach(handler => {
                     try {

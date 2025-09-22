@@ -29,39 +29,12 @@ class MetaverseService {
                 throw new Error('STOMP 연결에 실패했습니다.');
             }
 
-            // 이벤트 핸들러 먼저 설정
-            this.setupEventHandlers();
-            
-            // 1. 먼저 개인 큐 구독 (/user/queue/join)
-            await this.subscribeToPersonalQueue();
-
             this.isInitialized = true;
             return client;
         } catch (error) {
             this.isInitialized = false;
             throw error;
         }
-    }
-
-    async subscribeToPersonalQueue() {
-        // 1. 개인 입장 응답 큐 구독
-        this.connectionManager.subscribe('/user/queue/join', (response) => {
-            this.handleJoinResponse(response);
-        });
-        
-        // 2. 개인 위치 스냅샷 구독
-        this.connectionManager.subscribe('/user/queue/pos-snapshot', (snapshot) => {
-            if (GameEventBus && GameEventBus.updateAllPlayers) {
-                GameEventBus.updateAllPlayers(snapshot);
-            } else {
-                console.warn('GameEventBus not available for players:snapshot');
-            }
-        });
-        
-        // 3. 에러 큐 구독
-        this.connectionManager.subscribe('/user/queue/errors', (errorData) => {
-            this.handleError(errorData);
-        });
     }
 
     // 에러 처리 메서드
@@ -80,12 +53,6 @@ class MetaverseService {
         throw error;
     }
 
-    setupEventHandlers() {
-        // 서버에서 받은 이벤트를 React 콜백과 GameEventBus로 전달
-        // 이 메서드는 현재 서버에서 직접 오는 이벤트가 없으므로 비워둠
-        // 필요시 추가 이벤트 처리 로직 구현
-    }
-
     // 방 입장 요청
     async joinRoom(roomId, playerData, roomPassword = null) {
         try {
@@ -102,6 +69,9 @@ class MetaverseService {
             
             this.connectionManager.publish(`/app/room/${roomId}/join`, roomEnterDto);
             this.playerManager.setCurrentPlayer(playerData.id, playerData);
+
+            // 초기 구독 (/user/queue/join)
+            this.setupRoomSubscriptions();
         } catch (error) {
             console.error('Failed to join room:', error);
             throw error;
@@ -124,10 +94,14 @@ class MetaverseService {
             case 'JOIN':
                 this.setupRoomSubscriptions();
                 this.startPingInterval();
+                // 새로 입장한 경우 즉시 동기화 요청
+                this.requestSync();
                 // React는 useMetaverse에서 직접 처리하므로 GameEventBus 이벤트 불필요
                 break;
             case 'ALREADY':
                 this.setupRoomSubscriptions();
+                this.startPingInterval();
+                // 이미 입장한 경우 Scene 준비 완료 후 동기화 (리스너에서 처리)
                 // React는 useMetaverse에서 직접 처리하므로 GameEventBus 이벤트 불필요
                 break;
             case 'FULL':
@@ -152,7 +126,7 @@ class MetaverseService {
                 // React는 useMetaverse에서 직접 처리하므로 GameEventBus 이벤트 불필요
                 break;
             default:
-                console.log('❓ 알 수 없는 응답:', message);
+                // 알 수 없는 응답
         }
     }
 
@@ -160,9 +134,9 @@ class MetaverseService {
     setupRoomSubscriptions() {
         if (!this.currentRoomId) return;
 
-        // 방 브로드캐스트 구독
-        this.connectionManager.subscribe(`/topic/room/${this.currentRoomId}/pos`, (data) => {
-            GameEventBus.updatePlayer(data);
+         // 개인 입장 응답 큐 구독
+        this.connectionManager.subscribe('/user/queue/join', (response) => {
+            this.handleJoinResponse(response);
         });
 
         // 개인 위치 스냅샷 구독
@@ -175,14 +149,42 @@ class MetaverseService {
             // 필요시 GameEventBus 이벤트 추가
         });
 
-        // 초기 동기화 요청
-        this.requestSync();
+        // 방 브로드캐스트 구독
+        this.connectionManager.subscribe(`/topic/room/${this.currentRoomId}/pos`, (data) => {
+            GameEventBus.updatePlayer(data);
+        });
+
+        // 방 메시지 구독 (새 플레이어 입장/퇴장 알림)
+        this.connectionManager.subscribe(`/topic/room/${this.currentRoomId}/msg`, (messageData) => {
+            this.handleRoomMessage(messageData);
+        });
+    }
+
+    // 방 메시지 처리 (새 사용자 입장 알림)
+    handleRoomMessage(messageData) {
+        const { roomId, message, count } = messageData;
+
+        // JOIN인 경우에만 새로운 사용자가 입장했다는 의미
+        if (message === 'JOIN' || message === 'ALREADY') {
+            // 현재 방 인원 수 업데이트
+            if (this.onlineCountCallback && count !== undefined) {
+                this.onlineCountCallback(count);
+            }
+
+            // GameEventBus로 온라인 수 업데이트 전달 (Phaser 화면 업데이트용)
+            if (GameEventBus && GameEventBus.updateOnlineCount) {
+                GameEventBus.updateOnlineCount(count);
+            }
+
+            // 동기화 요청하여 새로운 플레이어 정보 가져오기
+            this.requestSync();
+        }
     }
 
     // 동기화 요청
     requestSync() {
         if (!this.currentRoomId) return;
-        
+
         this.connectionManager.publish(`/app/room/${this.currentRoomId}/sync`, {});
     }
 

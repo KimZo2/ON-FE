@@ -71,9 +71,7 @@ export default function useMetaverse(userNickName, roomId) {
             // 방 입장
             if (roomId) {
                 await metaverseService.joinRoom(roomId, playerData);
-                console.log('🏠 방 입장 완료, currentRoomId:', metaverseService.currentRoomId);
             } else {
-                console.log('❌ roomId가 없어서 방 입장을 건너뜀');
             }
 
             actions.connectSuccess(playerData);
@@ -160,6 +158,22 @@ export default function useMetaverse(userNickName, roomId) {
         return () => {
             InputEventBus.offPlayerMove(handlePlayerMove);
             InputEventBus.offChatSend(handleChatSend);
+        };
+    }, [state.connectionStatus]);
+
+    // Scene 준비 완료 이벤트 리스너 설정
+    useEffect(() => {
+        const handleSceneReady = (scene) => {
+            // Scene이 준비되면 동기화 요청
+            if (metaverseService.currentRoomId && state.connectionStatus === 'connected') {
+                metaverseService.requestSync();
+            }
+        };
+
+        GameEventBus.onSceneReady(handleSceneReady);
+
+        return () => {
+            // GameEventBus는 off 메서드가 없으므로 removeAllListeners로 정리
         };
     }, [state.connectionStatus]);
 

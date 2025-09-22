@@ -24,30 +24,39 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
 
     preload() {
         this.load.setPath('/assets');
-        // 플레이어 스프라이트시트 로드 (girl1.png)
-        this.load.spritesheet('player', '/girl1.png', {
-            frameWidth: 64,  // 각 프레임의 가로 크기 (4x4 그리드이므로 전체 이미지를 4로 나눈 크기)
-            frameHeight: 64  // 각 프레임의 세로 크기
-        });
 
-        // 맵 타일 생성
-        this.load.image('ground', 'data:image/svg+xml;base64,' + btoa(`
-            <svg width="32" height="32" xmlns="http://www.w3.org/2000/svg">
-                <rect width="32" height="32" fill="#90EE90" stroke="#228B22" stroke-width="1"/>
-            </svg>
-        `));
+        // 플레이어 스프라이트시트 로드 (girl1.png) - 중복 로드 방지
+        if (!this.textures.exists('player')) {
+            this.load.spritesheet('player', '/girl1.png', {
+                frameWidth: 64,  // 각 프레임의 가로 크기 (4x4 그리드이므로 전체 이미지를 4로 나눈 크기)
+                frameHeight: 64  // 각 프레임의 세로 크기
+            });
+        }
 
-        this.load.image('wall', 'data:image/svg+xml;base64,' + btoa(`
-            <svg width="32" height="32" xmlns="http://www.w3.org/2000/svg">
-                <rect width="32" height="32" fill="#8B4513" stroke="#654321" stroke-width="1"/>
-            </svg>
-        `));
+        // 맵 타일 생성 - 중복 로드 방지
+        if (!this.textures.exists('ground')) {
+            this.load.image('ground', 'data:image/svg+xml;base64,' + btoa(`
+                <svg width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="32" height="32" fill="#90EE90" stroke="#228B22" stroke-width="1"/>
+                </svg>
+            `));
+        }
 
-        this.load.image('water', 'data:image/svg+xml;base64,' + btoa(`
-            <svg width="32" height="32" xmlns="http://www.w3.org/2000/svg">
-                <rect width="32" height="32" fill="#4169E1" stroke="#191970" stroke-width="1"/>
-            </svg>
-        `));
+        if (!this.textures.exists('wall')) {
+            this.load.image('wall', 'data:image/svg+xml;base64,' + btoa(`
+                <svg width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="32" height="32" fill="#8B4513" stroke="#654321" stroke-width="1"/>
+                </svg>
+            `));
+        }
+
+        if (!this.textures.exists('water')) {
+            this.load.image('water', 'data:image/svg+xml;base64,' + btoa(`
+                <svg width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="32" height="32" fill="#4169E1" stroke="#191970" stroke-width="1"/>
+                </svg>
+            `));
+        }
     }
 
     create() {
@@ -282,7 +291,7 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
 
     setupSocketListeners() {
         // GameEventBus를 통한 게임 렌더링 이벤트 리스너 등록
-        
+
         // 다른 플레이어 이동 렌더링
         GameEventBus.onPlayerMoved((playerData) => {
             if (playerData.userId !== this.userId) {
@@ -292,8 +301,37 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
 
         // 전체 플레이어 상태 업데이트
         GameEventBus.onPlayersSnapshot((snapshot) => {
-            if (Array.isArray(snapshot)) {
-                snapshot.forEach(player => {
+            // 서버에서 오는 다양한 데이터 구조 처리
+            let playersArray = snapshot;
+            if (snapshot && snapshot.positions && Array.isArray(snapshot.positions)) {
+                playersArray = snapshot.positions;
+            } else if (snapshot && snapshot.updates && Array.isArray(snapshot.updates)) {
+                playersArray = snapshot.updates;
+            }
+            
+
+            if (Array.isArray(playersArray)) {
+                // 중복 플레이어 제거 (최신 업데이트만 유지)
+
+                const uniquePlayers = new Map();
+                
+                playersArray.forEach(player => {
+                    // 필드명 정규화
+                    const normalizedPlayer = {
+                        ...player,
+                        isMoving: player.moving !== undefined ? player.moving : player.isMoving
+                    };
+
+                    // 같은 userId의 경우 seq가 더 큰 것(최신)으로 덮어쓰기
+                    const existing = uniquePlayers.get(player.userId);
+                    if (!existing || (player.seq && existing.seq && player.seq > existing.seq)) {
+                        
+                        uniquePlayers.set(player.userId, normalizedPlayer);
+                    }
+                });
+
+
+                uniquePlayers.forEach(player => {
                     if (player.userId !== this.userId) {
                         if (this.players.has(player.userId)) {
                             this.updateOtherPlayer(player);
@@ -333,6 +371,12 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
 
         // 이미 존재하는 플레이어인지 확인
         if (this.players.has(userId)) {
+            return;
+        }
+
+        // 텍스처 존재 확인 후 스프라이트 생성
+        if (!this.textures.exists('player')) {
+            console.error('❌ Player texture not found, cannot create sprite');
             return;
         }
 
