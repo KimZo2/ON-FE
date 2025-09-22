@@ -151,7 +151,13 @@ class MetaverseService {
 
         // 방 브로드캐스트 구독
         this.connectionManager.subscribe(`/topic/room/${this.currentRoomId}/pos`, (data) => {
-            GameEventBus.updatePlayer(data);
+            // updates 배열이 있으면 snapshot 데이터로 처리
+            if (data.updates && Array.isArray(data.updates)) {
+                GameEventBus.updateAllPlayers(data);
+            } else {
+                // 개별 플레이어 데이터로 처리
+                GameEventBus.updatePlayer(data);
+            }
         });
 
         // 방 메시지 구독 (새 플레이어 입장/퇴장 알림)

@@ -294,8 +294,14 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
 
         // 다른 플레이어 이동 렌더링
         GameEventBus.onPlayerMoved((playerData) => {
-            if (playerData.userId !== this.userId) {
-                this.updateOtherPlayer(playerData);
+            // 데이터 필드 정규화
+            const normalizedData = {
+                ...playerData,
+                userId: playerData.userId || playerData.id || playerData.playerId || playerData.player_id
+            };
+
+            if (normalizedData.userId !== this.userId) {
+                this.updateOtherPlayer(normalizedData);
             }
         });
 
@@ -429,6 +435,8 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
                     otherPlayer.lastDirection = playerData.direction;
                 }
             }
+        } else {
+            // 플레이어를 찾을 수 없을 때는 새로 추가
         }
     }
 
@@ -456,6 +464,7 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
             up: this.cursors?.up?.isDown || false,
             down: this.cursors?.down?.isDown || false
         };
+
         
         // 플레이어 이동과 애니메이션 (화살표 키만 사용)
         let horizontalDirection = null;

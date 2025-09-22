@@ -123,10 +123,18 @@ export class MetaverseEventManager {
             data.id = data.userId;
         } else if (data.playerId && !data.id) {
             data.id = data.playerId;
+            data.userId = data.playerId; // userId도 설정
         } else if (data.playerid && !data.id) {
             data.id = data.playerid;
+            data.userId = data.playerid;
         } else if (data.player_id && !data.id) {
             data.id = data.player_id;
+            data.userId = data.player_id;
+        }
+
+        // id가 있는데 userId가 없으면 userId 설정
+        if (data.id && !data.userId) {
+            data.userId = data.id;
         }
         
         // 이름 필드 정규화
