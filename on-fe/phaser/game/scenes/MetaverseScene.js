@@ -338,7 +338,7 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
 
 
                 uniquePlayers.forEach(player => {
-                    if (player.userId !== this.userId) {
+                    if (player.userId !== this.userId) {                        
                         if (this.players.has(player.userId)) {
                             this.updateOtherPlayer(player);
                         } else {
