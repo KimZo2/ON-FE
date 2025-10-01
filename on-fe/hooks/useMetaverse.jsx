@@ -1,16 +1,14 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { v4 as uuidv4 } from 'uuid';
 import { useMetaverseContext } from '../contexts/MetaverseContext';
 import metaverseService from '../services/metaverseService';
-import { ServerEventBus } from '../phaser/game/ServerEventBus';
 import { InputEventBus } from '../phaser/game/InputEventBus';
 import { GameEventBus } from '../phaser/game/GameEventBus';
 
-export default function useMetaverse(userNickName, roomId) {
+export default function useMetaverse(userId, userNickName, roomId) {
     const { state, actions } = useMetaverseContext();
     const router = useRouter();
-    const userIdRef = useRef(uuidv4());
+    const userIdRef = useRef(userId);
     const playerNameRef = useRef(userNickName || '');
 
     // 메타버스 연결
@@ -163,7 +161,7 @@ export default function useMetaverse(userNickName, roomId) {
 
     // Scene 준비 완료 이벤트 리스너 설정
     useEffect(() => {
-        const handleSceneReady = (scene) => {
+        const handleSceneReady = () => {
             // Scene이 준비되면 동기화 요청
             if (metaverseService.currentRoomId && state.connectionStatus === 'connected') {
                 metaverseService.requestSync();

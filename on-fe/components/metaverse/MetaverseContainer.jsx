@@ -7,8 +7,8 @@ import MetaverseGameView from './MetaverseGameView';
 import FlyingStar from '../background/FlyingStar';
 import LoadingSpinner from '../loading/LoadingSpinner';
 
-function MetaverseContent({ userNickName, roomId }) {
-    const metaverse = useMetaverse(userNickName, roomId);
+function MetaverseContent({ userId, userNickName, roomId }) {
+    const metaverse = useMetaverse(userId, userNickName, roomId);
     const phaserGame = usePhaserGame(
         metaverse.userId,
         metaverse.playerName,
@@ -60,10 +60,10 @@ function MetaverseContent({ userNickName, roomId }) {
     );
 }
 
-export default function MetaverseContainer({ userNickName, roomId }) {
+export default function MetaverseContainer({ userId, userNickName, roomId }) {
     return (
         <MetaverseProvider>
-            <MetaverseContent userNickName={userNickName} roomId={roomId} />
+            <MetaverseContent userId={userId} userNickName={userNickName} roomId={roomId} />
         </MetaverseProvider>
     );
 }
