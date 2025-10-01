@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { use } from 'react';
 import dynamic from 'next/dynamic';
-import { isLoggedIn, getNickName } from '@/util/AuthUtil';
+import useUserInfo from '@/hooks/user/useUserInfo';
 
 const MetaverseContainer = dynamic(
     () => import('@/components/metaverse/MetaverseContainer'),
@@ -14,12 +14,12 @@ export default function MetaversePage({ params }) {
     // Next.js 최신 버전에서 params를 Promise로 처리
     const resolvedParams = use(params);
     const roomId = resolvedParams.id;
-    const userNickName = getNickName();
+    const {userId, userNickName} = useUserInfo();
 
 
     return (
         <div className="w-full h-screen">
-            <MetaverseContainer userNickName={userNickName} roomId={roomId} />
+            <MetaverseContainer userId={userId} userNickName={userNickName} roomId={roomId} />
         </div>
     );
 }
