@@ -1,24 +1,28 @@
 import { backendApiInstance } from '@/apis/instance';
 import ROUTES from '@/constants/ROUTES';
 import { isLoggedIn } from '@/util/AuthUtil';
-import { useLayoutEffect } from 'react';
-import { useState } from 'react'
+import { useState, useEffect } from 'react';
 
 const useUserInfo = () => {
+    const [userInfo, setUserInfo] = useState({ userId: null, userNickName: null });
 
-    const [userId, setUserId] = useState(null);
-    const [nickName, setNickName] = useState(null);
-
-    useLayoutEffect(() => {
-        if (isLoggedIn()) { // 로그인 되어 있으면
-            const { userId, nickname } = backendApiInstance.get(ROUTES.MYINFO);
-            const n = nickname;
-            setUserId(userId);
-            setNickName(n);
+    useEffect(() => {
+        const fetchUserInfo = async () => {
+            try {
+                const {userId, nickname} = await (await backendApiInstance.get(ROUTES.MYINFO)).data;
+                
+                setUserInfo({userId, userNickName : nickname});
+            } catch(e){
+                console.error("[useUserInfo] 조회 오류 : ", e);
+                setUserInfo({userId : null, userNickName : null});
+            }
+        }
+        if(isLoggedIn()) {
+            fetchUserInfo();
         }
     }, []);
 
-    return {userId, nickName};
+    return userInfo;
 }
 
 export default useUserInfo
