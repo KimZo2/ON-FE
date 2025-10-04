@@ -40,9 +40,7 @@ export class StompConnectionManager {
         const config = {
             webSocketFactory: () => new SockJS(serverUrl),
             debug: function (str) {
-                if (options.debug) {
-                    console.log('🔧 STOMP 디버그:', str);
-                }
+                // STOMP debug disabled
             },
             reconnectDelay: options.reconnectDelay || 5000,
             heartbeatIncoming: options.heartbeatIncoming || 0,
@@ -127,6 +125,8 @@ export class StompConnectionManager {
             ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
             ...headers
         };
+
+        // Development logging disabled
 
         try {
             this.client.publish({
@@ -251,6 +251,8 @@ export class StompConnectionManager {
                 } catch (e) {
                     parsedBody = body;
                 }
+
+                // Development logging disabled
 
                 handlers.forEach(handler => {
                     try {

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import StartGame from '@/phaser/game/main';
 
-export default function usePhaserGame(playerId, playerName, roomId, onGameReady, onSceneReady) {
+export default function usePhaserGame(userId, playerName, roomId, onGameReady, onSceneReady) {
     const gameContainerRef = useRef(null);
     const gameInstanceRef = useRef(null);
     const isInitializingRef = useRef(false);
@@ -11,7 +11,7 @@ export default function usePhaserGame(playerId, playerName, roomId, onGameReady,
             return null;
         }
 
-        if (!playerId || !playerName || !roomId) {
+        if (!userId || !playerName || !roomId) {
             console.warn('Player ID, name, and room ID are required for game initialization');
             return null;
         }
@@ -36,7 +36,7 @@ export default function usePhaserGame(playerId, playerName, roomId, onGameReady,
             if (metaverseScene) {
                 // 씬을 데이터와 함께 재시작
                 const sceneData = {
-                    playerId,
+                    userId,
                     playerName,
                     roomId
                 };
@@ -51,7 +51,7 @@ export default function usePhaserGame(playerId, playerName, roomId, onGameReady,
                     const scene = phaserGame.scene.getScene('MetaverseScene');
                     if (scene) {
                         const sceneData = {
-                            playerId,
+                            userId,
                             playerName,
                             roomId
                         };
@@ -73,7 +73,7 @@ export default function usePhaserGame(playerId, playerName, roomId, onGameReady,
             isInitializingRef.current = false;
             throw error;
         }
-    }, [playerId, playerName, roomId, onGameReady, onSceneReady]);
+    }, [userId, playerName, roomId, onGameReady, onSceneReady]);
 
     const destroyGame = useCallback(() => {
         if (gameInstanceRef.current) {

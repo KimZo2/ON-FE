@@ -1,17 +1,21 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { v4 as uuidv4 } from 'uuid';
 import { useMetaverseContext } from '../contexts/MetaverseContext';
 import metaverseService from '../services/metaverseService';
-import { ServerEventBus } from '../phaser/game/ServerEventBus';
 import { InputEventBus } from '../phaser/game/InputEventBus';
 import { GameEventBus } from '../phaser/game/GameEventBus';
 
-export default function useMetaverse(userNickName, roomId) {
+export default function useMetaverse(userId, userNickName, roomId) {
     const { state, actions } = useMetaverseContext();
     const router = useRouter();
-    const playerIdRef = useRef(uuidv4());
+    const userIdRef = useRef(userId);
     const playerNameRef = useRef(userNickName || '');
+
+    // userId와 userNickName이 변경되면 ref 업데이트
+    useEffect(() => {
+        if (userId) userIdRef.current = userId;
+        if (userNickName) playerNameRef.current = userNickName;
+    }, [userId, userNickName]);
 
     // 메타버스 연결
     const connect = useCallback(async (playerName) => {
@@ -42,7 +46,7 @@ export default function useMetaverse(userNickName, roomId) {
                 actions.addChatMessage({
                     text: messageData.message,
                     playerName: messageData.playerName,
-                    isOwn: messageData.playerId === playerIdRef.current
+                    isOwn: messageData.userId === userIdRef.current
                 });
                 // Phaser로 채팅 메시지 표시 전달
                 GameEventBus.displayChatMessage(messageData);
@@ -64,16 +68,13 @@ export default function useMetaverse(userNickName, roomId) {
 
             // 플레이어 데이터 설정
             const playerData = {
-                id: playerIdRef.current,
+                id: userIdRef.current,
                 name: playerNameRef.current
             };
 
             // 방 입장
             if (roomId) {
                 await metaverseService.joinRoom(roomId, playerData);
-                console.log('🏠 방 입장 완료, currentRoomId:', metaverseService.currentRoomId);
-            } else {
-                console.log('❌ roomId가 없어서 방 입장을 건너뜀');
             }
 
             actions.connectSuccess(playerData);
@@ -85,7 +86,7 @@ export default function useMetaverse(userNickName, roomId) {
             metaverseService.disconnect();
             return false;
         }
-    }, [actions]);
+    }, [actions, roomId, router]);
 
     // 메타버스 연결 해제
     const disconnect = useCallback(() => {
@@ -99,7 +100,7 @@ export default function useMetaverse(userNickName, roomId) {
 
         try {
             const messageData = {
-                playerId: state.player.id,
+                userId: state.player.id,
                 playerName: state.player.name,
                 message: message.trim(),
                 timestamp: new Date().toISOString()
@@ -163,6 +164,22 @@ export default function useMetaverse(userNickName, roomId) {
         };
     }, [state.connectionStatus]);
 
+    // Scene 준비 완료 이벤트 리스너 설정
+    useEffect(() => {
+        const handleSceneReady = () => {
+            // Scene이 준비되면 동기화 요청
+            if (metaverseService.currentRoomId && state.connectionStatus === 'connected') {
+                metaverseService.requestSync();
+            }
+        };
+
+        GameEventBus.onSceneReady(handleSceneReady);
+
+        return () => {
+            // GameEventBus는 off 메서드가 없으므로 removeAllListeners로 정리
+        };
+    }, [state.connectionStatus]);
+
     // 서버 이벤트 처리 (Server → React → Phaser)
     useEffect(() => {
         // 서버에서 받은 플레이어 관련 이벤트를 Phaser로 전달
@@ -219,7 +236,7 @@ export default function useMetaverse(userNickName, roomId) {
         // 편의 상태
         isConnected: state.connectionStatus === 'connected',
         isConnecting: state.connectionStatus === 'connecting',
-        playerId: playerIdRef.current,
+        userId: userIdRef.current,
         playerName: playerNameRef.current,
 
         // 액션

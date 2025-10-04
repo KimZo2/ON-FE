@@ -26,8 +26,8 @@ class GameEventBusClass extends Events.EventEmitter {
         this.emit('game:playerJoined', playerData);
     }
 
-    removePlayer(playerId) {
-        this.emit('game:playerLeft', playerId);
+    removePlayer(userId) {
+        this.emit('game:playerLeft', userId);
     }
 
     updatePlayer(playerData) {
