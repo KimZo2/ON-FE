@@ -9,9 +9,9 @@ const useUserInfo = () => {
     useEffect(() => {
         const fetchUserInfo = async () => {
             try {
-                const {userId, nickname} = await (await backendApiInstance.get(ROUTES.MYINFO)).data;
-                
-                setUserInfo({userId, userNickName : nickname});
+                const response = await backendApiInstance.get(ROUTES.MYINFO);
+                const { userId, nickName } = response.data;
+                setUserInfo({ userId, userNickName: nickName });
             } catch(e){
                 console.error("[useUserInfo] 조회 오류 : ", e);
                 setUserInfo({userId : null, userNickName : null});

@@ -11,6 +11,12 @@ export default function useMetaverse(userId, userNickName, roomId) {
     const userIdRef = useRef(userId);
     const playerNameRef = useRef(userNickName || '');
 
+    // userId와 userNickName이 변경되면 ref 업데이트
+    useEffect(() => {
+        if (userId) userIdRef.current = userId;
+        if (userNickName) playerNameRef.current = userNickName;
+    }, [userId, userNickName]);
+
     // 메타버스 연결
     const connect = useCallback(async (playerName) => {
         if (!playerName?.trim()) {
@@ -69,7 +75,6 @@ export default function useMetaverse(userId, userNickName, roomId) {
             // 방 입장
             if (roomId) {
                 await metaverseService.joinRoom(roomId, playerData);
-            } else {
             }
 
             actions.connectSuccess(playerData);
@@ -81,7 +86,7 @@ export default function useMetaverse(userId, userNickName, roomId) {
             metaverseService.disconnect();
             return false;
         }
-    }, [actions]);
+    }, [actions, roomId, router]);
 
     // 메타버스 연결 해제
     const disconnect = useCallback(() => {
