@@ -7,6 +7,6 @@ const ROUTES = {
     MAIN : "/",
     ADDITIONAL_INFO : "/login/additional-info",
     ROOM : "/room",
-    MYINFO : "/member/me"
+    MYINFO : "/member/info"
 }
 export default ROUTES;
