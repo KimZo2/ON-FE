@@ -78,6 +78,23 @@ class MetaverseService {
         }
     }
 
+    // 방 퇴장 요청
+    leaveRoom(roomId = this.currentRoomId) {
+        if (!roomId) {
+            return;
+        }
+
+        if (!this.connectionManager || !this.connectionManager.isStompConnected()) {
+            return;
+        }
+
+        try {
+            this.connectionManager.publish(`/app/room/${roomId}/leave`, {});
+        } catch (error) {
+            console.error('Failed to leave room:', error);
+        }
+    }
+
     // 방 입장 응답 처리
     handleJoinResponse(response) {
         const { roomId, message, count } = response;
@@ -266,6 +283,12 @@ class MetaverseService {
     // 연결 해제
     disconnect() {
         try {
+            const activeRoomId = this.currentRoomId;
+
+            if (activeRoomId) {
+                this.leaveRoom(activeRoomId);
+            }
+
             // 핑 인터벌 정리
             if (this.pingInterval) {
                 clearInterval(this.pingInterval);

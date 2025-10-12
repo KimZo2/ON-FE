@@ -180,6 +180,26 @@ export default function useMetaverse(userId, userNickName, roomId) {
         };
     }, [state.connectionStatus]);
 
+    useEffect(() => {
+        if (typeof window === 'undefined') return undefined;
+
+        const handleBeforeUnload = () => {
+            if (state.connectionStatus === 'connected') {
+                try {
+                    metaverseService.leaveRoom();
+                } catch (error) {
+                    console.warn('Failed to leave room before unload:', error);
+                }
+                metaverseService.disconnect();
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [state.connectionStatus]);
+
     // 서버 이벤트 처리 (Server → React → Phaser)
     useEffect(() => {
         // 서버에서 받은 플레이어 관련 이벤트를 Phaser로 전달
