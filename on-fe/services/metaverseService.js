@@ -16,6 +16,7 @@ class MetaverseService {
         this.joinStatus = null;
         this.sequenceNumber = 0;
         this.pingInterval = null;
+        this.initialSyncRequested = false;
     }
 
     async initialize() {
@@ -57,6 +58,7 @@ class MetaverseService {
     async joinRoom(roomId, playerData, roomPassword = null) {
         try {
             this.currentRoomId = roomId;
+            this.initialSyncRequested = false;
             
             // localStorage에서 nickName 추출
             const nickname = this._getNickname();
@@ -92,6 +94,8 @@ class MetaverseService {
             this.connectionManager.publish(`/app/room/${roomId}/leave`, {});
         } catch (error) {
             console.error('Failed to leave room:', error);
+        } finally {
+            this.initialSyncRequested = false;
         }
     }
 
@@ -111,18 +115,14 @@ class MetaverseService {
             case 'JOIN':
                 this.setupRoomSubscriptions();
                 this.startPingInterval();
-                // 새로 입장한 경우 즉시 동기화 요청
-                this.requestSync();
-                // React는 useMetaverse에서 직접 처리하므로 GameEventBus 이벤트 불필요
                 break;
             case 'ALREADY':
                 this.setupRoomSubscriptions();
                 this.startPingInterval();
-                // 이미 입장한 경우 Scene 준비 완료 후 동기화 (리스너에서 처리)
-                // React는 useMetaverse에서 직접 처리하므로 GameEventBus 이벤트 불필요
                 break;
             case 'FULL':
                 this.currentRoomId = null;
+                this.initialSyncRequested = false;
                 if (typeof window !== 'undefined') {
                     alert('방이 가득찼습니다.');
                 }
@@ -130,6 +130,7 @@ class MetaverseService {
                 break;
             case 'CLOSED_OR_NOT_FOUND':
                 this.currentRoomId = null;
+                this.initialSyncRequested = false;
                 if (typeof window !== 'undefined') {
                     alert('방이 종료되었거나 존재하지 않습니다.');
                 }
@@ -137,6 +138,7 @@ class MetaverseService {
                 break;
             case 'ERROR':
                 this.currentRoomId = null;
+                this.initialSyncRequested = false;
                 if (typeof window !== 'undefined') {
                     alert('알 수 없는 에러가 발생하였습니다.');
                 }
@@ -204,11 +206,42 @@ class MetaverseService {
         }
     }
 
-    // 동기화 요청
+    // 내부용 동기화 요청
     requestSync() {
         if (!this.currentRoomId) return;
 
         this.connectionManager.publish(`/app/room/${this.currentRoomId}/sync`, {});
+    }
+
+    // Scene 준비 완료 시 초기 위치 전송 및 동기화
+    handleSceneReady(scene) {
+        if (!this.currentRoomId || !this.connectionManager?.isStompConnected?.()) {
+            return;
+        }
+
+        const shouldSendInitialPosition = !this.initialSyncRequested;
+        const userId = scene?.userId || this.playerManager.getCurrentPlayer()?.userId;
+        const playerSprite = scene?.currentPlayer;
+
+        if (shouldSendInitialPosition && userId && playerSprite) {
+            try {
+                this.sendPlayerMove({
+                    userId,
+                    x: playerSprite.x,
+                    y: playerSprite.y,
+                    direction: playerSprite.lastDirection || 'down',
+                    isMoving: false
+                });
+            } catch (error) {
+                console.error('Failed to send initial player position:', error);
+            }
+        }
+
+        this.requestSync(); // 동기화 요청 보내기
+
+        if (shouldSendInitialPosition) {
+            this.initialSyncRequested = true;
+        }
     }
 
     // 핑 간격 시작
@@ -305,6 +338,7 @@ class MetaverseService {
             this.currentRoomId = null;
             this.joinStatus = null;
             this.sequenceNumber = 0;
+            this.initialSyncRequested = false;
         }
     }
 

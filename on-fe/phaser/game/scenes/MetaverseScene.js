@@ -219,6 +219,7 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
         
         // 기본 애니메이션 설정 (아래쪽을 보고 있는 정지 상태)
         this.currentPlayer.play('idle-down');
+        this.currentPlayer.lastDirection = 'down';
         
         // 플레이어 이름 표시
         this.currentPlayer.nameText = this.add.text(startX, startY - 30, this.playerName, {

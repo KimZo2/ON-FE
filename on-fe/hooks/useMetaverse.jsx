@@ -166,17 +166,22 @@ export default function useMetaverse(userId, userNickName, roomId) {
 
     // Scene 준비 완료 이벤트 리스너 설정
     useEffect(() => {
-        const handleSceneReady = () => {
-            // Scene이 준비되면 동기화 요청
-            if (metaverseService.currentRoomId && state.connectionStatus === 'connected') {
-                metaverseService.requestSync();
+        const handleSceneReady = (scene) => {
+            if (!metaverseService.currentRoomId || state.connectionStatus !== 'connected') {
+                return;
             }
+
+            metaverseService.handleSceneReady(scene);
         };
 
         GameEventBus.onSceneReady(handleSceneReady);
 
         return () => {
-            // GameEventBus는 off 메서드가 없으므로 removeAllListeners로 정리
+            if (typeof GameEventBus.off === 'function') {
+                GameEventBus.off('game:sceneReady', handleSceneReady);
+            } else if (typeof GameEventBus.removeListener === 'function') {
+                GameEventBus.removeListener('game:sceneReady', handleSceneReady);
+            }
         };
     }, [state.connectionStatus]);
 
@@ -186,11 +191,10 @@ export default function useMetaverse(userId, userNickName, roomId) {
         const handleBeforeUnload = () => {
             if (state.connectionStatus === 'connected') {
                 try {
-                    metaverseService.leaveRoom();
+                    metaverseService.disconnect();
                 } catch (error) {
-                    console.warn('Failed to leave room before unload:', error);
+                    console.warn('Failed to disconnect before unload:', error);
                 }
-                metaverseService.disconnect();
             }
         };
 
