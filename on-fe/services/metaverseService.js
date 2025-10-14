@@ -3,6 +3,13 @@ import { MetaverseEventManager } from './metaverse/MetaverseEventManager';
 import { PlayerManager } from './metaverse/PlayerManager';
 import { GameEventBus } from '../phaser/game/GameEventBus';
 
+const DEFAULT_PLAYER_SPAWN = {
+    x: 400,
+    y: 480,
+    direction: 'down',
+    isMoving: false
+};
+
 class MetaverseService {
     constructor() {
         this.isInitialized = false;
@@ -196,10 +203,12 @@ class MetaverseService {
         this.connectionManager.subscribe(`/topic/room/${this.currentRoomId}/pos`, (data) => {
             // updates 배열이 있으면 snapshot 데이터로 처리
             if (data.updates && Array.isArray(data.updates)) {
-                GameEventBus.updateAllPlayers(data);
+                const enrichedSnapshot = this._enrichSnapshotPayload(data);
+                GameEventBus.updateAllPlayers(enrichedSnapshot);
             } else {
                 // 개별 플레이어 데이터로 처리
-                GameEventBus.updatePlayer(data);
+                const enrichedPlayer = this._enrichPlayerPayload(data);
+                GameEventBus.updatePlayer(enrichedPlayer);
             }
         });
 
@@ -216,11 +225,12 @@ class MetaverseService {
 
     // 방 메시지 처리 (새 사용자 입장 알림)
     handleRoomMessage(messageData) {
-        const { roomId, message, count } = messageData;
+        const { roomId, message, count, userId, nickName } = messageData;
         const normalizedCount = this._normalizeCount(count);
 
         switch (message) {
             case 'JOIN': {
+                this._registerJoinedPlayer(userId, nickName || null);
                 const nextCount = normalizedCount ?? this.currentOnlineCount + 1;
                 this._updateOnlineCount(Math.max(0, nextCount));
                 // 동기화 요청하여 새로운 플레이어 정보 가져오기
@@ -231,11 +241,66 @@ class MetaverseService {
                 if (normalizedCount !== null) {
                     this._updateOnlineCount(normalizedCount);
                 }
+                this._registerJoinedPlayer(userId, nickName || null);
                 this.requestSync();
                 break;
             }
             default:
                 break;
+        }
+    }
+
+    _registerJoinedPlayer(userId, nickName) {
+        if (!userId) {
+            return;
+        }
+
+        const currentPlayer = this.playerManager.getCurrentPlayer?.();
+
+        if (currentPlayer && currentPlayer.userId === userId) {
+            return;
+        }
+
+        const existingPlayer = this.playerManager.getPlayer?.(userId);
+        if (existingPlayer) {
+            const nextNickName = nickName || existingPlayer.nickName;
+
+            if (nickName && existingPlayer.nickName !== nickName) {
+                const updatedPlayer = {
+                    ...existingPlayer,
+                    nickName: nextNickName
+                };
+
+                this.playerManager.addPlayer(updatedPlayer);
+
+                if (GameEventBus && typeof GameEventBus.updatePlayer === 'function') {
+                    GameEventBus.updatePlayer(updatedPlayer);
+                }
+            }
+            
+            this.playerManager.updatePlayerStatus?.(userId, 'online');
+            return;
+        }
+
+        try {
+            console.log('[MetaverseService] register new player via room message', {
+                userId,
+                nickName
+            });
+            const playerState = {
+                userId,
+                nickName: nickName || 'Unknown',
+                ...DEFAULT_PLAYER_SPAWN
+            };
+
+            const newPlayer = this.playerManager.addPlayer(playerState);
+
+            if (newPlayer && GameEventBus && typeof GameEventBus.addPlayer === 'function') {
+                console.log('[MetaverseService] emitting GameEventBus.addPlayer', newPlayer);
+                GameEventBus.addPlayer(newPlayer);
+            }
+        } catch (error) {
+            console.warn('Failed to register joined player:', error);
         }
     }
 
@@ -507,6 +572,55 @@ class MetaverseService {
 
         const numeric = Number(digitMatch[0]);
         return Number.isNaN(numeric) ? null : numeric;
+    }
+
+    _enrichSnapshotPayload(payload) {
+        if (!payload) return payload;
+
+        if (Array.isArray(payload)) {
+            return payload.map((player) => this._enrichPlayerPayload(player));
+        }
+
+        const enriched = { ...payload };
+
+        if (Array.isArray(payload.positions)) {
+            enriched.positions = payload.positions.map((player) => this._enrichPlayerPayload(player));
+        }
+
+        if (Array.isArray(payload.updates)) {
+            enriched.updates = payload.updates.map((player) => this._enrichPlayerPayload(player));
+        }
+
+        return enriched;
+    }
+
+    _enrichPlayerPayload(playerData) {
+        if (!playerData || typeof playerData !== 'object') {
+            return playerData;
+        }
+
+        const normalized = { ...playerData };
+
+        if (normalized.playerId && !normalized.userId) {
+            normalized.userId = normalized.playerId;
+        }
+
+        if (Object.prototype.hasOwnProperty.call(normalized, 'nickname')) {
+            delete normalized.nickname;
+        }
+
+        const existing = this.playerManager.getPlayer?.(normalized.userId);
+        const existingName = existing?.nickName;
+
+        if (!normalized.nickName && existingName) {
+            normalized.nickName = existingName;
+        }
+
+        if (!normalized.nickName) {
+            normalized.nickName = 'Unknown';
+        }
+
+        return normalized;
     }
 
     // localStorage 접근 헬퍼 메서드들
