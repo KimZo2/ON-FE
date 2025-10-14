@@ -283,10 +283,6 @@ class MetaverseService {
         }
 
         try {
-            console.log('[MetaverseService] register new player via room message', {
-                userId,
-                nickName
-            });
             const playerState = {
                 userId,
                 nickName: nickName || 'Unknown',
@@ -296,7 +292,6 @@ class MetaverseService {
             const newPlayer = this.playerManager.addPlayer(playerState);
 
             if (newPlayer && GameEventBus && typeof GameEventBus.addPlayer === 'function') {
-                console.log('[MetaverseService] emitting GameEventBus.addPlayer', newPlayer);
                 GameEventBus.addPlayer(newPlayer);
             }
         } catch (error) {

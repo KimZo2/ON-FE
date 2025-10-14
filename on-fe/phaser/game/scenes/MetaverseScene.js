@@ -355,11 +355,6 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
             return;
         }
 
-        console.log('[MetaverseScene] addOtherPlayer', {
-            userId,
-            playerName,
-            raw: playerData
-        });
         const otherPlayer = this.physics.add.sprite(playerData.x, playerData.y, 'player');
         otherPlayer.setTint(0xff6b6b); // 다른 플레이어는 다른 색상
         otherPlayer.setScale(0.7); // 스프라이트 크기 조정 (현재 플레이어와 동일)
@@ -392,11 +387,6 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
 
             const nextName = playerData.nickName;
             if (nextName && otherPlayer.nameText.text !== nextName) {
-                console.log('[MetaverseScene] updateOtherPlayer name change', {
-                    userId,
-                    nextName,
-                    raw: playerData
-                });
                 otherPlayer.nameText.setText(nextName);
             }
 
