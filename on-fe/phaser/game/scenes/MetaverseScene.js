@@ -219,6 +219,7 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
         
         // 기본 애니메이션 설정 (아래쪽을 보고 있는 정지 상태)
         this.currentPlayer.play('idle-down');
+        this.currentPlayer.lastDirection = 'down';
         
         // 플레이어 이름 표시
         this.currentPlayer.nameText = this.add.text(startX, startY - 30, this.playerName, {
@@ -341,7 +342,7 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
 
     addOtherPlayer(playerData) {
         const userId = playerData.userId || playerData.id;
-        const playerName = playerData.nickName || playerData.playerName || playerData.name;
+        const playerName = playerData.nickName || 'Unknown';
 
         // 이미 존재하는 플레이어인지 확인
         if (this.players.has(userId)) {
@@ -383,6 +384,11 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
         if (otherPlayer) {
             otherPlayer.setPosition(playerData.x, playerData.y);
             otherPlayer.nameText.setPosition(playerData.x, playerData.y - 30);
+
+            const nextName = playerData.nickName;
+            if (nextName && otherPlayer.nameText.text !== nextName) {
+                otherPlayer.nameText.setText(nextName);
+            }
 
             // 방향과 이동 상태에 따른 애니메이션 처리
             if (playerData.direction) {
