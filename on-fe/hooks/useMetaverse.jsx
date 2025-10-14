@@ -38,8 +38,6 @@ export default function useMetaverse(userId, userNickName, roomId) {
             // UI 콜백 등록
             metaverseService.setOnlineCountCallback((count) => {
                 actions.updateOnlineCount(count);
-                // Phaser로 온라인 수 업데이트 전달
-                GameEventBus.updateOnlineCount(count);
             });
 
             metaverseService.setChatMessageCallback((messageData) => {
@@ -55,6 +53,7 @@ export default function useMetaverse(userId, userNickName, roomId) {
             // 에러 콜백 등록 (MetaverseError 발생 시 라우팅)
             metaverseService.setErrorCallback(({ code, message }) => {
                 console.error(`에러 - 코드: ${code}, 메시지: ${message}`);
+                actions.connectFailed(message);
                 
                 // 사용자에게 에러 알림
                 if (typeof window !== 'undefined') {

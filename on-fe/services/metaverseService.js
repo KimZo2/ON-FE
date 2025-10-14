@@ -17,6 +17,7 @@ class MetaverseService {
         this.sequenceNumber = 0;
         this.pingInterval = null;
         this.initialSyncRequested = false;
+        this.currentOnlineCount = 0;
     }
 
     async initialize() {
@@ -101,51 +102,74 @@ class MetaverseService {
 
     // 방 입장 응답 처리
     handleJoinResponse(response) {
-        const { roomId, message, count } = response;
+        const { roomId, message } = response;
+        const normalizedCount = this._normalizeCount(response.count);
         this.joinStatus = message;
         
         // 방 인원 수 업데이트 (성공한 경우에만)
-        if (message === 'JOIN' || message === 'ALREADY') {
-            if (this.onlineCountCallback && count !== undefined) {
-                this.onlineCountCallback(count);
-            }
+        if ((message === 'JOIN' || message === 'ALREADY') && normalizedCount !== null) {
+            this._updateOnlineCount(normalizedCount);
         }
         
         switch (message) {
-            case 'JOIN':
+            case 'JOIN': {
                 this.setupRoomSubscriptions();
                 this.startPingInterval();
-                break;
-            case 'ALREADY':
-                this.setupRoomSubscriptions();
-                this.startPingInterval();
-                break;
-            case 'FULL':
-                this.currentRoomId = null;
-                this.initialSyncRequested = false;
-                if (typeof window !== 'undefined') {
-                    alert('방이 가득찼습니다.');
+                if (normalizedCount === null) {
+                    this._updateOnlineCount(Math.max(this.currentOnlineCount, 1));
                 }
-                // React는 useMetaverse에서 직접 처리하므로 GameEventBus 이벤트 불필요
+                break;
+            }
+            case 'ALREADY': {
+                this.setupRoomSubscriptions();
+                this.startPingInterval();
+                if (normalizedCount === null) {
+                    this._updateOnlineCount(Math.max(this.currentOnlineCount, 1));
+                }
+                break;
+            }
+            case 'FULL':
+                this._handleJoinFailure({
+                    roomId,
+                    code: 'ROOM_FULL',
+                    message: '방이 가득찼습니다.',
+                    reason: message
+                });
                 break;
             case 'CLOSED_OR_NOT_FOUND':
-                this.currentRoomId = null;
-                this.initialSyncRequested = false;
-                if (typeof window !== 'undefined') {
-                    alert('방이 종료되었거나 존재하지 않습니다.');
-                }
-                // React는 useMetaverse에서 직접 처리하므로 GameEventBus 이벤트 불필요
+                this._handleJoinFailure({
+                    roomId,
+                    code: 'ROOM_CLOSED_OR_NOT_FOUND',
+                    message: '방이 종료되었거나 존재하지 않습니다.',
+                    reason: message
+                });
                 break;
             case 'ERROR':
-                this.currentRoomId = null;
-                this.initialSyncRequested = false;
-                if (typeof window !== 'undefined') {
-                    alert('알 수 없는 에러가 발생하였습니다.');
-                }
-                // React는 useMetaverse에서 직접 처리하므로 GameEventBus 이벤트 불필요
+                this._handleJoinFailure({
+                    roomId,
+                    code: 'ROOM_JOIN_ERROR',
+                    message: '알 수 없는 에러가 발생하였습니다.',
+                    reason: message
+                });
                 break;
             default:
-                // 알 수 없는 응답
+                this._handleJoinFailure({
+                    roomId,
+                    code: 'ROOM_JOIN_UNKNOWN',
+                    message: '방 입장 중 알 수 없는 응답을 받았습니다.',
+                    reason: message
+                });
+        }
+    }
+
+    _handleJoinFailure({ roomId, code, message, reason }) {
+        this.currentRoomId = null;
+        this.initialSyncRequested = false;
+
+        if (this.errorCallback) {
+            this.errorCallback({ code, message, roomId, reason, phase: 'JOIN' });
+        } else if (typeof window !== 'undefined') {
+            alert(message);
         }
     }
 
@@ -183,27 +207,76 @@ class MetaverseService {
         this.connectionManager.subscribe(`/topic/room/${this.currentRoomId}/msg`, (messageData) => {
             this.handleRoomMessage(messageData);
         });
+
+        // 방 퇴장 브로드캐스트 구독
+        this.connectionManager.subscribe(`/topic/room/${this.currentRoomId}/leave`, (leaveData) => {
+            this._handlePlayerLeave(leaveData);
+        });
     }
 
     // 방 메시지 처리 (새 사용자 입장 알림)
     handleRoomMessage(messageData) {
         const { roomId, message, count } = messageData;
+        const normalizedCount = this._normalizeCount(count);
 
-        // JOIN인 경우에만 새로운 사용자가 입장했다는 의미
-        if (message === 'JOIN' || message === 'ALREADY') {
-            // 현재 방 인원 수 업데이트
-            if (this.onlineCountCallback && count !== undefined) {
-                this.onlineCountCallback(count);
+        switch (message) {
+            case 'JOIN': {
+                const nextCount = normalizedCount ?? this.currentOnlineCount + 1;
+                this._updateOnlineCount(Math.max(0, nextCount));
+                // 동기화 요청하여 새로운 플레이어 정보 가져오기
+                this.requestSync();
+                break;
             }
-
-            // GameEventBus로 온라인 수 업데이트 전달 (Phaser 화면 업데이트용)
-            if (GameEventBus && GameEventBus.updateOnlineCount) {
-                GameEventBus.updateOnlineCount(count);
+            case 'ALREADY': {
+                if (normalizedCount !== null) {
+                    this._updateOnlineCount(normalizedCount);
+                }
+                this.requestSync();
+                break;
             }
-
-            // 동기화 요청하여 새로운 플레이어 정보 가져오기
-            this.requestSync();
+            default:
+                break;
         }
+    }
+
+    _handlePlayerLeave(payload = {}) {
+        const { userId, reason } = payload;
+        const normalizedCount = this._normalizeCount(this.currentOnlineCount-1);
+        const targetUserId = userId;
+
+        if (!targetUserId) {
+            console.warn('Received player leave message without identifiable userId', payload);
+            return;
+        }
+
+        this.playerManager.removePlayer(targetUserId);
+
+        // Phaser 씬에서 해당 플레이어 제거
+        if (GameEventBus && typeof GameEventBus.removePlayer === 'function') {
+            GameEventBus.removePlayer(targetUserId);
+        }
+
+        if (reason) {
+            console.info(`Player ${targetUserId} left room (${reason})`);
+        }
+
+        if (normalizedCount !== null) {
+            this._updateOnlineCount(normalizedCount);
+            return;
+        }
+
+        // normalizedCount 값이 null 이라면 fallback 실행
+        const fallbackCount = Math.max(0, this.currentOnlineCount - 1);
+        const derivedCount = Math.max(0, this.playerManager.getPlayerCount());
+        let nextCount = Math.max(fallbackCount, derivedCount);
+
+        const currentPlayer = this.playerManager.getCurrentPlayer?.();
+        
+        if (currentPlayer) {
+            nextCount = Math.max(nextCount, 1);
+        }
+
+        this._updateOnlineCount(nextCount);
     }
 
     // 내부용 동기화 요청
@@ -339,6 +412,7 @@ class MetaverseService {
             this.joinStatus = null;
             this.sequenceNumber = 0;
             this.initialSyncRequested = false;
+            this.currentOnlineCount = 0;
         }
     }
 
@@ -375,6 +449,10 @@ class MetaverseService {
     // UI 콜백 등록 메서드
     setOnlineCountCallback(callback) {
         this.onlineCountCallback = callback;
+
+        if (callback && typeof this.currentOnlineCount === 'number') {
+            callback(this.currentOnlineCount);
+        }
     }
 
     setChatMessageCallback(callback) {
@@ -390,6 +468,45 @@ class MetaverseService {
         this.onlineCountCallback = null;
         this.chatMessageCallback = null;
         this.errorCallback = null;
+    }
+
+    _updateOnlineCount(count) {
+        if (typeof count !== 'number' || Number.isNaN(count)) {
+            return;
+        }
+
+        this.currentOnlineCount = count;
+
+        if (this.onlineCountCallback) {
+            this.onlineCountCallback(count);
+        }
+
+        if (GameEventBus && typeof GameEventBus.updateOnlineCount === 'function') {
+            GameEventBus.updateOnlineCount(count);
+        }
+    }
+
+    _normalizeCount(value) {
+        if (value === null || value === undefined) {
+            return null;
+        }
+
+        if (typeof value === 'number' && Number.isFinite(value)) {
+            return value;
+        }
+
+        const stringified = String(value).trim();
+        if (stringified.length === 0) {
+            return null;
+        }
+
+        const digitMatch = stringified.match(/-?\d+/);
+        if (!digitMatch) {
+            return null;
+        }
+
+        const numeric = Number(digitMatch[0]);
+        return Number.isNaN(numeric) ? null : numeric;
     }
 
     // localStorage 접근 헬퍼 메서드들
