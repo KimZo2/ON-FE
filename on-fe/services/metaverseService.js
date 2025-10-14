@@ -301,7 +301,6 @@ class MetaverseService {
 
     _handlePlayerLeave(payload = {}) {
         const { userId, reason } = payload;
-        const normalizedCount = this._normalizeCount(this.currentOnlineCount-1);
         const targetUserId = userId;
 
         if (!targetUserId) {
@@ -320,22 +319,7 @@ class MetaverseService {
             console.info(`Player ${targetUserId} left room (${reason})`);
         }
 
-        if (normalizedCount !== null) {
-            this._updateOnlineCount(normalizedCount);
-            return;
-        }
-
-        // normalizedCount 값이 null 이라면 fallback 실행
-        const fallbackCount = Math.max(0, this.currentOnlineCount - 1);
-        const derivedCount = Math.max(0, this.playerManager.getPlayerCount());
-        let nextCount = Math.max(fallbackCount, derivedCount);
-
-        const currentPlayer = this.playerManager.getCurrentPlayer?.();
-        
-        if (currentPlayer) {
-            nextCount = Math.max(nextCount, 1);
-        }
-
+        const nextCount = Math.max(0, this.currentOnlineCount - 1);
         this._updateOnlineCount(nextCount);
     }
 
