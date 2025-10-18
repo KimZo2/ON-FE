@@ -38,8 +38,6 @@ export default function useMetaverse(userId, userNickname, roomId) {
             // UI 콜백 등록
             metaverseService.setOnlineCountCallback((count) => {
                 actions.updateOnlineCount(count);
-                // Phaser로 온라인 수 업데이트 전달
-                GameEventBus.updateOnlineCount(count);
             });
 
             metaverseService.setChatMessageCallback((messageData) => {
@@ -61,6 +59,7 @@ export default function useMetaverse(userId, userNickname, roomId) {
             // 에러 콜백 등록 (MetaverseError 발생 시 라우팅)
             metaverseService.setErrorCallback(({ code, message }) => {
                 console.error(`에러 - 코드: ${code}, 메시지: ${message}`);
+                actions.connectFailed(message);
                 
                 // 사용자에게 에러 알림
                 if (typeof window !== 'undefined') {
@@ -173,17 +172,41 @@ export default function useMetaverse(userId, userNickname, roomId) {
 
     // Scene 준비 완료 이벤트 리스너 설정
     useEffect(() => {
-        const handleSceneReady = () => {
-            // Scene이 준비되면 동기화 요청
-            if (metaverseService.currentRoomId && state.connectionStatus === 'connected') {
-                metaverseService.requestSync();
+        const handleSceneReady = (scene) => {
+            if (!metaverseService.currentRoomId || state.connectionStatus !== 'connected') {
+                return;
             }
+
+            metaverseService.handleSceneReady(scene);
         };
 
         GameEventBus.onSceneReady(handleSceneReady);
 
         return () => {
-            // GameEventBus는 off 메서드가 없으므로 removeAllListeners로 정리
+            if (typeof GameEventBus.off === 'function') {
+                GameEventBus.off('game:sceneReady', handleSceneReady);
+            } else if (typeof GameEventBus.removeListener === 'function') {
+                GameEventBus.removeListener('game:sceneReady', handleSceneReady);
+            }
+        };
+    }, [state.connectionStatus]);
+
+    useEffect(() => {
+        if (typeof window === 'undefined') return undefined;
+
+        const handleBeforeUnload = () => {
+            if (state.connectionStatus === 'connected') {
+                try {
+                    metaverseService.disconnect();
+                } catch (error) {
+                    console.warn('Failed to disconnect before unload:', error);
+                }
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
         };
     }, [state.connectionStatus]);
 
