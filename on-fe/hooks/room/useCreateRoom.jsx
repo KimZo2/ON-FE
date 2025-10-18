@@ -2,14 +2,14 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { backendApiInstance } from '@/apis/instance'
 import ROUTES from '@/constants/ROUTES'
-import { getNickName } from '@/util/AuthUtil'
+import { getNickname } from '@/util/AuthUtil'
 
 export function useCreateRoom() {
   const router = useRouter()
 
   const [form, setForm] = useState({
     name: '',
-    creatorNickname: getNickName(),
+    creatorNickname: getNickname(),
     maxParticipants: '',
     isPrivate: false,
     password : '',

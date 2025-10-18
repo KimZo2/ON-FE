@@ -341,7 +341,7 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
 
     addOtherPlayer(playerData) {
         const userId = playerData.userId || playerData.id;
-        const playerName = playerData.nickName || playerData.playerName || playerData.name;
+        const playerName = playerData.nickname || playerData.nickName || playerData.playerName || playerData.name;
 
         // 이미 존재하는 플레이어인지 확인
         if (this.players.has(userId)) {
