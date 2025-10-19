@@ -121,9 +121,3 @@ export function isLoggedIn() {
   }
   return true;
 }
-
-export function logout() {
-  removeAccessToken();
-  removeNickName();
-  removeTokenExpire();
-}

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation'
-import { getNickName, isLoggedIn, removeAccessToken, removeNickName } from '@/util/AuthUtil';
+import { getNickName, isLoggedIn, removeAccessToken, removeNickName, removeTokenExpire } from '@/util/AuthUtil';
 import ROUTES from '@/constants/ROUTES';
 import { pressStart2P } from '@/constants/FONT'
 
@@ -18,6 +18,7 @@ const Header = () => {
   const handleLogout = () => {
     removeAccessToken();   // 토큰 삭제
     removeNickName();      // 닉네임 삭제
+    removeTokenExpire();   // 만료시간 삭제
     setIsLogin(false);
     router.replace(ROUTES.MAIN);   // 홈으로 이동
   };
