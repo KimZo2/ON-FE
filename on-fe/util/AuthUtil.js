@@ -116,7 +116,9 @@ export function isLoggedIn() {
   
   if (!token || !nickname || !expire) return false;
   if (Date.now() >= expire) { // 토큰 만료되면 자동 로그아웃 처리
-    logout();
+    removeAccessToken();
+    removeNickName();
+    removeTokenExpire();
     return false;
   }
   return true;
