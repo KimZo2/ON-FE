@@ -2,7 +2,7 @@
 import { useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import LoadingSpinner from '@/components/loading/LoadingSpinner'
-import { saveAccessToken, saveNickName } from '@/util/AuthUtil'
+import { saveAccessToken, saveNickName, saveTokenExpire } from '@/util/AuthUtil'
 import { goLogin } from '@/apis/auth'
 import ROUTES from '@/constants/ROUTES'
 
@@ -32,9 +32,10 @@ function OAuthCallbackContent() {
 
     ; (async () => {
       try {
-        const { token, nickname } = await getAccessTokenByType(oauthType, code)
+        const { token, tokenExpire, nickname } = await getAccessTokenByType(oauthType, code)
         saveAccessToken(token);
         saveNickName(nickname);
+        saveTokenExpire(tokenExpire);
         router.replace(ROUTES.MAIN) // main page로 이동
 
 

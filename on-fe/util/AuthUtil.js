@@ -7,8 +7,6 @@ const GOOGLE_REDIRECT_URI = process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI;
 const GITHUB_CLIENT_ID = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID;
 const GITHUB_REDIRECT_URI = process.env.NEXT_PUBLIC_GITHUB_REDIRECT_URI;
 
-
-
 // URL-safe 토큰 (base64url). 기본 32바이트 ≈ 43자
 export function cryptoRandom(bytes = 32) {
   const buf = new Uint8Array(bytes);
@@ -44,7 +42,7 @@ export function handleGoogle() {
     redirect_uri: GOOGLE_REDIRECT_URI, 
     response_type: 'code',
     scope: 'openid email profile',     
-    access_type: 'offline',            // 리프레시 토큰 필요 시
+    access_type: 'offline',
     prompt: 'consent',
     state
   });
@@ -68,7 +66,7 @@ export function handleGithub() {
 
 export function saveAccessToken(accessToken){
   if(typeof window !== 'undefined'){
-    localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("j", accessToken);
   }
 }
 
@@ -79,7 +77,7 @@ export function saveNickName(nickName) {
 }
 
 export function removeAccessToken(){
-    localStorage.removeItem("accessToken");
+    localStorage.removeItem("j");
 }
 
 export function removeNickName(){
@@ -88,7 +86,7 @@ export function removeNickName(){
 
 export function getAccessToken(){
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem('accessToken');
+  return localStorage.getItem('j');
 }
 
 export function getNickName(){
@@ -96,8 +94,36 @@ export function getNickName(){
   return localStorage.getItem('nickName');
 }
 
-export function isLoggedIn() {
-  return !!getAccessToken() && !!getNickName();
+export function saveTokenExpire(expire){
+  if(typeof window !== 'undefined'){
+    localStorage.setItem("m", expire);
+  }
 }
 
-// TODO: 서버에서 만료 시간 넘겨주면 저장하기
+export function getTokenExpire(){
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('m');
+}
+
+export function removeTokenExpire(){
+    localStorage.removeItem("m");
+}
+
+export function isLoggedIn() {
+  const token = getAccessToken();
+  const nickname = getNickName();
+  const expire = Number(getTokenExpire());
+  
+  if (!token || !nickname || !expire) return false;
+  if (Date.now() >= expire) { // 토큰 만료되면 자동 로그아웃 처리
+    logout();
+    return false;
+  }
+  return true;
+}
+
+export function logout() {
+  removeAccessToken();
+  removeNickName();
+  removeTokenExpire();
+}
