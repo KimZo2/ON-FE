@@ -1,6 +1,6 @@
-import { getAccessToken, removeAccessToken, removeNickName, removeTokenExpire, saveTokenExpire } from "@/util/AuthUtil";
 import axios from "axios";
 import { isLoggedIn } from "@/util/AuthUtil";
+import { getAccessToken, saveAccessToken,saveTokenExpire } from "@/util/AuthUtil";
 
 // TODO: withCredentials 처리해주기
 
@@ -23,46 +23,68 @@ export const backendApiInstance = axios.create({
     baseURL: process.env.NEXT_PUBLIC_BE_SERVER_URL,
     headers: {
         "Content-Type": "application/json",
-    }
+    },
+    withCredentials: true, // 쿠키 전송 허용
+
 })
 
-
-// Request interceptor: 인증된 요청에만 accessToken 자동 추가 & 만료시간 감지
+// 요청 interceptor: Access Token 자동 추가
 backendApiInstance.interceptors.request.use(
-    async (config) => {
-        // 로그인 페이지나 /auth/refresh 요청은 interceptor 무시
-        if (config.url.includes("/auth/login") || config.url.includes("/auth/refresh")) {
-        return config;
-        }
-        // 그 외 모든 api 요청은 AT 검증 필요
-        if (!isLoggedIn()) { // login이 유효하지 않다면 (로그아웃/AT만료/AT저장안됨)
-            try {
-                // Refresh Token으로 새 Access Token 발급 요청
-                const res = await axios.post(`${process.env.NEXT_PUBLIC_BE_SERVER_URL}/auth/refresh`, {}, { withCredentials: true });
-                const { token, tokenExpire } = res.data;
-                saveAccessToken(token);
-                saveTokenExpire(tokenExpire);
-            } catch (err) {
-                // Refresh Token도 만료 → 재로그인
-                removeAccessToken();
-                removeNickName();
-                removeTokenExpire();
-                // TODO: 이동 전 사용자에게 재로그인 요청을 알리는 모달 혹은 메시지 표시 필요
-                alert("세션이 만료되었습니다. 다시 로그인해주세요!");
-                window.location.href = '/login';
-                return Promise.reject(err);
-            }
-            }
+  (config) => {
+    if (config.url.includes("/auth/login") || config.url.includes("/auth/refresh")) {
+      return config;
+    }
 
-    const accessToken = getAccessToken();
-    if (accessToken) {
-        config.headers.Authorization = `Bearer ${accessToken}`;
+    const token = getAccessToken();
+    if (token && isLoggedIn()) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
-    },
-    (error) => {
-        return Promise.reject(error);
+  },
+  (error) => Promise.reject(error)
+);
+
+// 응답 interceptor: 401 → refresh 후 원래 요청 재시도
+backendApiInstance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    // console.log("interceptor error:", error); 
+
+    // Access Token 만료로 401 발생
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      try {
+        const refreshResponse = await axios.get(
+          `${process.env.NEXT_PUBLIC_BE_SERVER_URL}/auth/refresh`,
+          { withCredentials: true }
+        );
+        const { token, tokenExpire } = refreshResponse.data;
+
+        if (!token) throw new Error("Refresh 실패: token 없음");
+
+        // 새 토큰 저장
+        saveAccessToken(token);
+        saveTokenExpire(tokenExpire);
+        // console.log("Access Token 갱신 완료!");
+
+        // 원래 요청 헤더에 새 토큰 적용
+        originalRequest.headers.Authorization = `Bearer ${token}`;
+
+        /// 원래 요청 재시도
+        const retryResponse = await backendApiInstance(originalRequest);
+        return retryResponse;
+
+
+      } catch (refreshError) {
+        alert("세션이 만료되었습니다. 다시 로그인해주세요!");
+        window.location.href = "/login";
+        return Promise.reject(refreshError);
+      }
     }
+
+    return Promise.reject(error);
+  }
 );
 
 /**
