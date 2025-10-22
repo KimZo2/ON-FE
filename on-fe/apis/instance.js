@@ -88,6 +88,22 @@ backendApiInstance.interceptors.response.use(
 );
 
 /**
+ * 로그아웃 요청 (Refresh Token 삭제)
+ */
+export const logoutRequest = async () => {
+  try {
+    const response = await backendApiInstance.post("/auth/logout", {}, {
+      withCredentials: true, // 쿠키 포함
+    });
+    return response.data;
+  } catch (error) {
+    console.error("로그아웃 요청 실패:", error);
+    throw error;
+  }
+};
+
+
+/**
  * 외부 서버로 요청을 보내는 인스턴스 생성
  */
 export const createNewAxios = (config) => {
