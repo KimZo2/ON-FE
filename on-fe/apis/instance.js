@@ -54,6 +54,7 @@ backendApiInstance.interceptors.response.use(
 
     // Access Token 만료로 401 발생
     if (error.response?.status === 401 && !originalRequest._retry) {
+        originalRequest._retry = true;
       try {
         const refreshResponse = await axios.get(
           `${process.env.NEXT_PUBLIC_BE_SERVER_URL}/auth/refresh`,
