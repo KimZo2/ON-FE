@@ -115,10 +115,7 @@ export function isLoggedIn() {
   const expire = Number(getTokenExpire());
   
   if (!token || !nickname || !expire) return false;
-  if (Date.now() >= expire) { // 토큰 만료됐는지 확인
-    // removeAccessToken();
-    // removeNickName();
-    // removeTokenExpire();
+  if (Date.now() >= expire) {
     return false;
   }
   return true;
