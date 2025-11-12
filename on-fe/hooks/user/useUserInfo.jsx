@@ -4,17 +4,17 @@ import { isLoggedIn } from '@/util/AuthUtil';
 import { useState, useEffect } from 'react';
 
 const useUserInfo = () => {
-    const [userInfo, setUserInfo] = useState({ userId: null, userNickName: null });
+    const [userInfo, setUserInfo] = useState({ userId: null, userNickname: null });
 
     useEffect(() => {
         const fetchUserInfo = async () => {
             try {
                 const response = await backendApiInstance.get(ROUTES.MYINFO);
-                const { userId, nickName } = response.data;
-                setUserInfo({ userId, userNickName: nickName });
+                const { userId, nickname } = response.data;
+                setUserInfo({ userId, userNickname: nickname });
             } catch(e){
                 console.error("[useUserInfo] 조회 오류 : ", e);
-                setUserInfo({userId : null, userNickName : null});
+                setUserInfo({userId : null, userNickname : null});
             }
         }
         if(isLoggedIn()) {

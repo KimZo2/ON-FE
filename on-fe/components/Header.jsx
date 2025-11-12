@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation'
-import { getNickName, isLoggedIn, removeAccessToken, removeNickName, removeTokenExpire } from '@/util/AuthUtil';
+import { getNickname, isLoggedIn, removeAccessToken, removeNickname, removeTokenExpire } from '@/util/AuthUtil';
 import ROUTES from '@/constants/ROUTES';
 import { pressStart2P } from '@/constants/FONT'
 import { logoutRequest } from '@/apis/instance';
@@ -21,7 +21,7 @@ const Header = () => {
     await logoutRequest();
 
     removeAccessToken();
-    removeNickName();
+    removeNickname();
     removeTokenExpire();
     setIsLogin(false);
 
@@ -37,7 +37,7 @@ const Header = () => {
 
       {isLogin ? (
         <div className="flex items-center gap-4">
-          <span className="text-white text-[1rem]"> Welcome {getNickName()}!</span>
+          <span className="text-white text-[1rem]"> Welcome {getNickname()}!</span>
           <button
             onClick={handleLogout}
             className={`${pressStart2P.className} text-white text-[0.9rem] px-3 py-1 border border-white rounded hover:bg-white hover:text-black transition`}

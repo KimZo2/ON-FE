@@ -70,9 +70,9 @@ export function saveAccessToken(accessToken){
   }
 }
 
-export function saveNickName(nickName) {
+export function saveNickname(nickname) {
   if(typeof window !== 'undefined'){
-    localStorage.setItem("nickName", nickName);
+    localStorage.setItem("nickname", nickname);
   }
 }
 
@@ -80,8 +80,8 @@ export function removeAccessToken(){
     localStorage.removeItem("j");
 }
 
-export function removeNickName(){
-    localStorage.removeItem("nickName");
+export function removeNickname(){
+    localStorage.removeItem("nickname");
 }
 
 export function getAccessToken(){
@@ -89,9 +89,9 @@ export function getAccessToken(){
   return localStorage.getItem('j');
 }
 
-export function getNickName(){
+export function getNickname(){
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem('nickName');
+  return localStorage.getItem('nickname');
 }
 
 export function saveTokenExpire(expire){
@@ -111,7 +111,7 @@ export function removeTokenExpire(){
 
 export function isLoggedIn() {
   const token = getAccessToken();
-  const nickname = getNickName();
+  const nickname = getNickname();
   const expire = Number(getTokenExpire());
   
   if (!token || !nickname || !expire) return false;

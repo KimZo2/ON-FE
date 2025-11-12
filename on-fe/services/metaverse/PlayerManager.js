@@ -19,9 +19,11 @@ export class PlayerManager {
             throw new Error('Player data must have a userId');
         }
 
+        const nickname = playerData.nickname || playerData.nickName || 'Unknown';
+
         const enrichedPlayer = {
             userId: playerData.userId,
-            nickName: playerData.nickName || 'Unknown',
+            nickname,
             x: playerData.x || 0,
             y: playerData.y || 0,
             direction: playerData.direction || 'down',
@@ -31,6 +33,9 @@ export class PlayerManager {
             lastUpdate: Date.now(),
             isOnline: true
         };
+
+        // 하위 호환을 위해 nickName 필드도 유지
+        enrichedPlayer.nickName = nickname;
 
         this.players.set(playerData.userId, enrichedPlayer);
         return enrichedPlayer;
@@ -134,7 +139,8 @@ export class PlayerManager {
 
         return {
             userId: player.userId,
-            nickName: player.nickName,
+            nickname: player.nickname || player.nickName,
+            nickName: player.nickname || player.nickName,
             x: player.x,
             y: player.y,
             direction: player.direction,

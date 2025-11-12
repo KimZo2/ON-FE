@@ -68,7 +68,7 @@ class MetaverseService {
             this.currentRoomId = roomId;
             this.initialSyncRequested = false;
             
-            // localStorage에서 nickName 추출
+            // localStorage에서 nickname 추출
             const nickname = this._getNickname();
             
             // RoomEnterDTO 형태로 데이터 전송
@@ -389,12 +389,15 @@ class MetaverseService {
         try {
             this.sequenceNumber++;
             
+            // 닉네임은 로컬 저장소에 저장된 값을 우선 사용하고, 없으면 Anonymous로 처리한다.
+            const nickname = this._getNickname();
             const moveData = {
                 x: playerData.x,
                 y: playerData.y,
                 seq: this.sequenceNumber,
                 direction: playerData.direction,
-                isMoving: playerData.isMoving
+                isMoving: playerData.isMoving,
+                nickname
             };
 
             this.connectionManager.publish(`/app/room/${this.currentRoomId}/move`, moveData);
@@ -614,7 +617,7 @@ class MetaverseService {
 
     _getNickname() {
         try {
-            return localStorage.getItem('nickName') || 'Anonymous';
+            return localStorage.getItem('nickname') || localStorage.getItem('nickName') || 'Anonymous';
         } catch (error) {
             console.warn('Failed to get nickname from localStorage:', error);
             return 'Anonymous';
