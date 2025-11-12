@@ -234,6 +234,15 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
         
         // 책상과 충돌 설정
         this.physics.add.collider(this.currentPlayer, this.desks);
+
+        // 물리 연산 이후 이름 위치 동기화 - 캐릭터 몸체와 닉네임이 한 프레임씩 차이가 나는 문제 해결
+        this.events.on(Phaser.Scenes.Events.POST_UPDATE, () => {
+            if (!this.currentPlayer?.nameText) return;
+            this.currentPlayer.nameText.setPosition(
+                this.currentPlayer.x,
+                this.currentPlayer.y - 30
+            );
+        });
     }
 
     createUI() {
@@ -493,13 +502,6 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
             }
         }
 
-        // 이름 텍스트 위치 업데이트
-        this.currentPlayer.nameText.setPosition(
-            this.currentPlayer.x, 
-            this.currentPlayer.y - 30
-        );
-
-        
         if (moved && direction) {
             InputEventBus.sendPlayerMove({
                 userId: this.userId,
