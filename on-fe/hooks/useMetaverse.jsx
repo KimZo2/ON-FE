@@ -5,17 +5,17 @@ import metaverseService from '../services/metaverseService';
 import { InputEventBus } from '../phaser/game/InputEventBus';
 import { GameEventBus } from '../phaser/game/GameEventBus';
 
-export default function useMetaverse(userId, userNickName, roomId) {
+export default function useMetaverse(userId, userNickname, roomId) {
     const { state, actions } = useMetaverseContext();
     const router = useRouter();
     const userIdRef = useRef(userId);
-    const playerNameRef = useRef(userNickName || '');
+    const playerNameRef = useRef(userNickname || '');
 
-    // userId와 userNickName이 변경되면 ref 업데이트
+    // userId와 userNickname이 변경되면 ref 업데이트
     useEffect(() => {
         if (userId) userIdRef.current = userId;
-        if (userNickName) playerNameRef.current = userNickName;
-    }, [userId, userNickName]);
+        if (userNickname) playerNameRef.current = userNickname;
+    }, [userId, userNickname]);
 
     // 메타버스 연결
     const connect = useCallback(async (playerName) => {
@@ -41,13 +41,19 @@ export default function useMetaverse(userId, userNickName, roomId) {
             });
 
             metaverseService.setChatMessageCallback((messageData) => {
+                const displayName = messageData.nickname || messageData.playerName || messageData.nickName || '';
+                const normalizedMessage = {
+                    ...messageData,
+                    playerName: displayName,
+                    nickname: messageData.nickname || displayName
+                };
                 actions.addChatMessage({
-                    text: messageData.message,
-                    playerName: messageData.playerName,
-                    isOwn: messageData.userId === userIdRef.current
+                    text: normalizedMessage.message,
+                    playerName: displayName,
+                    isOwn: normalizedMessage.userId === userIdRef.current
                 });
                 // Phaser로 채팅 메시지 표시 전달
-                GameEventBus.displayChatMessage(messageData);
+                GameEventBus.displayChatMessage(normalizedMessage);
             });
 
             // 에러 콜백 등록 (MetaverseError 발생 시 라우팅)
@@ -68,7 +74,8 @@ export default function useMetaverse(userId, userNickName, roomId) {
             // 플레이어 데이터 설정
             const playerData = {
                 id: userIdRef.current,
-                name: playerNameRef.current
+                name: playerNameRef.current,
+                nickname: playerNameRef.current
             };
 
             // 방 입장
@@ -133,10 +140,10 @@ export default function useMetaverse(userId, userNickName, roomId) {
 
     // 자동 연결 (로그인된 사용자)
     useEffect(() => {
-        if (userNickName && state.connectionStatus === 'disconnected') {
-            connect(userNickName);
+        if (userNickname && state.connectionStatus === 'disconnected') {
+            connect(userNickname);
         }
-    }, [userNickName, state.connectionStatus, connect]);
+    }, [userNickname, state.connectionStatus, connect]);
 
     // InputEventBus 이벤트 리스너 설정 (Phaser → React)
     useEffect(() => {

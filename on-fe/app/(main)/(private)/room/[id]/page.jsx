@@ -14,12 +14,12 @@ export default function MetaversePage({ params }) {
     // Next.js 최신 버전에서 params를 Promise로 처리
     const resolvedParams = use(params);
     const roomId = resolvedParams.id;
-    const {userId, userNickName} = useUserInfo();
+    const {userId, userNickname} = useUserInfo();
 
 
     return (
         <div className="w-full h-screen">
-            <MetaverseContainer userId={userId} userNickName={userNickName} roomId={roomId} />
+            <MetaverseContainer userId={userId} userNickname={userNickname} roomId={roomId} />
         </div>
     );
 }

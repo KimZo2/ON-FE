@@ -72,9 +72,9 @@ export function saveAccessToken(accessToken){
   }
 }
 
-export function saveNickName(nickName) {
+export function saveNickname(nickname) {
   if(typeof window !== 'undefined'){
-    localStorage.setItem("nickName", nickName);
+    localStorage.setItem("nickname", nickname);
   }
 }
 
@@ -82,8 +82,8 @@ export function removeAccessToken(){
     localStorage.removeItem("accessToken");
 }
 
-export function removeNickName(){
-    localStorage.removeItem("nickName");
+export function removeNickname(){
+    localStorage.removeItem("nickname");
 }
 
 export function getAccessToken(){
@@ -91,13 +91,13 @@ export function getAccessToken(){
   return localStorage.getItem('accessToken');
 }
 
-export function getNickName(){
+export function getNickname(){
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem('nickName');
+  return localStorage.getItem('nickname');
 }
 
 export function isLoggedIn() {
-  return !!getAccessToken() && !!getNickName();
+  return !!getAccessToken() && !!getNickname();
 }
 
 // TODO: 서버에서 만료 시간 넘겨주면 저장하기

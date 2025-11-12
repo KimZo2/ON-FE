@@ -145,6 +145,24 @@ export class MetaverseEventManager {
         } else if (data.username && !data.name) {
             data.name = data.username;
         }
+
+        if (!data.playerName && data.nickname) {
+            data.playerName = data.nickname;
+        }
+
+        // 닉네임 필드 정규화 (백엔드에서 nickname으로 내려오는 경우 대응)
+        if (!data.nickname) {
+            if (data.nickName) {
+                data.nickname = data.nickName;
+            } else if (data.name) {
+                data.nickname = data.name;
+            }
+        }
+
+        // 하위 호환을 위해 nickName도 유지
+        if (!data.nickName && data.nickname) {
+            data.nickName = data.nickname;
+        }
         
         // 숫자 타입 유연하게 처리  
         if (data.x !== undefined && data.x !== null) {
@@ -180,7 +198,8 @@ export class MetaverseEventManager {
         if (!data.userId || typeof data.userId !== 'string') {
             throw new Error('Chat message must have a valid user ID');
         }
-        if (!data.playerName || typeof data.playerName !== 'string') {
+        const playerName = data.playerName || data.nickname || data.nickName;
+        if (!playerName || typeof playerName !== 'string') {
             throw new Error('Chat message must have a valid player name');
         }
         if (!data.message || typeof data.message !== 'string' || data.message.trim().length === 0) {
@@ -191,6 +210,8 @@ export class MetaverseEventManager {
         }
         return {
             ...data,
+            nickname: data.nickname || data.nickName || playerName,
+            playerName,
             message: data.message.trim()
         };
     }
