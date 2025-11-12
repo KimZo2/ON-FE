@@ -3,9 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation'
-import { getNickname, isLoggedIn, removeAccessToken, removeNickname } from '@/util/AuthUtil';
+import { getNickname, isLoggedIn, removeAccessToken, removeNickname, removeTokenExpire } from '@/util/AuthUtil';
 import ROUTES from '@/constants/ROUTES';
 import { pressStart2P } from '@/constants/FONT'
+import { logoutRequest } from '@/apis/instance';
 
 const Header = () => {
   const router = useRouter();
@@ -15,12 +16,20 @@ const Header = () => {
     setIsLogin(isLoggedIn());
   }, []);
 
-  const handleLogout = () => {
-    removeAccessToken();   // 토큰 삭제
-    removeNickname();      // 닉네임 삭제
+  const handleLogout = async () => {
+  try {
+    await logoutRequest();
+
+    removeAccessToken();
+    removeNickname();
+    removeTokenExpire();
     setIsLogin(false);
-    router.replace(ROUTES.MAIN);   // 홈으로 이동
-  };
+
+    router.replace(ROUTES.MAIN);
+  } catch (error) {
+    console.error("로그아웃 중 오류 발생:", error);
+  }
+};
 
   return (
     <div className="flex justify-between px-[30px] py-[30px] items-center">
