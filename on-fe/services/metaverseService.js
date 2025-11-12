@@ -25,6 +25,8 @@ class MetaverseService {
         this.pingInterval = null;
         this.initialSyncRequested = false;
         this.currentOnlineCount = 0;
+        this.chatSubscriptionTopic = null;
+        this.roomJoinTimestamp = null;
     }
 
     async initialize() {
@@ -67,6 +69,8 @@ class MetaverseService {
         try {
             this.currentRoomId = roomId;
             this.initialSyncRequested = false;
+            this.roomJoinTimestamp = null;
+            this.unsubscribeChatChannel();
             
             // localStorage에서 nickname 추출
             const nickname = this._getNickname();
@@ -104,6 +108,8 @@ class MetaverseService {
             console.error('Failed to leave room:', error);
         } finally {
             this.initialSyncRequested = false;
+            this.roomJoinTimestamp = null;
+            this.unsubscribeChatChannel();
         }
     }
 
@@ -122,6 +128,8 @@ class MetaverseService {
             case 'JOIN': {
                 this.setupRoomSubscriptions();
                 this.startPingInterval();
+                this.roomJoinTimestamp = Date.now();
+                this.subscribeChatChannel();
                 if (normalizedCount === null) {
                     this._updateOnlineCount(Math.max(this.currentOnlineCount, 1));
                 }
@@ -130,6 +138,8 @@ class MetaverseService {
             case 'ALREADY': {
                 this.setupRoomSubscriptions();
                 this.startPingInterval();
+                this.roomJoinTimestamp = Date.now();
+                this.subscribeChatChannel();
                 if (normalizedCount === null) {
                     this._updateOnlineCount(Math.max(this.currentOnlineCount, 1));
                 }
@@ -248,6 +258,72 @@ class MetaverseService {
             default:
                 break;
         }
+    }
+
+    subscribeChatChannel() {
+        if (!this.currentRoomId || !this.connectionManager?.isStompConnected?.()) {
+            return;
+        }
+
+        const topic = `/topic/room/${this.currentRoomId}/chat`;
+
+        if (this.chatSubscriptionTopic === topic) {
+            return;
+        }
+
+        this.chatSubscriptionTopic = topic;
+
+        this.connectionManager.subscribe(topic, (messageData) => {
+            this.handleIncomingChatMessage(messageData);
+        });
+    }
+
+    unsubscribeChatChannel() {
+        if (!this.chatSubscriptionTopic) {
+            return;
+        }
+
+        try {
+            this.connectionManager.unsubscribe(this.chatSubscriptionTopic);
+        } catch (error) {
+            console.warn('Failed to unsubscribe chat topic:', error);
+        } finally {
+            this.chatSubscriptionTopic = null;
+        }
+    }
+
+    handleIncomingChatMessage(messageData = {}) {
+        console.log('[chat]',messageData);
+        
+        const { userId, nickname, content, timestamp } = messageData;
+
+        if (!content) {
+            return;
+        }
+
+        if (this.roomJoinTimestamp && timestamp) {
+            const incomingTime = new Date(timestamp).getTime();
+            if (!Number.isNaN(incomingTime) && incomingTime < this.roomJoinTimestamp) {
+                return;
+            }
+        }
+
+        const normalized = {
+            userId,
+            nickname: nickname || 'Anonymous',
+            content,
+            timestamp: typeof timestamp === 'number' ? timestamp : Date.now()
+        };
+
+        if (this.chatMessageCallback) {
+            this.chatMessageCallback(normalized);
+        }
+
+            GameEventBus.displayChatMessage({
+                playerName: normalized.nickname,
+                message: normalized.content,
+                timestamp: normalized.timestamp
+            });
     }
 
     _registerJoinedPlayer(userId, nickName) {
@@ -424,9 +500,25 @@ class MetaverseService {
     }
 
     // 채팅 메시지 전송
-    sendChatMessage(messageData) {
+    sendChatMessage(content) {
+        if (!this.currentRoomId) {
+            console.error('No active room for sending chat message');
+            return;
+        }
+
+        if (!content || !content.trim()) {
+            return;
+        }
+
         try {
-            this.connectionManager.publish('/app/chatMessage', messageData);
+            const nickname = this._getNickname();
+            const payload = {
+                nickname: nickname || 'Anonymous',
+                content: content.trim(),
+                timestamp: Date.now()
+            };
+
+            this.connectionManager.publish(`/app/room/${this.currentRoomId}/chat`, payload);
         } catch (error) {
             console.error('Failed to send chat message:', error);
             throw error;
@@ -460,6 +552,8 @@ class MetaverseService {
             this.sequenceNumber = 0;
             this.initialSyncRequested = false;
             this.currentOnlineCount = 0;
+            this.roomJoinTimestamp = null;
+            this.unsubscribeChatChannel();
         }
     }
 
@@ -587,15 +681,15 @@ class MetaverseService {
             normalized.userId = normalized.playerId;
         }
 
-        if (Object.prototype.hasOwnProperty.call(normalized, 'nickname')) {
-            delete normalized.nickname;
-        }
-
         const existing = this.playerManager.getPlayer?.(normalized.userId);
         const existingName = existing?.nickName;
 
         if (!normalized.nickName && existingName) {
             normalized.nickName = existingName;
+        }
+
+        if (!normalized.nickName && normalized.nickname) {
+            normalized.nickName = normalized.nickname;
         }
 
         if (!normalized.nickName) {

@@ -83,17 +83,22 @@ const metaverseReducer = (state, action) => {
                 onlineCount: action.payload
             };
 
-        case ActionTypes.ADD_CHAT_MESSAGE:
+        case ActionTypes.ADD_CHAT_MESSAGE: {
+            const messageTimestamp = action.payload?.timestamp
+                ? new Date(action.payload.timestamp)
+                : new Date();
+
             const newMessage = {
                 id: Date.now() + Math.random(),
                 ...action.payload,
-                timestamp: new Date()
+                timestamp: messageTimestamp
             };
             
             return {
                 ...state,
-                chatMessages: [...state.chatMessages.slice(-19), newMessage] // 최근 20개만 유지
+                chatMessages: [...state.chatMessages, newMessage]
             };
+        }
 
         case ActionTypes.CLEAR_CHAT_MESSAGES:
             return {
