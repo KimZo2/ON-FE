@@ -293,7 +293,6 @@ class MetaverseService {
     }
 
     handleIncomingChatMessage(messageData = {}) {
-        console.log('[chat]',messageData);
         
         const { userId, nickname, content, timestamp } = messageData;
 
