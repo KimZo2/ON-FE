@@ -176,100 +176,16 @@ export class StompConnectionManager {
     }
 
     _setupManualMessageParsing() {
-        const webSocket = this.client.webSocket;
-        if (!webSocket) {
-            return;
-        }
-
-        // 기존 onmessage 핸들러 백업
-        const originalOnMessage = webSocket.onmessage;
-
-        webSocket.onmessage = (event) => {
-            try {
-                const message = event.data;
-
-                // STOMP 프레임 파싱
-                const lines = message.split('\n');
-                const command = lines[0];
-
-                if (command === 'MESSAGE') {
-                    let destination = '';
-                    let body = '';
-                    let bodyStarted = false;
-
-                    for (let i = 1; i < lines.length; i++) {
-                        const line = lines[i];
-
-                        if (line.startsWith('destination:')) {
-                            destination = line.substring('destination:'.length);
-                        } else if (line === '') {
-                            bodyStarted = true;
-                        } else if (bodyStarted) {
-                            // null terminator 제거
-                            const cleanLine = line.replace(/\0/g, '');
-                            if (cleanLine.length > 0) {
-                                if (body.length > 0) {
-                                    body += '\n';
-                                }
-                                body += cleanLine;
-                            }
-                        }
-                    }
-
-                    // 전체 body에서도 null terminator 제거
-                    body = body.replace(/\0/g, '');
-
-                    if (destination && body.trim()) {
-                        // 빈 배열이나 빈 객체는 스킵
-                        if (body.trim() === '[]' || body.trim() === '{}') {
-                            return;
-                        }
-
-                        this._handleManualMessage(destination, body);
-                    }
-                }
-            } catch (error) {
-                // 에러 무시 (원본 핸들러가 처리할 수 있도록)
-            }
-
-            // 원본 핸들러도 호출 (STOMP 내부 처리를 위해)
-            if (originalOnMessage) {
-                originalOnMessage.call(webSocket, event);
-            }
-        };
-    }
-
-    _handleManualMessage(destination, body) {
-        try {
-            // 등록된 핸들러 찾기
-            const handlers = this.subscriptionManager.getHandlerForTopic(destination);
-
-            if (handlers && handlers.length > 0) {
-                let parsedBody;
-                try {
-                    parsedBody = JSON.parse(body);
-                } catch (e) {
-                    parsedBody = body;
-                }
-
-                // Development logging disabled
-
-                handlers.forEach(handler => {
-                    try {
-                        handler(parsedBody);
-                    } catch (error) {
-                        // 핸들러 에러는 무시
-                    }
-                });
-            }
-        } catch (error) {
-            // 에러 무시
-        }
+        // STOMP Client 7.1.x의 기본 onmessage 처리를 그대로 사용한다.
+        // 과거 수동 파싱 로직은 subscribe 핸들러를 두 번 호출하게 만들어
+        // 메시지가 중복 표시되는 문제가 있어 비활성화한다.
     }
 
     _getAccessToken() {
         try {
-            return localStorage.getItem('accessToken');
+            return (
+                localStorage.getItem('j')
+            );
         } catch (error) {
             console.warn('Failed to get accessToken from localStorage:', error);
             return null;
