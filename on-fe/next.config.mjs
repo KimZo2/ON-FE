@@ -9,12 +9,13 @@ const nextConfig = {
         path: false,
       };
     }
-    
+
     return config;
   },
   // 외부 패키지를 트랜스파일하지 않도록 설정
   transpilePackages: [],
-  
+  reactStrictMode: false
+
   // // 실험적 기능 (필요한 경우)
   // experimental: {
   //   esmExternals: 'loose'
