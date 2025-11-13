@@ -9,13 +9,13 @@ export default function useMetaverseChat(userId, playerName) {
         const handleChatMessage = (messageData) => {
             const newMessage = {
                 id: Date.now() + Math.random(),
-                text: messageData.message,
-                playerName: messageData.playerName,
-                timestamp: new Date(),
+                text: messageData.content || messageData.message,
+                playerName: messageData.nickname || messageData.playerName,
+                timestamp: messageData.timestamp ? new Date(messageData.timestamp) : new Date(),
                 isOwn: messageData.userId === userId
             };
             
-            setMessages(prev => [...prev.slice(-19), newMessage]); // 최근 20개만 유지
+            setMessages(prev => [...prev, newMessage].slice(-200));
         };
 
         metaverseService.setChatMessageCallback(handleChatMessage);
@@ -28,14 +28,7 @@ export default function useMetaverseChat(userId, playerName) {
     const sendMessage = useCallback((message) => {
         if (!message || !message.trim()) return;
         
-        const messageData = {
-            userId,
-            playerName,
-            message: message.trim(),
-            timestamp: new Date().toISOString()
-        };
-
-        metaverseService.sendChatMessage(messageData);
+        metaverseService.sendChatMessage(message.trim());
     }, [userId, playerName]);
 
     const clearMessages = useCallback(() => {

@@ -35,26 +35,26 @@ export default function useMetaverse(userId, userNickname, roomId) {
                 throw new Error('메타버스 서비스 연결에 실패했습니다.');
             }
 
-            // UI 콜백 등록
             metaverseService.setOnlineCountCallback((count) => {
                 actions.updateOnlineCount(count);
             });
 
-            metaverseService.setChatMessageCallback((messageData) => {
+            const chatCallback = (messageData) => {
                 const displayName = messageData.nickname || messageData.playerName || messageData.nickName || '';
-                const normalizedMessage = {
-                    ...messageData,
-                    playerName: displayName,
-                    nickname: messageData.nickname || displayName
-                };
+                const content = messageData.content || messageData.message || '';
+                const timestamp = typeof messageData.timestamp === 'number'
+                    ? messageData.timestamp
+                    : Date.now();
+
                 actions.addChatMessage({
-                    text: normalizedMessage.message,
+                    text: content,
                     playerName: displayName,
-                    isOwn: normalizedMessage.userId === userIdRef.current
+                    isOwn: messageData.userId === userIdRef.current,
+                    timestamp
                 });
-                // Phaser로 채팅 메시지 표시 전달
-                GameEventBus.displayChatMessage(normalizedMessage);
-            });
+            };
+
+            metaverseService.setChatMessageCallback(chatCallback);
 
             // 에러 콜백 등록 (MetaverseError 발생 시 라우팅)
             metaverseService.setErrorCallback(({ code, message }) => {
@@ -90,6 +90,7 @@ export default function useMetaverse(userId, userNickname, roomId) {
             const errorMessage = error.message || '메타버스 연결에 실패했습니다. 서버 상태를 확인해주세요.';
             actions.connectFailed(errorMessage);
             metaverseService.disconnect();
+            metaverseService.setChatMessageCallback(null);
             return false;
         }
     }, [actions, roomId, router]);
@@ -97,46 +98,24 @@ export default function useMetaverse(userId, userNickname, roomId) {
     // 메타버스 연결 해제
     const disconnect = useCallback(() => {
         metaverseService.disconnect();
+        metaverseService.setChatMessageCallback(null);
         actions.disconnect();
     }, [actions]);
 
     // 채팅 메시지 전송
     const sendChatMessage = useCallback((message) => {
-        if (!message?.trim() || !state.player) return false;
+        if (!message?.trim()) {
+            return false;
+        }
 
         try {
-            const messageData = {
-                userId: state.player.id,
-                playerName: state.player.name,
-                message: message.trim(),
-                timestamp: new Date().toISOString()
-            };
-
-            // 현재 씬을 통해 메시지 전송
-            if (state.currentScene && state.currentScene.sendChatMessage) {
-                state.currentScene.sendChatMessage(message);
-                return true;
-            }
-            
-            // 게임 인스턴스를 통해 씬 찾기
-            if (state.gameInstance) {
-                const metaverseScene = state.gameInstance.scene.getScene('MetaverseScene');
-                if (metaverseScene && metaverseScene.sendChatMessage) {
-                    metaverseScene.sendChatMessage(message);
-                    actions.setCurrentScene(metaverseScene);
-                    return true;
-                }
-            }
-
-            // 직접 서비스를 통해 전송
-            metaverseService.sendChatMessage(messageData);
+            metaverseService.sendChatMessage(message.trim());
             return true;
-
         } catch (error) {
             console.error('Failed to send chat message:', error);
             return false;
         }
-    }, [state.player, state.currentScene, state.gameInstance, actions]);
+    }, []);
 
     // 자동 연결 (로그인된 사용자)
     useEffect(() => {
@@ -157,7 +136,10 @@ export default function useMetaverse(userId, userNickname, roomId) {
         // 채팅 메시지 입력 처리
         const handleChatSend = (chatData) => {
             if (metaverseService.currentRoomId && state.connectionStatus === 'connected') {
-                metaverseService.sendChatMessage(chatData);
+                const content = typeof chatData === 'string' ? chatData : chatData?.message || chatData?.content;
+                if (content?.trim()) {
+                    metaverseService.sendChatMessage(content.trim());
+                }
             }
         };
 

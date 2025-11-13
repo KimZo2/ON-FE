@@ -3,11 +3,13 @@
 import { useCreateRoom } from '@/hooks/room/useCreateRoom';
 import React from 'react'
 import FormField from '../FormField';
-import CheckboxField from '../CheckboxField';
 import { prompt } from '@/constants/FONT';
 
-const CreateRoomForm = ({className}) => {
-    const { form, isSubmitting, handleChange, handleSubmit } = useCreateRoom();
+const CreateRoomForm = ({ className, onFormSubmissionStart, onFormSubmissionComplete }) => {
+    const { form, isSubmitting, handleChange, handleSubmit } = useCreateRoom({
+        onFormSubmissionStart,
+        onFormSubmissionComplete,
+    });
 
     return (
         <form onSubmit={handleSubmit} className={`${className}`}>
@@ -43,7 +45,7 @@ const CreateRoomForm = ({className}) => {
                 labelClass={`text-white ${prompt.className}`}
             />
 
-            <CheckboxField
+            {/* <CheckboxField
                 label="비공개 방 (비공개시 비밀번호를 입력해주세요.)"
                 name="isPrivate"
                 checked={form.isPrivate}
@@ -63,7 +65,7 @@ const CreateRoomForm = ({className}) => {
                     inputClass={`text-white ${prompt.className} !bg-black !border-white border-1`}
                     labelClass={`text-white ${prompt.className}`}
                 />
-            )}
+            )} */}
 
             <button type="submit" className="bg-[#444] rounded-xl w-full h-[3rem] text-white" disabled={isSubmitting}>
                 {isSubmitting ? '제출 중…' : '생성하기'}

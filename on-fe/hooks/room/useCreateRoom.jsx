@@ -4,26 +4,23 @@ import { backendApiInstance } from '@/apis/instance'
 import ROUTES from '@/constants/ROUTES'
 import { getNickname } from '@/util/AuthUtil'
 
-export function useCreateRoom() {
+export function useCreateRoom({ onFormSubmissionStart, onFormSubmissionComplete } = {}) {
   const router = useRouter()
 
   const [form, setForm] = useState({
     name: '',
     creatorNickname: getNickname(),
     maxParticipants: '',
-    isPrivate: false,
-    password : '',
     roomTime: '',
-
   })
   
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleChange = (e) => {
-    const { name, type, value, checked } = e.target
+    const { name, value } = e.target
     setForm(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: value,
     }))
   }
 
@@ -34,21 +31,18 @@ export function useCreateRoom() {
       return
     }
 
-    if(form.isPrivate && !form.password){
-      alert("비밀번호를 입력하세요.")
-      return
-    }
-
+    onFormSubmissionStart?.()
     setIsSubmitting(true)
     try {
-      const payload = { ...form }
-      const res = await backendApiInstance.post( // TODO: axios 객체 커스텀 하기
+      const payload = { ...form, isPrivate: false, password: '' }
+      const res = await backendApiInstance.post(
         ROUTES.ROOM, 
         payload
       )
       if (res.status===201) {
         alert('방 생성 성공!')
-        router.push(ROUTES.ROOM) // TODO: 생성한 방으로 이동하기
+        router.push(ROUTES.ROOM)
+        onFormSubmissionComplete?.()
       } else {
         throw new Error('서버 응답 오류')
       }
