@@ -96,7 +96,7 @@ const metaverseReducer = (state, action) => {
             
             return {
                 ...state,
-                chatMessages: [...state.chatMessages, newMessage]
+                chatMessages: [...state.chatMessages, newMessage].slice(-200)
             };
         }
 

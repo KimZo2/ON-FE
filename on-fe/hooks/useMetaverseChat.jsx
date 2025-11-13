@@ -15,7 +15,7 @@ export default function useMetaverseChat(userId, playerName) {
                 isOwn: messageData.userId === userId
             };
             
-            setMessages(prev => [...prev, newMessage]);
+            setMessages(prev => [...prev, newMessage].slice(-200));
         };
 
         metaverseService.setChatMessageCallback(handleChatMessage);
