@@ -22,7 +22,7 @@ export default function MetaverseLoginForm({ onConnect, connectionStatus, error,
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label htmlFor="playerName" className="block text-sm font-medium text-blue-200 mb-2">
+                        <label htmlFor="playerName" className="block font-medium text-blue-200 mb-2">
                             플레이어 이름
                         </label>
                         <input
@@ -39,7 +39,7 @@ export default function MetaverseLoginForm({ onConnect, connectionStatus, error,
                     </div>
 
                     {error && (
-                        <div className="bg-red-500 bg-opacity-20 border border-red-400 text-red-200 px-3 py-2 rounded text-sm">
+                        <div className="bg-red-500 bg-opacity-20 border border-red-400 text-red-200 px-3 py-2 rounded">
                             {error}
                         </div>
                     )}
@@ -60,7 +60,7 @@ export default function MetaverseLoginForm({ onConnect, connectionStatus, error,
                     </button>
                 </form>
 
-                <div className="mt-6 text-center text-sm text-blue-300">
+                <div className="mt-6 text-center text-blue-300">
                     <p>• 실시간 멀티플레이어 지원</p>
                     <p>• 채팅 및 상호작용 가능</p>
                     <p>• 가상 세계 탐험</p>

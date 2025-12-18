@@ -10,9 +10,9 @@ import React from 'react';
  * @param {string} props.subtitle - 모달의 부제목 (선택 사항)
  * @param {React.ReactNode} props.children - 모달 콘텐츠 영역에 렌더링될 내용
  * @param {function} props.onClose - 모달을 닫을 때 호출되는 함수
- * @param {string} [props.size='w-80'] - 모달 콘텐츠의 너비 (Tailwind CSS 클래스)
+ * @param {string} [props.size='w-[20rem]'] - 모달 콘텐츠의 너비 (Tailwind CSS 클래스)
  */
-export default function BaseModal({ title, subtitle, children, onClose, size = 'w-80' }) {
+export default function BaseModal({ title, subtitle, children, onClose, size = 'w-[20rem]' }) {
   // 모달 외부 클릭 시 닫기
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget) {
@@ -26,7 +26,7 @@ export default function BaseModal({ title, subtitle, children, onClose, size = '
       onClick={handleOverlayClick}
     >
       {/* 모달 콘텐츠 영역 */}
-      <div className={`bg-black border border-gray-600 rounded-2xl p-10 relative ${size}`}>
+      <div className={`bg-black border border-gray-600 rounded-2xl p-[4rem] relative w-fit ${size}`}>
         {/* 닫기 버튼 */}
         <button
           onClick={onClose}
@@ -36,9 +36,9 @@ export default function BaseModal({ title, subtitle, children, onClose, size = '
         </button>
 
         {/* 모달 헤더 (제목 및 부제목) */}
-        <div className="text-center mb-8">
-          <h1 className={`${pressStart2P.className} whitespace-nowrap text-white text-center text-[30px]`}>{title}</h1>
-          {subtitle && <p className="text-gray-400 text-sm">{subtitle}</p>}
+        <div className="text-center mb-[3rem]">
+          <h1 className={`${pressStart2P.className} whitespace-nowrap text-white text-center text-[2.3rem]`}>{title}</h1>
+          {subtitle && <p className="text-gray-400">{subtitle}</p>}
         </div>
 
         {/* 모달 콘텐츠 (자식 요소) */}

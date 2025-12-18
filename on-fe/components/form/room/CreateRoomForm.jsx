@@ -20,7 +20,7 @@ const CreateRoomForm = ({ className, onFormSubmissionStart, onFormSubmissionComp
                 value={form.name}
                 onChange={handleChange}
                 required
-                inputClass={`text-white ${prompt.className} !bg-black !border-white border-1`}
+                inputClass={`text-white ${prompt.className} !bg-black !border-gray-500 border-1`}
                 labelClass={`text-white ${prompt.className}`}
             />
             <FormField
@@ -30,7 +30,7 @@ const CreateRoomForm = ({ className, onFormSubmissionStart, onFormSubmissionComp
                 onChange={handleChange}
                 required
                 type="number"
-                inputClass={`text-white ${prompt.className} !bg-black !border-white border-1`}
+                inputClass={`text-white ${prompt.className} !bg-black !border-gray-500 border-1`}
                 labelClass={`text-white ${prompt.className}`}
             />
             <FormField
@@ -41,7 +41,7 @@ const CreateRoomForm = ({ className, onFormSubmissionStart, onFormSubmissionComp
                 maxLength={8}
                 type="number"
                 required
-                inputClass={`text-white ${prompt.className} !bg-black !border-white border-1`}
+                inputClass={`text-white ${prompt.className} !bg-black !border-gray-500 border-1`}
                 labelClass={`text-white ${prompt.className}`}
             />
 
@@ -67,8 +67,8 @@ const CreateRoomForm = ({ className, onFormSubmissionStart, onFormSubmissionComp
                 />
             )} */}
 
-            <button type="submit" className="bg-[#444] rounded-xl w-full h-[3rem] text-white" disabled={isSubmitting}>
-                {isSubmitting ? '제출 중…' : '생성하기'}
+            <button type="submit" className="bg-gray-500 rounded-xl w-full h-[4.5rem] text-white" disabled={isSubmitting}>
+                {isSubmitting ? '생성 중' : '생성하기'}
             </button>
         </form>
     )

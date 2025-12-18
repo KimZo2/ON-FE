@@ -17,10 +17,10 @@ export default function CreateRoomModal({ onClose, onStartLoading, onStopLoading
       title="Create Room!"     
       subtitle='입장하기 전, 새로운 방을 생성해 주세요!'                 
       onClose={onClose}                         
-      size="w-[25dvw]"
+      size="w-[30rem]"
     >
       <CreateRoomForm
-        className="flex flex-col justify-between gap-4" 
+        className="flex flex-col justify-between gap-[1.5rem]" 
         onFormSubmissionStart={onStartLoading}
         onFormSubmissionComplete={handleFormSubmissionComplete}
       />
