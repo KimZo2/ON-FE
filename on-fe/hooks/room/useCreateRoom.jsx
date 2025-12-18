@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { backendApiInstance } from '@/apis/instance'
+import { roomService } from '@/apis/client/roomService'
 import ROUTES from '@/constants/ROUTES'
 import { getNickname } from '@/util/AuthUtil'
 
@@ -35,17 +35,18 @@ export function useCreateRoom({ onFormSubmissionStart, onFormSubmissionComplete 
     setIsSubmitting(true)
     try {
       const payload = { ...form, isPrivate: false, password: '' }
-      const res = await backendApiInstance.post(
-        ROUTES.ROOM, 
-        payload
-      )
-      if (res.status===201) {
-        alert('방 생성 성공!')
-        router.push(ROUTES.ROOM)
-        onFormSubmissionComplete?.()
-      } else {
-        throw new Error('서버 응답 오류')
-      }
+      const res = await roomService.create(payload)
+      // TODO: API 응답 구조에 맞게 수정 필요
+      alert('방 생성 성공!')
+      router.push(ROUTES.ROOM)
+      onFormSubmissionComplete?.()
+      // if (res.status===201) {
+      //   alert('방 생성 성공!')
+      //   router.push(ROUTES.ROOM)
+      //   onFormSubmissionComplete?.()
+      // } else {
+      //   throw new Error('서버 응답 오류')
+      // }
     } catch {
       alert('방 생성에 실패하였습니다.')
     } finally {

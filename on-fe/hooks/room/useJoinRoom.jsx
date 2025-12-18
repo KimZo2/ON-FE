@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { backendApiInstance } from '@/apis/instance';
+import { roomService } from '@/apis/client/roomService'
 import { useModal } from '../useModal';
 
 export function useJoinRoom() {
@@ -22,13 +22,11 @@ export function useJoinRoom() {
     setIsLoading(true);
     
     try {
-      const res = await backendApiInstance.get(`/room?page=${page}&size=${size}`);
-      
       const {
         rooms,
         totalElement,
         hasNext,
-      } = res.data;
+      } = await roomService.fetchList({ page, size });      
 
       setRooms(rooms);
       setTotalElements(totalElement);
@@ -73,7 +71,7 @@ export function useJoinRoom() {
   const handleJoinByCode = useCallback(async (code) => {
     setIsSubmitting(true);
     try {
-      const res = await backendApiInstance.post('/api/rooms/join-by-code', { code }); // TODO: 코드 입장 API 수정 필요
+      const res = await roomService.joinByCode(code); // TODO: 코드 입장 API 수정 필요
 
       if (res.status === 200) {
         alert('코드로 방 입장 성공!');
@@ -94,9 +92,8 @@ export function useJoinRoom() {
   const handleJoinExistingRoom = useCallback(async (roomId) => {
     setIsSubmitting(true);
     try {
-      // const res = await backendApiInstance.post(`/room/${roomId}`); // TODO: 방 입장 API 수정 필요
-        alert('방 입장 성공!');
-        router.push(`/room/${roomId}`);
+      const res = await roomService.join(roomId);
+      router.push(`/room/${roomId}`);
     } catch (err) {
       console.error('기존 방 입장 실패:', err);
       alert(`방 입장에 실패하였습니다. ${err.response?.data?.message || err.message}`);
