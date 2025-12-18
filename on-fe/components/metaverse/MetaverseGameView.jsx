@@ -26,7 +26,7 @@ export default function MetaverseGameView({
                 {/* <div className="text-sm">온라인: {onlineCount}명</div>
                 <div className="text-xs text-gray-300">플레이어: {playerName}</div> */}
                 <div className="">온라인: {onlineCount}명</div>
-                <div className="text-[1rem] text-gray-300">플레이어: {playerName}</div>
+                <div className="text-[1.2rem] text-gray-300">플레이어: {playerName}</div>
             </div>
 
             {/* 채팅 인터페이스 */}

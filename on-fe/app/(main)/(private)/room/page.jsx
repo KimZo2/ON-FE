@@ -40,7 +40,7 @@ const Page = () => {
         <DefaultPageFrame>
 
             {/* 램프 모양과 버튼 부분 */}
-            <div className="relative max-w-[300rem] mx-auto p-[3rem] px-[1.5rem] grid gap-12 items-center justify-items-center text-center min-h-screen">
+            <div className="relative max-w-[120rem] mx-auto p-[3rem] px-[1.5rem] grid gap-12 items-center justify-items-center text-center min-h-screen">
                 <div className='flex flex-col gap-[5dvw]'>
                     <StudyTogether />
                     <div className='flex flex-row justify-between w-[50dvw]'>

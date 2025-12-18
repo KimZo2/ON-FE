@@ -21,7 +21,7 @@ const Main = () => {
     <DefaultPageFrame>
 
       {/* 본문 콘텐츠 */}
-      <div className="relative py-[7rem] grid gap-[0.5rem] items-center justify-items-center text-center min-h-screen">
+      <div className="relative max-w-[120rem] mx-auto py-[7rem] grid gap-[0.5rem] items-center justify-items-center text-center min-h-screen">
         <Image
           src="/assets/on_icon.svg"
           width={300}

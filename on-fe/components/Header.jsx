@@ -46,7 +46,7 @@ const Header = () => {
           </button>
         </div>
       ) : (
-        <Link href="/login" className={`${pressStart2P.className} text-white  hover:opacity-80`}>login</Link>
+        <Link href="/login" className={`${pressStart2P.className} text-white hover:opacity-80`}>login</Link>
       )}
     </div>
   );

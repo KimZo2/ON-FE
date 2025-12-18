@@ -12,7 +12,7 @@ export default function FormField({ label, type = 'text', name, value, onChange,
     <div className={`${divClass} w-full`}>
       <label className={labelClass}>{label}</label>
       <input
-        className={`input p-[0.5rem] mt-[0.5rem] w-full rounded-xl bg-white placeholder:text-gray-400 focus:outline-none ${inputClass}`}
+        className={`input p-[1.25rem] mt-[0.75rem] w-full rounded-xl bg-white placeholder:text-gray-400 focus:outline-none ${inputClass}`}
         type={type}
         name={name}
         value={value}
