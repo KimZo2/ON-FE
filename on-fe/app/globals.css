@@ -4,11 +4,10 @@
 /* 기본 폰트는 body에만 적용해야 Tailwind 클래스가 덮어쓸 수 있음 */
 body {
   font-family: 'Pretendard', sans-serif;
+  font-size: 1.6rem; /* 16px */
 }
 
-html, body {
-  width: 100%;
-  height: 100%;
+html {
   overflow: hidden;
-  
+  font-size: 62.5%; /* 1rem = 10px */
 }
