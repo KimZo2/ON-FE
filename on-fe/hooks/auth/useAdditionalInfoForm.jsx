@@ -1,8 +1,6 @@
-// hooks/useAdditionalInfoForm.js
 import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import axios from 'axios'
-
+import { userService } from '@/apis/client/userService'
 
 export function useAdditionalInfoForm() {
   const router = useRouter()
@@ -40,10 +38,7 @@ export function useAdditionalInfoForm() {
     setIsSubmitting(true)
     try {
       const payload = { provider, providerId, ...form }
-      const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_BE_SERVER_URL}/auth/signup`,
-        payload
-      )
+      const res = await userService.signup(payload)
       if (res.status===201) {
         alert('회원가입 성공!')
         router.push('/')
