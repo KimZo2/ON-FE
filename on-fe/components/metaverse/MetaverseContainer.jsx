@@ -31,7 +31,7 @@ function MetaverseContent({ userId, userNickname, roomId }) {
                 <FlyingStar />
                 <div className="relative z-10 bg-black bg-opacity-50 backdrop-blur-sm border border-white border-opacity-20 rounded-xl p-8 text-center">
                     <LoadingSpinner message='메타버스에 연결 중..' color='white'/>
-                    <p className="text-gray-300 text-sm mt-4">
+                    <p className="text-gray-300 mt-4">
                         {metaverse.error ? `연결 오류: ${metaverse.error}` : '잠시만 기다려주세요'}
                     </p>
                     {metaverse.error && (
