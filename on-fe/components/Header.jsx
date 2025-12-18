@@ -32,21 +32,21 @@ const Header = () => {
 };
 
   return (
-    <div className="flex justify-between px-[30px] py-[30px] items-center">
-      <Link href="/" className={`${pressStart2P.className} text-white text-[1rem]`}>ON</Link>
+    <div className="flex justify-between px-[3rem] py-[3rem] items-center">
+      <Link href="/" className={`${pressStart2P.className} text-white`}>ON</Link>
 
       {isLogin ? (
-        <div className="flex items-center gap-4">
-          <span className="text-white text-[1rem]"> Welcome {getNickname()}!</span>
+        <div className="flex items-center gap-[1rem] text-[1.5rem]">
+          <span className={`${pressStart2P.className} text-white`}> Welcome {getNickname()}!</span>
           <button
             onClick={handleLogout}
-            className={`${pressStart2P.className} text-white text-[0.9rem] px-3 py-1 border border-white rounded hover:bg-white hover:text-black transition`}
+            className={`${pressStart2P.className} text-white px-[1rem] py-[0.5rem] border border-white rounded-xl hover:bg-white hover:text-black transition`}
           >
             logout
           </button>
         </div>
       ) : (
-        <Link href="/login" className={`${pressStart2P.className} text-white text-[1rem] hover:opacity-80`}>login</Link>
+        <Link href="/login" className={`${pressStart2P.className} text-white  hover:opacity-80`}>login</Link>
       )}
     </div>
   );

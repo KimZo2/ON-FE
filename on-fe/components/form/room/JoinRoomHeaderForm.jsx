@@ -22,22 +22,22 @@ export default function JoinRoomHeaderForm({ searchTerm, onSearchChange, onOpenC
             value={searchTerm} 
             onChange={onSearchChange}
             className="
-                w-full h-14 rounded-xl
+                w-full h-[3.5rem] rounded-xl
                 bg-transparent
-                text-white placeholder:text-white/50
-                border border-white/50
-                px-12 outline-none
+                text-white placeholder:text-gray-400
+                border border-gray-400
+                px-[3rem] outline-none
                 focus:border-white focus:ring-1 focus:ring-white
             "
         />
-        <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="absolute left-[1rem] top-1/2 -translate-y-1/2 w-[1.5rem] h-[1.5rem] text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
       </div>
       {/* 코드로 입장하기 위한 코드 버튼 */}
       <button 
           onClick={onOpenCodeModal}
-          className="h-14 bg-transparent border border-white text-white px-4 py-2 rounded-xl">
+          className="h-[3.5rem] bg-transparent border border-white text-white px-[1rem] py-[0.5rem] rounded-xl">
           code
       </button>  
     </div>

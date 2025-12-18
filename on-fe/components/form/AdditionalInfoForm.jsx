@@ -6,12 +6,12 @@ import { useAdditionalInfoForm } from '@/hooks/auth/useAdditionalInfoForm'
 import Link from 'next/link'
 import { pressStart2P } from '@/constants/FONT'
 
-export default function AdditionalInfoForm({className}) {
+export default function AdditionalInfoForm() {
     const { form, isSubmitting, handleChange, handleSubmit } = useAdditionalInfoForm();
 
     return (
-        <form onSubmit={handleSubmit} className={`inputs ${className}`}>
-            <Link href="/" className={`${pressStart2P.className} text-white text-center text-[36px]`}>ON</Link>
+        <form onSubmit={handleSubmit} className="inputs">
+            <Link href="/" className={`${pressStart2P.className} text-white text-center text-[2.5rem]`}>ON</Link>
 
             <FormField
                 className=""
@@ -21,7 +21,7 @@ export default function AdditionalInfoForm({className}) {
                 onChange={handleChange}
                 required={true}
                 labelClass="text-white"
-                inputClass="!h-[3rem]"
+                inputClass="!h-[4rem] !w-full"
             />
             <FormField
                 label="*닉네임"
@@ -30,7 +30,7 @@ export default function AdditionalInfoForm({className}) {
                 onChange={handleChange}
                 required={true}
                 labelClass="text-white"
-                inputClass="!h-[3rem]"
+                inputClass="!h-[4rem] !w-full"
             />
             <FormField
                 label="*생년월일 (8자리)"
@@ -40,7 +40,7 @@ export default function AdditionalInfoForm({className}) {
                 maxLength={8}
                 required={true}
                 labelClass="text-white"
-                inputClass="!h-[3rem]"
+                inputClass="!h-[4rem] !w-full"
             />
 
             <CheckboxField
@@ -50,8 +50,8 @@ export default function AdditionalInfoForm({className}) {
                 onChange={handleChange}
             />
 
-            <button type="submit" className="submit-btn" disabled={isSubmitting}>
-                {isSubmitting ? '제출 중…' : '회원가입'}
+            <button type="submit" className="submit-btn w-full" disabled={isSubmitting}>
+                {isSubmitting ? '제출 중' : '회원가입'}
             </button>
         </form>
     )

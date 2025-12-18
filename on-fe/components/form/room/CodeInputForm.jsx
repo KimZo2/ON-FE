@@ -44,13 +44,13 @@ export default function CodeInputForm({
         value={code} // `code` 상태와 연결
         onChange={(e) => setCode(e.target.value)} // 입력 값 변경 시 `code` 상태 업데이트
         // Tailwind CSS 클래스를 사용하여 이미지에 맞는 스타일 적용
-        className="w-full p-4 rounded-xl bg-gray-800 text-white placeholder:text-gray-400 border border-gray-600 focus:border-white outline-none"
+        className="p-[1rem] rounded-xl text-white placeholder:text-gray-400 border border-gray-600 focus:border-white outline-none"
         disabled={isSubmitting} // 제출 중일 때 입력 필드 비활성화
       />
       <button
         type="submit"
         // Tailwind CSS 클래스를 사용하여 이미지에 맞는 스타일 적용 (노란색 버튼)
-        className="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-4 rounded-xl transition-colors duration-200"
+        className="bg-gray-500 hover:bg-yellow-500 text-white py-[1rem] rounded-xl transition-colors duration-200"
         disabled={isSubmitting} // 제출 중일 때 버튼 비활성화
       >
         입장하기

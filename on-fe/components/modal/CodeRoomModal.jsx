@@ -17,10 +17,9 @@ export default function CodeRoomModal({ onClose, onStartLoading, onStopLoading }
       title="Code"     
       subtitle='입장하려는 방의 코드를 입력해 주세요!'                 
       onClose={onClose}                         
-      size="w-[30rem] max-w-[90vw]" 
     >
       <CodeInputForm
-        className="flex flex-col gap-4" // 이미지처럼 입력창과 버튼 사이에 간격(gap)을 줍니다.
+        className="flex flex-col gap-[1rem]" // 이미지처럼 입력창과 버튼 사이에 간격(gap)을 줍니다.
         onFormSubmissionStart={onStartLoading}
         onFormSubmissionComplete={handleFormSubmissionComplete}
       />

@@ -5,50 +5,50 @@ import { pressStart2P } from '@/constants/FONT'
 
 const LoginForm = () => {
   return (
-    <div className="flex flex-col gap-8 w-[20dvw] items-center bg-black">
-      <Link href="/" className={`${pressStart2P.className} text-white text-center text-[36px]`}>ON</Link>
+    <div className="flex flex-col gap-[2rem] w-fit items-center bg-black">
+      <Link href="/" className={`${pressStart2P.className} text-white text-center text-[2.5rem]`}>ON</Link>
 
       {/* 카카오 로그인 */}
       <div
-        className="flex items-center justify-center w-full px-6 py-6 gap-6
-                   rounded-[12px] bg-[#FEE500] text-[1dvw] border border-[#BEBEBE]
+        className="flex items-center justify-center w-full mx-[5rem] px-[2rem] py-[1.5rem] gap-[2rem]
+                   rounded-xl bg-[#FEE500] border border-[#BEBEBE]
                    hover:bg-[#4d2512] hover:text-white cursor-pointer transition-colors"
         onClick={handleKakao}
       >
-        <div className="w-[35px] h-[35px] bg-[url('/assets/kakao_icon.svg')] bg-center bg-cover bg-no-repeat" />
+        <div className="w-[2rem] h-[2rem] bg-[url('/assets/kakao_icon.svg')] bg-center bg-cover bg-no-repeat" />
         카카오 로그인
       </div>
 
       {/* 구글 로그인 */}
       <div
-        className="flex items-center justify-center w-full px-6 py-6 gap-6
-                   rounded-[12px] bg-white text-[1dvw] border border-[#BEBEBE]
+        className="flex items-center justify-center w-full px-[2rem] py-[1.5rem] gap-[2rem]
+                   rounded-xl bg-white border border-[#BEBEBE]
                    hover:bg-[#585858] hover:text-white cursor-pointer transition-colors"
         onClick={handleGoogle}
       >
-        <div className="w-[35px] h-[35px] bg-[url('/assets/google_icon.svg')] bg-center bg-cover bg-no-repeat" />
+        <div className="w-[2rem] h-[2rem] bg-[url('/assets/google_icon.svg')] bg-center bg-cover bg-no-repeat" />
         구글 로그인
       </div>
 
       {/* 네이버 로그인 */}
       <div
-        className="flex items-center justify-center w-full px-6 py-6 gap-5
-                   rounded-[12px] bg-[#04C75B] text-[1dvw]
+        className="flex items-center justify-center w-full px-[2rem] py-[1.5rem] gap-[2rem]
+                   rounded-xl bg-[#04C75B]
                    hover:bg-[#2DB400] hover:text-white cursor-pointer transition-colors"
         onClick={handleNaver}
       >
-        <div className="w-[35px] h-[35px] bg-[url('/assets/naver_icon.svg')] bg-center bg-cover bg-no-repeat" />
+        <div className="w-[2rem] h-[2rem] bg-[url('/assets/naver_icon.svg')] bg-center bg-cover bg-no-repeat" />
         네이버 로그인
       </div>
 
       {/* 깃허브 로그인 */}
       <div
-        className="flex items-center justify-center w-full px-6 py-6 gap-5
-                   rounded-[12px] bg-white text-[1dvw] border border-[#BEBEBE]
+        className="flex items-center justify-center w-full px-[2rem] py-[1.5rem] gap-[2rem]
+                   rounded-xl bg-white border border-[#BEBEBE]
                    hover:bg-black hover:text-white cursor-pointer transition-colors"
         onClick={handleGithub}
       >
-        <div className="w-[35px] h-[35px] bg-[url('/assets/github_icon.svg')] bg-center bg-cover bg-no-repeat" />
+        <div className="w-[2rem] h-[2rem] bg-[url('/assets/github_icon.svg')] bg-center bg-cover bg-no-repeat" />
         깃허브 로그인
       </div>
     </div>

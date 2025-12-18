@@ -40,20 +40,20 @@ const Page = () => {
         <DefaultPageFrame>
 
             {/* 램프 모양과 버튼 부분 */}
-            <div className="relative max-w-[1200px] mx-auto p-12 px-6 grid gap-12 items-center justify-items-center text-center min-h-screen">
+            <div className="relative max-w-[300rem] mx-auto p-[3rem] px-[1.5rem] grid gap-12 items-center justify-items-center text-center min-h-screen">
                 <div className='flex flex-col gap-[5dvw]'>
                     <StudyTogether />
                     <div className='flex flex-row justify-between w-[50dvw]'>
                         <div className='flex flex-col justify-between'>
                             {onMouse[0] ? <LampOn /> : <LampOff />}
                             <div onMouseOver={() => handleMouseOver(0)} onMouseLeave={() => handleMouseLeave(0)}>
-                                <RoomButton text={"Create Room!"} onClick={openCreateModal} />
+                                <RoomButton text={"Create Room"} onClick={openCreateModal} />
                             </div>
                         </div>
                         <div className='flex flex-col justify-between'>
                             {onMouse[1] ? <LampOn /> : <LampOff />}
                             <div onMouseOver={() => handleMouseOver(1)} onMouseLeave={() => handleMouseLeave(1)}>
-                                <RoomButton text={"Join Room!"} onClick={openJoinModal} />
+                                <RoomButton text={"Join Room"} onClick={openJoinModal} />
                             </div>
                         </div>
                     </div>
@@ -85,7 +85,7 @@ const RoomButton = ({ text, onClick }) => {
     return (
         <StarBorderButton
             as="button"
-            className="custom-class text-xs"
+            className="custom-class"
             speed="5s"
             onClick={onClick}
         >
@@ -102,7 +102,7 @@ const StudyTogether = () => {
             pauseDuration={1500}
             showCursor={true}
             cursorCharacter="|"
-            className='text-3xl'
+            className='text-[2.5rem] text-white'
         />
     );
 };

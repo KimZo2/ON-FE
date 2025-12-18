@@ -21,19 +21,19 @@ const Main = () => {
     <DefaultPageFrame>
 
       {/* 본문 콘텐츠 */}
-      <div className="relative max-w-[1200px] mx-auto p-12 px-6 grid gap-12 items-center justify-items-center text-center min-h-screen">
+      <div className="relative py-[7rem] grid gap-[0.5rem] items-center justify-items-center text-center min-h-screen">
         <Image
           src="/assets/on_icon.svg"
           width={300}
           height={300}
           alt='on' />
-        <div className="flex flex-col gap-8 items-center max-w-[800px]">
-          <div className={`${pressStart2P.className} antialiased text-white text-[0.8rem] font-semibold tracking-wider uppercase`}>{sub_title}</div>
-          <div className={`${pressStart2P.className} text-[2rem] font-black leading-[1.1] bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent`}>{title}</div>
-          <div className="text-gray-300 text-base leading-relaxed max-w-[32rem]">{slogan}</div>
+        <div className="flex flex-col gap-[2rem] items-center">
+          <div className={`${pressStart2P.className} antialiased text-white text-[1.5rem] font-semibold tracking-wider uppercase`}>{sub_title}</div>
+          <div className={`${pressStart2P.className} text-[3rem] leading-[1.1] bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent`}>{title}</div>
+          <div className="text-gray-300 leading-relaxed px-[5rem]">{slogan}</div>
           <Link
             href={isLogin ? ROUTES.ROOM : ROUTES.LOGIN}
-            className="px-8 py-4 text-base text-white rounded-md bg-gray-700/70 shadow-[0_10px_15px_rgba(255,255,255,0.1)] transition-all duration-300 ease-in-out cursor-pointer overflow-hidden
+            className="px-[2rem] py-[1rem] text-white rounded-xl bg-gray-500/70 transition-all duration-300 ease-in-out cursor-pointer overflow-hidden
                 hover:-translate-y-0.5 hover:shadow-[0_20px_25px_rgba(0,0,0,0.15)]"
           >시작하기</Link>
         </div>

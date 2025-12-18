@@ -29,33 +29,33 @@ export default function RoomListDisplay({
   return (
     <div>
       {availableRooms && availableRooms.length > 0 ? (        
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-[1rem]">
           <button
             onClick={goToPrevPage}
             disabled={currentPage === 1 || isSubmitting}
-            className="bg-black hover:bg-gray-600 text-white p-2 rounded-full disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+            className="bg-black hover:bg-gray-600 text-white p-[0.5rem] rounded-full disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
             aria-label="Previous page"
           >
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-[1.5rem] h-[1.5rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
 
-          <div className="grid grid-cols-3 gap-4 pb-4 flex-grow">
+          <div className="grid grid-cols-3 gap-[1rem] pb-[2rem] flex-grow">
             {availableRooms.map(room => (
               <div
                 key={room.roomId}
                 onClick={() => !isSubmitting && onRoomSelect(room.roomId)}
-                className={`bg-white text-gray-900 rounded-lg cursor-pointer transition-colors duration-200 p-4
+                className={`bg-white text-gray-900 rounded-lg cursor-pointer transition-colors duration-200 p-[1rem]
                             ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'} flex flex-col justify-between`}
               >
                 {/* 방 이름 */}
-                <div className="mb-2">
-                    <h4 className="font-medium text-base">{room.roomName}</h4>
+                <div className="w-[15rem] mb-[1.5rem] p-[0.5rem]">
+                    <h4 className="">{room.roomName}</h4>
                 </div>
                 {/* 참여 인원 정보 */}
-                <div className="flex items-center justify-end text-sm text-gray-600">
-                    <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="flex items-center justify-end text-gray-600">
+                    <svg className="w-[1.5rem] h-[1.5rem] mr-[1rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                     <span>{room.roomCurrentPersonCnt}/{room.roomMaximumPersonCnt}</span>
