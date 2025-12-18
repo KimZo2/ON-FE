@@ -4,10 +4,10 @@
 
 const AUTH = {
     SIGNUP: "/auth/signup",
-    KAKAO_LOGIN : "/auth/login/kakao",
-    NAVER_LOGIN : "/auth/login/naver",
-    GITHUB_LOGIN : "/auth/login/github",
-    GOOGLE_LOGIN : "/auth/login/google"
+    LOGIN: "/auth/login",
+    LOGOUT: "/auth/logout",
+    REFRESH: "/auth/refresh",
+    OAUTH_LOGIN: (provider) => `/auth/login/${provider}`,
 };
 
 const WEBSOCKET = {
