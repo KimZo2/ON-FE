@@ -5,10 +5,11 @@ import { clientApiInstance } from "../instances/clientApiInstance";
 /**
  * OAuth 로그인
  */
-export const login = ({ oauthType, code }) => {
-  return publicApiInstance.get(API.AUTH.OAUTH_LOGIN(oauthType), {
+export const login = async({ oauthType, code }) => {
+  const res = await publicApiInstance.get(API.AUTH.OAUTH_LOGIN(oauthType), {
     params: { code },
   });
+  return res.data;
 };
 
 /**
