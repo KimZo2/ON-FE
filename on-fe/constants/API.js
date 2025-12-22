@@ -4,7 +4,6 @@
 
 const AUTH = {
     SIGNUP: "/auth/signup",
-    LOGIN: "/auth/login",
     LOGOUT: "/auth/logout",
     REFRESH: "/auth/refresh",
     OAUTH_LOGIN: (provider) => `/auth/login/${provider}`,
