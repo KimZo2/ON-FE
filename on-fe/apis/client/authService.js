@@ -1,6 +1,7 @@
 import API from "@/constants/API";
 import { publicApiInstance } from "../instances/publicApiInstance";
 import { clientApiInstance } from "../instances/clientApiInstance";
+import { handleApiResponse } from "../utils/handleApiResponse";
 
 /**
  * OAuth 로그인
@@ -9,7 +10,7 @@ export const login = async({ oauthType, code }) => {
   const res = await publicApiInstance.get(API.AUTH.OAUTH_LOGIN(oauthType), {
     params: { code },
   });
-  return res.data;
+  return handleApiResponse(res);
 };
 
 /**
