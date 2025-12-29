@@ -1,15 +1,15 @@
 import { clientApiInstance } from '@/apis/instances/clientApiInstance'
-import ROUTES from '@/constants/ROUTES'
+import API from '@/constants/API'
 
 export const roomService = {
   // 방 생성
   create(payload) {
-    return clientApiInstance.post(ROUTES.ROOM, payload)
+    return clientApiInstance.post(API.ROOM.BASE, payload)
   },
 
   // 방 목록 조회 (페이징)
   fetchList({ page, size, keyword }) {
-    return clientApiInstance.get(ROUTES.ROOM, {
+    return clientApiInstance.get(API.ROOM.BASE, {
       params: {
         page,
         size,
@@ -18,13 +18,14 @@ export const roomService = {
     })
   },
 
-  // 코드로 방 입장
-  joinByCode(code) {
-    return clientApiInstance.post('/room/join-by-code', { code })
-  },
+  // TODO: 추후 API 확정되면 메서드 구현 or 제거 필요
+  // // 코드로 방 입장
+  // joinByCode(code) {
+  //   return clientApiInstance.post(API.ROOM.JOIN_BY_CODE, { code })
+  // },
 
-  // 기존 방 입장
-  join(roomId) {
-    return clientApiInstance.post(`/room/${roomId}/join`) // TODO: API 경로 확인 필요
-  },
+  // // 기존 방 입장
+  // join(roomId) {
+  //   return clientApiInstance.post(API.ROOM.JOIN(roomId)) // TODO: API 경로 확인 필요
+  // },
 }
