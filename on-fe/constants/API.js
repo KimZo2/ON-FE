@@ -4,10 +4,10 @@
 
 const AUTH = {
     SIGNUP: "/auth/signup",
-    KAKAO_LOGIN : "/auth/login/kakao",
-    NAVER_LOGIN : "/auth/login/naver",
-    GITHUB_LOGIN : "/auth/login/github",
-    GOOGLE_LOGIN : "/auth/login/google"
+    LOGOUT: "/auth/logout",
+    REFRESH: "/auth/refresh",
+    LOGIN: "/auth/login",
+    OAUTH_LOGIN: (provider) => `/auth/login/${provider}`,
 };
 
 const WEBSOCKET = {
@@ -21,4 +21,13 @@ const METAVERSE = {
     SYNC : (roomId) => `/app/room/${roomId}.sync`,
 }
 
-export default {AUTH, METAVERSE, WEBSOCKET};
+const ROOM = {
+  BASE: "/room",
+};
+
+const USER = {
+    MYINFO : "/member/info",
+    ADDITIONAL_INFO : "/member/additional-info",
+}
+
+export default {AUTH, METAVERSE, WEBSOCKET, ROOM};

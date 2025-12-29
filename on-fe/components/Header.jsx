@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { getNickname, isLoggedIn, removeAccessToken, removeNickname, removeTokenExpire } from '@/util/AuthUtil';
 import ROUTES from '@/constants/ROUTES';
 import { pressStart2P } from '@/constants/FONT'
-import { logoutRequest } from '@/apis/instance';
+import { logoutRequest } from '@/apis/client/authService';
 
 const Header = () => {
   const router = useRouter();

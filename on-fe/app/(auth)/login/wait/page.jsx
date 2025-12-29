@@ -3,7 +3,7 @@ import { useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import LoadingSpinner from '@/components/loading/LoadingSpinner'
 import { saveAccessToken, saveNickname, saveTokenExpire } from '@/util/AuthUtil'
-import { goLogin } from '@/apis/auth'
+import { login } from '@/apis/client/authService'
 import ROUTES from '@/constants/ROUTES'
 
 const SUPPORTED = new Set(['kakao', 'github', 'google', 'naver']);
@@ -22,7 +22,7 @@ function OAuthCallbackContent() {
       if (!SUPPORTED.has(oauthType)) {
         throw new Error(`지원하지 않는 OAuth 타입입니다: ${oauthType}`);
       }
-      return await goLogin({ oauthType, code });
+      return await login({ oauthType, code });
     };
 
     if (!code || !oauthType) {
