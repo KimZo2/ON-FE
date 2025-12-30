@@ -16,14 +16,12 @@ export default function OAuthCallbackContent() {
 
   useEffect(() => {
     if (hasProcessed.current) return
+    hasProcessed.current = true
 
     if (!accessToken || !accessTokenExpire || !nickname) {
-      hasProcessed.current = true
       router.replace(ROUTES.LOGIN)
       return
     }
-
-    hasProcessed.current = true
 
     saveAccessToken(accessToken)
     saveTokenExpire(accessTokenExpire)
