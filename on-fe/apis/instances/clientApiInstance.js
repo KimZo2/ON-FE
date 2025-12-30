@@ -57,12 +57,12 @@ clientApiInstance.interceptors.response.use(
 
       try {
         const refreshRes = await clientApiInstance.get(API.AUTH.REFRESH);
-        const { token, tokenExpire } = refreshRes;
+        const { accessToken, accessTokenExpire } = refreshRes;
 
-        saveAccessToken(token);
-        saveTokenExpire(tokenExpire);
+        saveAccessToken(accessToken);
+        saveTokenExpire(accessTokenExpire);
 
-        originalRequest.headers.Authorization = `Bearer ${token}`;
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return clientApiInstance(originalRequest);
       } catch (e) {
         window.location.href = "/login";

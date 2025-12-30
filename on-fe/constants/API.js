@@ -5,10 +5,8 @@
 const AUTH = {
     SIGNUP: "/auth/signup",
     LOGOUT: "/auth/logout",
-    REFRESH: "/auth/refresh",
+    REFRESH: "/auth/reissue",
     LOGIN: "/auth/login",
-    // TODO: backend 로직 변경으로 인해 제거 필요 & 동작 확인 후 삭제
-    // OAUTH_LOGIN: (provider) => `/oauth2/authorization/${provider}`,
 };
 
 const WEBSOCKET = {
