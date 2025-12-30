@@ -5,9 +5,8 @@
 const AUTH = {
     SIGNUP: "/auth/signup",
     LOGOUT: "/auth/logout",
-    REFRESH: "/auth/refresh",
+    REFRESH: "/auth/reissue",
     LOGIN: "/auth/login",
-    OAUTH_LOGIN: (provider) => `/auth/login/${provider}`,
 };
 
 const WEBSOCKET = {

@@ -5,8 +5,7 @@ import { userService } from '@/apis/client/userService'
 export function useAdditionalInfoForm() {
   const router = useRouter()
   const params = useSearchParams()
-  const provider   = params.get('provider')   || ''
-  const providerId = params.get('providerId') || ''
+  const memberId   = params.get('memberId')   || ''
 
   const [form, setForm] = useState({
     name: '',
@@ -37,17 +36,18 @@ export function useAdditionalInfoForm() {
 
     setIsSubmitting(true)
     try {
-      const payload = { provider, providerId, ...form }
-      const res = await userService.signup(payload)
-      if (res.status===201) {
-        alert('회원가입 성공!')
-        router.push('/')
+      const payload = { memberId, ...form }
+      await userService.signup(payload)
+      alert('회원가입 성공!')
+      router.push('/')
+
+    }catch (error) {    
+      if (error.type === "BUSINESS") {
+        alert(error.message);
       } else {
-        throw new Error('서버 응답 오류')
+        alert("일시적인 오류가 발생했습니다.");
       }
-    } catch {
-      alert('회원가입 실패, 다시 시도해 주세요.')
-    } finally {
+    }finally {
       setIsSubmitting(false)
     }
   }

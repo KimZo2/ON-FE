@@ -1,5 +1,5 @@
 import React from 'react'
-import { handleGithub, handleGoogle, handleKakao, handleNaver } from '@/util/AuthUtil'
+import { handleGithub, handleKakao } from '@/util/AuthUtil'
 import Link from 'next/link'
 import { pressStart2P } from '@/constants/FONT'
 
@@ -17,28 +17,6 @@ const LoginForm = () => {
       >
         <div className="w-[2rem] h-[2rem] bg-[url('/assets/kakao_icon.svg')] bg-center bg-cover bg-no-repeat" />
         카카오 로그인
-      </div>
-
-      {/* 구글 로그인 */}
-      <div
-        className="flex items-center justify-center w-full px-[2rem] py-[1.5rem] gap-[2rem]
-                   rounded-xl bg-white border border-[#BEBEBE]
-                   hover:bg-[#585858] hover:text-white cursor-pointer transition-colors"
-        onClick={handleGoogle}
-      >
-        <div className="w-[2rem] h-[2rem] bg-[url('/assets/google_icon.svg')] bg-center bg-cover bg-no-repeat" />
-        구글 로그인
-      </div>
-
-      {/* 네이버 로그인 */}
-      <div
-        className="flex items-center justify-center w-full px-[2rem] py-[1.5rem] gap-[2rem]
-                   rounded-xl bg-[#04C75B]
-                   hover:bg-[#2DB400] hover:text-white cursor-pointer transition-colors"
-        onClick={handleNaver}
-      >
-        <div className="w-[2rem] h-[2rem] bg-[url('/assets/naver_icon.svg')] bg-center bg-cover bg-no-repeat" />
-        네이버 로그인
       </div>
 
       {/* 깃허브 로그인 */}
