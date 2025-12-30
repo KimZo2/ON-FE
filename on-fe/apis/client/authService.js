@@ -6,12 +6,13 @@ import { handleApiResponse } from "../utils/handleApiResponse";
 /**
  * OAuth 로그인
  */
-export const login = async({ oauthType, code }) => {
-  const res = await publicApiInstance.get(API.AUTH.OAUTH_LOGIN(oauthType), {
-    params: { code },
-  });
-  return handleApiResponse(res);
-};
+// TODO: backend 로직 변경으로 인해 제거 필요 & 동작 확인 후 삭제
+// export const login = async({ oauthType, code }) => {
+//   const res = await publicApiInstance.get(API.AUTH.OAUTH_LOGIN(oauthType), {
+//     params: { code },
+//   });
+//   return handleApiResponse(res);
+// };
 
 /**
  * 로그아웃 요청 (Refresh Token 삭제)

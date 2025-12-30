@@ -6,13 +6,13 @@ import { saveAccessToken, saveNickname, saveTokenExpire } from '@/util/AuthUtil'
 import { login } from '@/apis/client/authService'
 import ROUTES from '@/constants/ROUTES'
 
-const SUPPORTED = new Set(['kakao', 'github', 'google', 'naver']);
+const SUPPORTED = new Set(['kakao', 'github',]);
 
 function OAuthCallbackContent() {
   const router = useRouter()
   const params = useSearchParams()
   const code = params.get('code')
-  const oauthType = params.get('oauthType')  // 'kakao', 'github', 'google', 'naver'
+  const oauthType = params.get('oauthType')  // 'kakao', 'github'
 
   // 로그인 페이지로 넘어온 이후, 로직
   useEffect(() => {
@@ -22,7 +22,7 @@ function OAuthCallbackContent() {
       if (!SUPPORTED.has(oauthType)) {
         throw new Error(`지원하지 않는 OAuth 타입입니다: ${oauthType}`);
       }
-      return await login({ oauthType, code });
+      // return await login({ oauthType, code });
     };
 
     if (!code || !oauthType) {
