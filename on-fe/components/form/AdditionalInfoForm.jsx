@@ -13,7 +13,7 @@ export default function AdditionalInfoForm() {
         <form onSubmit={handleSubmit} className="inputs flex flex-col gap-[2rem] w-full">
             <Link href="/" className={`${pressStart2P.className} text-white text-center text-[2.5rem]`}>ON</Link>
             <p className='text-center text-white'>회원가입을 위해 아래 정보를 입력해주세요 !</p>
-            {/* <FormField
+            <FormField
                 className=""
                 label="* 이름"
                 name="name"
@@ -22,7 +22,7 @@ export default function AdditionalInfoForm() {
                 required={true}
                 labelClass="text-white"
                 inputClass="!h-[4rem] !w-full"
-            /> */}
+            />
             <FormField
                 label="* 닉네임"
                 name="nickname"
@@ -41,6 +41,7 @@ export default function AdditionalInfoForm() {
                 required={true}
                 labelClass="text-white"
                 inputClass="!h-[4rem] !w-full"
+                placeholder="예: 19900101"
             />
 
             <CheckboxField

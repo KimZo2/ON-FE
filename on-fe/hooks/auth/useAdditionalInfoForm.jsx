@@ -8,6 +8,7 @@ export function useAdditionalInfoForm() {
   const memberId   = params.get('memberId')   || ''
 
   const [form, setForm] = useState({
+    name: '',
     nickname: '',
     birthday: '',
     agreement: false,
@@ -24,7 +25,7 @@ export function useAdditionalInfoForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!form.nickname || form.birthday.length !== 8) {
+    if (!form.name || !form.nickname || form.birthday.length !== 8) {
       alert('필수 항목을 올바르게 입력해 주세요.')
       return
     }
@@ -36,6 +37,7 @@ export function useAdditionalInfoForm() {
     setIsSubmitting(true)
     try {
       const payload = { memberId, ...form }
+      console.log('Signup payload:', payload);
       await userService.signup(payload)
       
       alert('회원가입 성공!')
