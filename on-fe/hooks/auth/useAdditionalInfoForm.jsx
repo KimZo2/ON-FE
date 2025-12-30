@@ -37,9 +37,7 @@ export function useAdditionalInfoForm() {
     setIsSubmitting(true)
     try {
       const payload = { memberId, ...form }
-      console.log('Signup payload:', payload);
       await userService.signup(payload)
-      
       alert('회원가입 성공!')
       router.push('/')
 

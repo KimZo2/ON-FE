@@ -9,11 +9,11 @@ export function cryptoRandom(bytes = 32) {
 
 
 export function handleKakao() {
-  window.location.href = `http://localhost:8080/oauth2/authorization/kakao`
+  window.location.href = `${process.env.NEXT_PUBLIC_BE_SERVER_URL}/oauth2/authorization/kakao`
 }
 
 export function handleGithub() {
-  window.location.href = `http://localhost:8080/oauth2/authorization/github`;
+  window.location.href = `${process.env.NEXT_PUBLIC_BE_SERVER_URL}/oauth2/authorization/github`;
 }
 
 
