@@ -36,20 +36,18 @@ publicApiInstance.interceptors.response.use(
       }
 
       // 서버 에러지만 규격 외 응답
-      return Promise.reject({
-        type: "HTTP",
-        status: error.response.status,
-        message:
-          error.response.data?.message ||
-          "서버 오류가 발생했습니다.",
-      });
+      const httpError = new Error(
+        error.response.data?.message || "서버 오류가 발생했습니다."
+      );
+      httpError.type = "HTTP";
+      httpError.status = error.response.status;
+      return Promise.reject(httpError);
     }
 
     // 네트워크 에러 (timeout, CORS 등)
-    return Promise.reject({
-      type: "NETWORK",
-      message: "네트워크 오류가 발생했습니다.",
-    });
+    const networkError = new Error("네트워크 오류가 발생했습니다.");
+    networkError.type = "NETWORK";
+    return Promise.reject(networkError);
   }
 );
 
