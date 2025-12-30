@@ -1,46 +1,40 @@
 'use client'
-import { Suspense } from 'react'
+import { useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import LoadingSpinner from '@/components/loading/LoadingSpinner'
 import { saveAccessToken, saveNickname, saveTokenExpire } from '@/util/AuthUtil'
 import ROUTES from '@/constants/ROUTES'
 
-function OAuthCallbackContent() {
+export default function OAuthCallbackContent() {
   const router = useRouter()
   const params = useSearchParams()
+  const hasProcessed = useRef(false) // 중복 실행 방지
   const accessToken = params.get('accessToken')
-  const tokenExpire = params.get('expireTime')
-  const nickname = params.get('nickname')
+  const accessTokenExpire = params.get('accessTokenExpire')
+  const rawNickname = params.get('nickname')
+  const nickname = decodeURIComponent(rawNickname || '')
 
-  if (!accessToken || !tokenExpire || !nickname) {
-      router.replace(ROUTES.LOGIN);
-      return;
+  useEffect(() => {
+    if (hasProcessed.current) return
+
+    if (!accessToken || !accessTokenExpire || !nickname) {
+      hasProcessed.current = true
+      router.replace(ROUTES.LOGIN)
+      return
     }
 
-  // 닉네임 한글 깨짐 방지 디코딩
-  if (nickname) {
-    nickname = decodeURIComponent(nickname);
-  }
+    hasProcessed.current = true
 
-  // 토큰 저장 및 메인 페이지로 이동
-  if (accessToken) {
-    saveAccessToken(accessToken);
-    saveTokenExpire(tokenExpire);
-    saveNickname(nickname);
+    saveAccessToken(accessToken)
+    saveTokenExpire(accessTokenExpire)
+    saveNickname(nickname)
+
     router.replace(ROUTES.MAIN)
-  }
+  }, [accessToken, accessTokenExpire, nickname, router])
 
   return (
     <div className="flex items-center justify-center h-screen">
       <LoadingSpinner />
     </div>
-  )
-}
-
-export default function OAuthCallbackPage() {
-  return (
-    <Suspense fallback={<div className="flex items-center justify-center h-screen"><LoadingSpinner /></div>}>
-      <OAuthCallbackContent />
-    </Suspense>
   )
 }
