@@ -46,7 +46,7 @@ export default function CodeInputForm({
     }
   };
 
-  
+  onFormSubmissionComplete?.(); // 모달 외부의 로딩 상태 및 모달 닫기 완료, TODO 작업 이후 삭제
 
   return (
     <form onSubmit={handleSubmit} className={className}>
