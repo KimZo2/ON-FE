@@ -14,9 +14,7 @@ const AuthValidation = ({ loginRequired = true, children }) => {
     useLayoutEffect(() => {
         if (loginStatus === null) return; // 로그인 상태가 아직 결정되지 않았으면 대기
         if (loginStatus === false && loginRequired) {
-            // alert("로그인이 필요합니다.");
             setIsOpen(true)
-            // router.replace(ROUTES.LOGIN);
         }
     }, [loginStatus, loginRequired, router]);
     
