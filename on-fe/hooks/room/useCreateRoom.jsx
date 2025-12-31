@@ -29,12 +29,22 @@ export function useCreateRoom({ onFormSubmissionStart, onFormSubmissionComplete 
 
   const handleChange = (e) => {
     const { name, type, value, checked } = e.target;
+
+    let nextValue;
+
+    if (type === 'checkbox') {
+      nextValue = checked;
+    } else if (type === 'number') {
+      nextValue = value === '' ? '' : parseInt(value);
+    } else {
+      nextValue = value;
+    }
+
     setForm(prev => ({
-        ...prev,
-        [name]: type === 'checkbox' ? checked : value,
-        [name]: type ==='number' ? parseInt(value) : value,
+      ...prev,
+      [name]: nextValue,
     }));
-  }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault()
