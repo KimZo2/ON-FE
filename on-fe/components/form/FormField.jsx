@@ -1,7 +1,7 @@
 // components/FormField.jsx
 import React from 'react'
 
-export default function FormField({ label, type = 'text', name, value, onChange, maxLength, required, divClass, labelClass, inputClass, disabled, placeholder }) {
+export default function FormField({ label, type = 'text', name, value, onChange, maxLength, required, divClass, labelClass, inputClass, disabled, placeholder,error }) {
 
   // const titleColor = style.titleColor ? style.titleColor : '';
   // const font = style.font ? style.font : '';
@@ -21,7 +21,13 @@ export default function FormField({ label, type = 'text', name, value, onChange,
         required={required}
         disabled={disabled}
         placeholder={placeholder}
+        error={error}
       />
+      {error && (
+        <p className="mt-[0.5rem] text-xl text-red-400">
+          {error}
+        </p>
+      )}
     </div>
   )
 }
