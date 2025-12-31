@@ -21,7 +21,6 @@ export default function FormField({ label, type = 'text', name, value, onChange,
         required={required}
         disabled={disabled}
         placeholder={placeholder}
-        error={error}
       />
       {error && (
         <p className="mt-[0.5rem] text-xl text-red-400">

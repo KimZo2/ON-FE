@@ -11,7 +11,6 @@ export default function CheckboxField({ label, checked, name, onChange, labelCla
         checked={checked}
         onChange={onChange}
         style={{ accentColor: '#ffd753', marginRight: 8 }}
-        error={error}
       />
       <span className={labelClass}>{label}</span>
       {error && (

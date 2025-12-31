@@ -55,7 +55,7 @@ export default function AdditionalInfoForm() {
 
             <button 
                 type="submit" 
-                className="submit-btn w-full bg-yellow-400 text-black p-[1rem] rounded-xl disabled={isSubmitting}"
+                className="submit-btn w-full bg-yellow-400 text-black p-[1rem] rounded-xl"
                 disabled={isSubmitting}
             >
                 {isSubmitting ? '제출 중' : '회원가입'}
