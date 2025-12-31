@@ -35,7 +35,7 @@ export function useCreateRoom({ onFormSubmissionStart, onFormSubmissionComplete 
     if (type === 'checkbox') {
       nextValue = checked;
     } else if (type === 'number') {
-      nextValue = value === '' ? '' : parseInt(value);
+      nextValue = value === '' ? '' : parseInt(value,10);
     } else {
       nextValue = value;
     }
@@ -54,12 +54,12 @@ export function useCreateRoom({ onFormSubmissionStart, onFormSubmissionComplete 
     const time = form.roomTime
 
     // TODO: 인원수 결정 필요
-    if (max < 2 || max > 10) {
+    if (!(max >= 2 && max <= 10)) {
       newErrors.maxParticipants = '인원 수는 2~10명 사이여야 합니다.' 
     }
 
     // TODO: 시간 결정 필요
-    if (time < 1 || time > 120) {
+    if (!(time >= 1 && time <= 120)) {
       newErrors.roomTime = '시간은 1시간~12시간 사이여야 합니다.'
     }
 

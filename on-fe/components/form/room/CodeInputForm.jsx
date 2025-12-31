@@ -32,7 +32,8 @@ export default function CodeInputForm({
     return;
   }
   setError(''); // 이전 에러 초기화
-  onFormSubmissionStart && onFormSubmissionStart(); // 모달 외부의 로딩 상태 시작
+  // TODO: 이후 코드 입장 기능 구현 시, 주석 해제
+  // onFormSubmissionStart && onFormSubmissionStart(); // 모달 외부의 로딩 상태 시작
   
   
   try {
@@ -45,8 +46,6 @@ export default function CodeInputForm({
       toast.error(err?.message || '방 입장에 실패했습니다.');
     }
   };
-
-  onFormSubmissionComplete?.(); // 모달 외부의 로딩 상태 및 모달 닫기 완료, TODO 작업 이후 삭제
 
   return (
     <form onSubmit={handleSubmit} className={className}>
