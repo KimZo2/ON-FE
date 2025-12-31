@@ -13,6 +13,11 @@ export function useCreateRoom({ onFormSubmissionStart, onFormSubmissionComplete 
     creatorNickname: getNickname(),
     maxParticipants: '',
     roomTime: '',
+    // TODO: 추후 방 타입 추가 시 활성화
+    // roomType: 0, 
+    // TODO: 추후 비공개 방 기능 추가 시 활성화
+    // isPrivate: false, 
+    // password: '',
   })
   
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -23,19 +28,20 @@ export function useCreateRoom({ onFormSubmissionStart, onFormSubmissionComplete 
 
 
   const handleChange = (e) => {
-    const { name, value } = e.target
+    const { name, type, value, checked } = e.target;
     setForm(prev => ({
-      ...prev,
-      [name]: value,
-    }))
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value,
+        [name]: type ==='number' ? parseInt(value) : value,
+    }));
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     
     const newErrors = {}
-    const max = Number(form.maxParticipants)
-    const time = Number(form.roomTime)
+    const max = form.maxParticipants
+    const time = form.roomTime
 
     // TODO: 인원수 결정 필요
     if (max < 2 || max > 10) {
@@ -56,8 +62,8 @@ export function useCreateRoom({ onFormSubmissionStart, onFormSubmissionComplete 
     setIsSubmitting(true)
 
     try {
-      const payload = { ...form, isPrivate: false, password: '' }
-      const res = await roomService.create(payload)
+      const payload = { ...form, isPrivate: false, password: '', roomType: 0 }
+      await roomService.create(payload)
 
       // 성공 Toast
       toast.success('방이 생성되었습니다!')
