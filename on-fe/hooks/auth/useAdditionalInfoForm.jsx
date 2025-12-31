@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { userService } from '@/apis/client/userService'
+import toast from 'react-hot-toast'
+import { validateBirthday } from '@/util/validators/birthdayValidator'
 
 export function useAdditionalInfoForm() {
   const router = useRouter()
@@ -14,6 +16,11 @@ export function useAdditionalInfoForm() {
     agreement: false,
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errors, setErrors] = useState({
+    birthday: '',
+    agreement: '',
+  })
+
 
   const handleChange = (e) => {
     const { name, type, value, checked } = e.target
@@ -25,32 +32,45 @@ export function useAdditionalInfoForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!form.name || !form.nickname || form.birthday.length !== 8) {
-      alert('필수 항목을 올바르게 입력해 주세요.')
-      return
+    const newErrors = {}
+    
+    // 생년월일 검증
+    const birthdayError = validateBirthday(form.birthday)
+    if (birthdayError) {
+      newErrors.birthday = birthdayError
     }
+    // 약관 동의 검증
     if (!form.agreement) {
-      alert('약관에 동의해 주세요.')
-      return
+      newErrors.agreement = '약관에 동의해 주세요.'
     }
-
+    // 오류가 있으면 제출 중단
+    if (Object.keys(newErrors).length > 0) {
+    setErrors(newErrors)
+    return
+    }
+    // 오류 없으면 제출 진행
+    setErrors({})
     setIsSubmitting(true)
+
     try {
       const payload = { memberId, ...form }
       await userService.signup(payload)
-      alert('회원가입 성공!')
+
+      // 성공 Toast
+      toast.success('회원가입이 완료되었습니다!')
       router.push('/')
 
     }catch (error) {    
-      if (error.type === "BUSINESS") {
-        alert(error.message);
-      } else {
-        alert("일시적인 오류가 발생했습니다.");
-      }
+      // 서버 에러 Toast
+      toast.error(
+        error.type === 'BUSINESS'
+          ? error.message
+          : '일시적인 오류가 발생했습니다.'
+      )
     }finally {
       setIsSubmitting(false)
     }
   }
 
-  return { form, isSubmitting, handleChange, handleSubmit }
+  return { form, errors, isSubmitting, handleChange, handleSubmit }
 }
