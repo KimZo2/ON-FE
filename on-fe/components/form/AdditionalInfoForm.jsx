@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { pressStart2P } from '@/constants/FONT'
 
 export default function AdditionalInfoForm() {
-    const { form, isSubmitting, handleChange, handleSubmit } = useAdditionalInfoForm();
+    const { form, errors, isSubmitting, handleChange, handleSubmit } = useAdditionalInfoForm();
 
     return (
         <form onSubmit={handleSubmit} className="inputs flex flex-col gap-[2rem] w-full">
@@ -42,6 +42,7 @@ export default function AdditionalInfoForm() {
                 labelClass="text-white"
                 inputClass="!h-[4rem] !w-full"
                 placeholder="예: 19900101"
+                error={errors.birthday}
             />
 
             <CheckboxField
@@ -49,9 +50,14 @@ export default function AdditionalInfoForm() {
                 name="agreement"
                 checked={form.agreement}
                 onChange={handleChange}
+                error={errors.agreement}
             />
 
-            <button type="submit" className="submit-btn w-full bg-yellow-400 text-black p-[1rem] rounded-xl disabled={isSubmitting}">
+            <button 
+                type="submit" 
+                className="submit-btn w-full bg-yellow-400 text-black p-[1rem] rounded-xl"
+                disabled={isSubmitting}
+            >
                 {isSubmitting ? '제출 중' : '회원가입'}
             </button>
         </form>

@@ -3,8 +3,11 @@ import axios from "axios";
 import {isLoggedIn,getAccessToken,saveAccessToken,saveTokenExpire,} from "@/util/AuthUtil";
 import API from "@/constants/API";
 import { handleApiResponse } from "@/apis/utils/handleApiResponse";
-
-
+import { transformAppError } from "@/apis/utils/transformAppError";
+/**
+ * Client API Instance
+ * - 인증이 필요한 API 요청을 보내는 인스턴스
+ */
 export const clientApiInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BE_SERVER_URL,
   headers: {
@@ -51,7 +54,7 @@ clientApiInstance.interceptors.response.use(
     const originalRequest = error.config;
     if (!originalRequest) return Promise.reject(error);
 
-    // 401 → 토큰 만료
+    // 401 에러 처리 (토큰 갱신)
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
@@ -64,19 +67,14 @@ clientApiInstance.interceptors.response.use(
 
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return clientApiInstance(originalRequest);
-      } catch (e) {
-        window.location.href = "/login";
-        return Promise.reject(e);
+      } catch (refreshResError) {
+        // 갱신 실패 시 로그인 유도 및 변환된 에러 전달
+        if (typeof window !== "undefined") window.location.href = "/login";
+        return Promise.reject(transformAppError(refreshResError));
       }
     }
 
-    // HTTP / 네트워크 에러
-    return Promise.reject({
-      type: "HTTP",
-      status: error.response?.status,
-      message:
-        error.response?.data?.message ||
-        "서버 오류가 발생했습니다.",
-    });
+    // 그 외 모든 에러 (401 제외한 HTTP, BUSINESS, NETWORK)
+    return Promise.reject(transformAppError(error));
   }
 );

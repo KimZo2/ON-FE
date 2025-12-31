@@ -6,7 +6,7 @@ import FormField from '../FormField';
 import { prompt } from '@/constants/FONT';
 
 const CreateRoomForm = ({ className, onFormSubmissionStart, onFormSubmissionComplete }) => {
-    const { form, isSubmitting, handleChange, handleSubmit } = useCreateRoom({
+    const { form, errors, isSubmitting, handleChange, handleSubmit } = useCreateRoom({
         onFormSubmissionStart,
         onFormSubmissionComplete,
     });
@@ -32,6 +32,7 @@ const CreateRoomForm = ({ className, onFormSubmissionStart, onFormSubmissionComp
                 type="number"
                 inputClass={`text-white ${prompt.className} !bg-black !border-gray-500 border-1`}
                 labelClass={`text-white ${prompt.className}`}
+                error={errors.maxParticipants}
             />
             <FormField
                 label="*방 유지 시간 (시간)"
@@ -43,6 +44,7 @@ const CreateRoomForm = ({ className, onFormSubmissionStart, onFormSubmissionComp
                 required
                 inputClass={`text-white ${prompt.className} !bg-black !border-gray-500 border-1`}
                 labelClass={`text-white ${prompt.className}`}
+                error={errors.roomTime}
             />
 
             {/* <CheckboxField
@@ -67,8 +69,12 @@ const CreateRoomForm = ({ className, onFormSubmissionStart, onFormSubmissionComp
                 />
             )} */}
 
-            <button type="submit" className="bg-gray-500 rounded-xl w-full h-[4.5rem] text-white" disabled={isSubmitting}>
-                {isSubmitting ? '생성 중' : '생성하기'}
+            <button 
+                type="submit" 
+                className="bg-gray-500 rounded-xl w-full h-[4.5rem] text-white" 
+                disabled={isSubmitting}
+            >
+            {isSubmitting ? '생성 중' : '생성하기'}
             </button>
         </form>
     )

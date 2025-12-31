@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation'
 import { roomService } from '@/apis/client/roomService'
 import ROUTES from '@/constants/ROUTES'
 import { getNickname } from '@/util/AuthUtil'
+import { toast } from 'react-hot-toast'
 
 export function useCreateRoom({ onFormSubmissionStart, onFormSubmissionComplete } = {}) {
   const router = useRouter()
@@ -12,42 +13,83 @@ export function useCreateRoom({ onFormSubmissionStart, onFormSubmissionComplete 
     creatorNickname: getNickname(),
     maxParticipants: '',
     roomTime: '',
-    roomType: 0, // TODO: 방 타입 추가 시 수정
+    // TODO: 추후 방 타입 추가 시 활성화
+    // roomType: 0, 
+    // TODO: 추후 비공개 방 기능 추가 시 활성화
+    // isPrivate: false, 
+    // password: '',
   })
   
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errors, setErrors] = useState({
+    maxParticipants: '',
+    roomTime: '',
+  })
+
 
   const handleChange = (e) => {
-    const { name, value, valueAsNumber, type } = e.target
+    const { name, type, value, checked } = e.target;
+
+    let nextValue;
+
+    if (type === 'checkbox') {
+      nextValue = checked;
+    } else if (type === 'number') {
+      nextValue = value === '' ? '' : parseInt(value,10);
+    } else {
+      nextValue = value;
+    }
+
     setForm(prev => ({
       ...prev,
-      [name]: type === 'number' ? valueAsNumber : value,
-    }))
-  }
+      [name]: nextValue,
+    }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!form.name || !form.maxParticipants || !form.roomTime) {
-      alert('필수 항목을 올바르게 입력해 주세요.')
-      return
+    
+    const newErrors = {}
+    const max = form.maxParticipants
+    const time = form.roomTime
+
+    // TODO: 인원수 결정 필요
+    if (!(max >= 2 && max <= 10)) {
+      newErrors.maxParticipants = '인원 수는 2~10명 사이여야 합니다.' 
     }
 
+    // TODO: 시간 결정 필요
+    if (!(time >= 1 && time <= 120)) {
+      newErrors.roomTime = '시간은 1시간~12시간 사이여야 합니다.'
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      return
+    }
+    setErrors({})
     onFormSubmissionStart?.()
     setIsSubmitting(true)
+
     try {
-      const payload = { ...form, isPrivate: false, password: '' }
-      console.log('Creating room with payload:', payload)
-      const res = await roomService.create(payload)
-      // TODO: API 응답 구조에 맞게 수정 필요
-      toast.success('방 생성 성공!')
+      const payload = { ...form, isPrivate: false, password: '', roomType: 0 }
+      await roomService.create(payload)
+
+      // 성공 Toast
+      toast.success('방이 생성되었습니다!')
       router.push(ROUTES.ROOM)
       onFormSubmissionComplete?.()
-    } catch {
-      toast.error('방 생성 실패!')
+    } catch (error) {
+      // 실패 Toast
+      toast.error(
+        error.type === 'BUSINESS'
+          ? error.message
+          : '방 생성에 실패했습니다.'
+      );
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  return { form, isSubmitting, handleChange, handleSubmit }
+  return { form, errors, isSubmitting, handleChange, handleSubmit }
 }
