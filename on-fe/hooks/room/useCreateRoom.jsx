@@ -79,9 +79,13 @@ export function useCreateRoom({ onFormSubmissionStart, onFormSubmissionComplete 
       toast.success('방이 생성되었습니다!')
       router.push(ROUTES.ROOM)
       onFormSubmissionComplete?.()
-    } catch {
+    } catch (error) {
       // 실패 Toast
-      toast.error('방 생성에 실패했습니다.')
+      toast.error(
+        error.type === 'BUSINESS'
+          ? error.message
+          : '방 생성에 실패했습니다.'
+      );
     } finally {
       setIsSubmitting(false)
     }
