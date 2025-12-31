@@ -12,15 +12,16 @@ export function useCreateRoom({ onFormSubmissionStart, onFormSubmissionComplete 
     creatorNickname: getNickname(),
     maxParticipants: '',
     roomTime: '',
+    roomType: 0, // TODO: 방 타입 추가 시 수정
   })
   
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleChange = (e) => {
-    const { name, value } = e.target
+    const { name, value, valueAsNumber, type } = e.target
     setForm(prev => ({
       ...prev,
-      [name]: value,
+      [name]: type === 'number' ? valueAsNumber : value,
     }))
   }
 
@@ -35,6 +36,7 @@ export function useCreateRoom({ onFormSubmissionStart, onFormSubmissionComplete 
     setIsSubmitting(true)
     try {
       const payload = { ...form, isPrivate: false, password: '' }
+      console.log('Creating room with payload:', payload)
       const res = await roomService.create(payload)
       // TODO: API 응답 구조에 맞게 수정 필요
       alert('방 생성 성공!')
