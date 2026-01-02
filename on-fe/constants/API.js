@@ -29,4 +29,4 @@ const USER = {
     ADDITIONAL_INFO : "/member/additional-info",
 }
 
-export default {AUTH, METAVERSE, WEBSOCKET, ROOM};
+export default {AUTH, METAVERSE, WEBSOCKET, ROOM, USER};
