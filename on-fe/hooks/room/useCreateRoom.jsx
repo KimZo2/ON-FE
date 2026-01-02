@@ -39,18 +39,11 @@ export function useCreateRoom({ onFormSubmissionStart, onFormSubmissionComplete 
       console.log('Creating room with payload:', payload)
       const res = await roomService.create(payload)
       // TODO: API 응답 구조에 맞게 수정 필요
-      alert('방 생성 성공!')
+      toast.success('방 생성 성공!')
       router.push(ROUTES.ROOM)
       onFormSubmissionComplete?.()
-      // if (res.status===201) {
-      //   alert('방 생성 성공!')
-      //   router.push(ROUTES.ROOM)
-      //   onFormSubmissionComplete?.()
-      // } else {
-      //   throw new Error('서버 응답 오류')
-      // }
     } catch {
-      alert('방 생성에 실패하였습니다.')
+      toast.error('방 생성 실패!')
     } finally {
       setIsSubmitting(false)
     }
