@@ -45,7 +45,7 @@ export default function ChatInterface({ onSendMessage, messages = [], currentPla
 
     if (isMinimized) {
         return (
-            <div className="fixed bottom-[1rem] left-[5rem] z-50">
+            <div className="fixed bottom-[1rem] left-[2rem] z-50">
                 <button
                     onClick={toggleMinimize}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-[1.3rem] py-[1rem] rounded-lg shadow-lg transition duration-200 flex items-center"
@@ -65,7 +65,7 @@ export default function ChatInterface({ onSendMessage, messages = [], currentPla
     }
 
     return (
-        <div className="fixed bottom-[1rem] left w-[40rem] bg-black bg-opacity-80 backdrop-blur-sm rounded-lg shadow-lg z-50">
+        <div className="fixed bottom-[1rem] left-[0.5rem] w-[40rem] bg-black bg-opacity-80 backdrop-blur-sm rounded-lg shadow-lg z-50">
             {/* 채팅 헤더 */}
             <div className="flex items-center justify-between p-[1rem] border-b border-gray-600">
                 <div className="flex items-center">
@@ -87,10 +87,10 @@ export default function ChatInterface({ onSendMessage, messages = [], currentPla
             {/* 채팅 히스토리 */}
             <div 
                 ref={chatHistoryRef}
-                className="h-[25rem] overflow-y-auto p-[1rem] ml-[5rem] space-y-[1rem] scrollbar-thin scrollbar-track-gray-800 scrollbar-thumb-gray-600"
+                className="relative h-[25rem] overflow-y-auto p-[1rem] space-y-[1rem] scrollbar-thin scrollbar-track-gray-800 scrollbar-thumb-gray-600"
             >
                 {chatHistory.length === 0 ? (
-                    <div className="text-gray-400 text-center py-[3rem]">
+                    <div className="absolute inset-0 flex items-center justify-center text-gray-400 text-center">
                         아직 메시지가 없습니다.<br />
                         다른 플레이어들과 대화해보세요!
                     </div>
@@ -98,22 +98,22 @@ export default function ChatInterface({ onSendMessage, messages = [], currentPla
                     chatHistory.map((msg) => (
                         <div
                             key={msg.id}
-                            className={`flex ${msg.isOwn ? 'justify-end' : 'justify-start'}`}
+                            className={`flex ml-[5rem] ${msg.isOwn ? 'justify-end' : 'justify-start'}`}
                         >
                             <div
-                                className={`break-words whitespace-pre-wrap px-[1rem] py-[1rem] rounded-lg ${
+                                className={`break-words whitespace-pre-wrap px-[1rem] py-[0.8rem] rounded-lg ${
                                     msg.isOwn
                                         ? 'bg-blue-600 text-white'
                                         : 'bg-gray-700 text-gray-100'
                                 }`}
                             >
                                 {!msg.isOwn && (
-                                    <div className="text-xs text-blue-300 mb-1">
+                                    <div className="text-xs text-blue-300 mb-[0.5rem]">
                                         {msg.playerName}
                                     </div>
                                 )}
                                 <div>{msg.text}</div>
-                                <div className={`text-base mt-1 ${msg.isOwn ? 'text-blue-200' : 'text-gray-400'}`}>
+                                <div className={`text-base mt-[0.5rem] ${msg.isOwn ? 'text-blue-200' : 'text-gray-400'}`}>
                                     {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                 </div>
                             </div>
