@@ -56,6 +56,8 @@ function MetaverseContent({ userId, userNickname, roomId }) {
             messages={metaverse.chatMessages}
             onSendMessage={metaverse.sendChatMessage}
             userId={metaverse.userId}
+            // TODO: 방 이름 전달 metaverse에 roomName이 없으면 roomId 사용
+            roomName={metaverse.roomName || "학습 공간 (추후 방 이름)"}
         />
     );
 }
