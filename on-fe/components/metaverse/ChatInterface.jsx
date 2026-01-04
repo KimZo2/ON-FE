@@ -90,7 +90,7 @@ export default function ChatInterface({ onSendMessage, messages = [], currentPla
                 className="relative h-[25rem] overflow-y-auto p-[1rem] space-y-[1rem] scrollbar-thin scrollbar-track-gray-800 scrollbar-thumb-gray-600"
             >
                 {chatHistory.length === 0 ? (
-                    <div className="absolute inset-0 flex items-center justify-center text-gray-400 text-center">
+                    <div className="absolute inset-0 flex items-center justify-center text-gray-200 text-center">
                         아직 메시지가 없습니다.<br />
                         다른 플레이어들과 대화해보세요!
                     </div>
