@@ -228,20 +228,35 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
             stroke: '#000000',
             strokeThickness: 2
         }).setOrigin(0.5);
-
+        // 고해상도 텍스트: devicePixelRatio와 카메라 줌을 곱해 내부 렌더 해상도를 높임
+        const camForName = this.cameras.main;
+        const initialRes = (window.devicePixelRatio || 1) * (camForName?.zoom || 1);
+        this.currentPlayer.nameText._lastNameZoom = camForName?.zoom || 1;
+        this.currentPlayer.nameText.setResolution?.(initialRes);
+        this.currentPlayer.nameText.setDepth(5);
+ 
         // 벽과 충돌 설정
         this.physics.add.collider(this.currentPlayer, this.walls);
         
         // 책상과 충돌 설정
         this.physics.add.collider(this.currentPlayer, this.desks);
 
-        // 물리 연산 이후 이름 위치 동기화 - 캐릭터 몸체와 닉네임이 한 프레임씩 차이가 나는 문제 해결
+        // 물리 연산 이후 이름 위치 동기화 및 줌 변화에 따른 해상도 갱신
         this.events.on(Phaser.Scenes.Events.POST_UPDATE, () => {
             if (!this.currentPlayer?.nameText) return;
+            const cam = this.cameras.main;
+            // 월드 좌표에서 직접 위치 설정 (nameText는 월드 오브젝트)
             this.currentPlayer.nameText.setPosition(
                 this.currentPlayer.x,
                 this.currentPlayer.y - 30
             );
+            // 카메라 줌이 바뀌면 내부 해상도만 업데이트 (비싼 연산을 줄이기 위해 변경 시만)
+            const curZoom = cam?.zoom || 1;
+            if (this.currentPlayer.nameText._lastNameZoom !== curZoom) {
+                this.currentPlayer.nameText._lastNameZoom = curZoom;
+                const newRes = (window.devicePixelRatio || 1) * curZoom;
+                this.currentPlayer.nameText.setResolution?.(newRes);
+            }
         });
     }
 
@@ -382,6 +397,10 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
             stroke: '#000000',
             strokeThickness: 2
         }).setOrigin(0.5);
+        const camForOther = this.cameras.main;
+        otherPlayer.nameText._lastNameZoom = camForOther?.zoom || 1;
+        otherPlayer.nameText.setResolution?.((window.devicePixelRatio || 1) * otherPlayer.nameText._lastNameZoom);
+        otherPlayer.nameText.setDepth(5);
 
         this.players.set(userId, otherPlayer);
     }
@@ -392,7 +411,14 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
 
         if (otherPlayer) {
             otherPlayer.setPosition(playerData.x, playerData.y);
+            // 월드 좌표로 위치 동기화
             otherPlayer.nameText.setPosition(playerData.x, playerData.y - 30);
+            // 줌 변화 시 내부 해상도 갱신
+            const curZoom = this.cameras.main?.zoom || 1;
+            if (otherPlayer.nameText._lastNameZoom !== curZoom) {
+                otherPlayer.nameText._lastNameZoom = curZoom;
+                otherPlayer.nameText.setResolution?.((window.devicePixelRatio || 1) * curZoom);
+            }
 
             const nextName = playerData.nickName;
             if (nextName && otherPlayer.nameText.text !== nextName) {
