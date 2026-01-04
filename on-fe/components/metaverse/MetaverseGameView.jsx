@@ -21,7 +21,7 @@ export default function MetaverseGameView({
             />
 
             {/* 게임 상태 오버레이 */}
-            <div className="absolute top-4 right-4 bg-black bg-opacity-50 text-white p-2 rounded">
+            <div className="absolute top-[1rem] right-[1rem] bg-black bg-opacity-50 text-white p-2 rounded">
                 {/* TODO: 메타버스 화면 진행 후, 크기에 맞게 스타일 수정 필요 */}
                 {/* <div className="text-sm">온라인: {onlineCount}명</div>
                 <div className="text-xs text-gray-300">플레이어: {playerName}</div> */}
@@ -37,7 +37,7 @@ export default function MetaverseGameView({
             />
 
             {/* 게임 컨트롤 안내 */}
-            <div className="absolute bottom-4 left-4 bg-black bg-opacity-50 text-white p-2 rounded">
+            <div className="absolute bottom-[1rem] right-[1rem] bg-black bg-opacity-50 text-white p-[0.7rem] rounded">
                 <div>이동: 화살표 키</div>
                 <div>채팅: 하단 입력창 사용</div>
             </div>
