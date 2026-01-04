@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 
 export default function ChatInterface({ onSendMessage, messages = [], currentPlayerId }) {
     const [message, setMessage] = useState('');
-    const [isMinimized, setIsMinimized] = useState(false);
+    const [isMinimized, setIsMinimized] = useState(true);
     
     // props로 받은 messages를 사용
     const chatHistory = messages;
@@ -65,7 +65,7 @@ export default function ChatInterface({ onSendMessage, messages = [], currentPla
     }
 
     return (
-        <div className="fixed bottom-[1rem] left-[0.5rem] w-[40rem] bg-black bg-opacity-80 backdrop-blur-sm rounded-lg shadow-lg z-50">
+        <div className="fixed bottom-[1rem] left-[0.5rem] w-[40rem] bg-gray-900/50 backdrop-blur-sm rounded-lg shadow-lg z-50">
             {/* 채팅 헤더 */}
             <div className="flex items-center justify-between p-[1rem] border-b border-gray-600">
                 <div className="flex items-center">
@@ -101,7 +101,7 @@ export default function ChatInterface({ onSendMessage, messages = [], currentPla
                             className={`flex ml-[5rem] ${msg.isOwn ? 'justify-end' : 'justify-start'}`}
                         >
                             <div
-                                className={`break-words whitespace-pre-wrap px-[1rem] py-[0.8rem] rounded-lg ${
+                                className={`break-words whitespace-pre-wrap px-[1.5rem] py-[0.8rem] rounded-3xl ${
                                     msg.isOwn
                                         ? 'bg-blue-600 text-white'
                                         : 'bg-gray-700 text-gray-100'
