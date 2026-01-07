@@ -25,43 +25,6 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
         this.mapType = data.mapType || 'CLASSROOM';
     }
 
-    preload() {
-        this.load.setPath('/assets');
-
-        // 플레이어 스프라이트시트 로드 (girl1.png) - 중복 로드 방지
-        if (!this.textures.exists('player')) {
-            this.load.spritesheet('player', '/girl1.png', {
-                frameWidth: 64,  // 각 프레임의 가로 크기 (4x4 그리드이므로 전체 이미지를 4로 나눈 크기)
-                frameHeight: 64  // 각 프레임의 세로 크기
-            });
-        }
-
-        // 맵 타일 생성 - 중복 로드 방지
-        if (!this.textures.exists('ground')) {
-            this.load.image('ground', 'data:image/svg+xml;base64,' + btoa(`
-                <svg width="32" height="32" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="32" height="32" fill="#90EE90" stroke="#228B22" stroke-width="1"/>
-                </svg>
-            `));
-        }
-
-        if (!this.textures.exists('wall')) {
-            this.load.image('wall', 'data:image/svg+xml;base64,' + btoa(`
-                <svg width="32" height="32" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="32" height="32" fill="#8B4513" stroke="#654321" stroke-width="1"/>
-                </svg>
-            `));
-        }
-
-        if (!this.textures.exists('water')) {
-            this.load.image('water', 'data:image/svg+xml;base64,' + btoa(`
-                <svg width="32" height="32" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="32" height="32" fill="#4169E1" stroke="#191970" stroke-width="1"/>
-                </svg>
-            `));
-        }
-    }
-
     create() {
         // 배경색 설정
         this.cameras.main.setBackgroundColor(0x87CEEB);
@@ -94,6 +57,9 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
         GameEventBus.onOnlineCountUpdate((count) => {
             this.onlineCountText.setText(`온라인: ${count}명`);
         });
+
+        // scene ready 이벤트 emit
+        this.game.events.emit('metaverse-scene-ready', this);
     }
 
     createPlayerAnimations() {
@@ -228,20 +194,35 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
             stroke: '#000000',
             strokeThickness: 2
         }).setOrigin(0.5);
-
+        // 고해상도 텍스트: devicePixelRatio와 카메라 줌을 곱해 내부 렌더 해상도를 높임
+        const camForName = this.cameras.main;
+        const initialRes = (window.devicePixelRatio || 1) * (camForName?.zoom || 1);
+        this.currentPlayer.nameText._lastNameZoom = camForName?.zoom || 1;
+        this.currentPlayer.nameText.setResolution?.(initialRes);
+        this.currentPlayer.nameText.setDepth(5);
+ 
         // 벽과 충돌 설정
         this.physics.add.collider(this.currentPlayer, this.walls);
         
         // 책상과 충돌 설정
         this.physics.add.collider(this.currentPlayer, this.desks);
 
-        // 물리 연산 이후 이름 위치 동기화 - 캐릭터 몸체와 닉네임이 한 프레임씩 차이가 나는 문제 해결
+        // 물리 연산 이후 이름 위치 동기화 및 줌 변화에 따른 해상도 갱신
         this.events.on(Phaser.Scenes.Events.POST_UPDATE, () => {
             if (!this.currentPlayer?.nameText) return;
+            const cam = this.cameras.main;
+            // 월드 좌표에서 직접 위치 설정 (nameText는 월드 오브젝트)
             this.currentPlayer.nameText.setPosition(
                 this.currentPlayer.x,
                 this.currentPlayer.y - 30
             );
+            // 카메라 줌이 바뀌면 내부 해상도만 업데이트 (비싼 연산을 줄이기 위해 변경 시만)
+            const curZoom = cam?.zoom || 1;
+            if (this.currentPlayer.nameText._lastNameZoom !== curZoom) {
+                this.currentPlayer.nameText._lastNameZoom = curZoom;
+                const newRes = (window.devicePixelRatio || 1) * curZoom;
+                this.currentPlayer.nameText.setResolution?.(newRes);
+            }
         });
     }
 
@@ -265,6 +246,18 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
             strokeThickness: 1,
             wordWrap: { width: 400 }
         }).setScrollFactor(0);
+    }
+    
+    setPlayerData({ userId, playerName, roomId }) {
+        this.userId = userId;
+        this.playerName = playerName;
+        this.roomId = roomId;
+        // 현재 플레이어 이름 텍스트 업데이트
+        if (this.currentPlayer?.nameText) {
+            this.currentPlayer.nameText.setText(playerName);
+        }
+        // 방 변경 로직
+        this.handleRoomChange?.();
     }
 
     setupSocketListeners() {
@@ -382,6 +375,10 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
             stroke: '#000000',
             strokeThickness: 2
         }).setOrigin(0.5);
+        const camForOther = this.cameras.main;
+        otherPlayer.nameText._lastNameZoom = camForOther?.zoom || 1;
+        otherPlayer.nameText.setResolution?.((window.devicePixelRatio || 1) * otherPlayer.nameText._lastNameZoom);
+        otherPlayer.nameText.setDepth(5);
 
         this.players.set(userId, otherPlayer);
     }
@@ -392,7 +389,14 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
 
         if (otherPlayer) {
             otherPlayer.setPosition(playerData.x, playerData.y);
+            // 월드 좌표로 위치 동기화
             otherPlayer.nameText.setPosition(playerData.x, playerData.y - 30);
+            // 줌 변화 시 내부 해상도 갱신
+            const curZoom = this.cameras.main?.zoom || 1;
+            if (otherPlayer.nameText._lastNameZoom !== curZoom) {
+                otherPlayer.nameText._lastNameZoom = curZoom;
+                otherPlayer.nameText.setResolution?.((window.devicePixelRatio || 1) * curZoom);
+            }
 
             const nextName = playerData.nickName;
             if (nextName && otherPlayer.nameText.text !== nextName) {

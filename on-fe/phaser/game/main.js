@@ -1,3 +1,4 @@
+import { BootScene } from './scenes/BootScene';
 import { MetaverseScene } from './scenes/MetaverseScene';
 import { getOptimalSize } from '@/phaser/game/util/gameUtil';
 
@@ -20,8 +21,10 @@ const createConfig = (Phaser) => {
         parent: 'game-container',
         backgroundColor: '#028af8',
         scale: {
-            mode: Phaser.Scale.FIT,
-            autoCenter: Phaser.Scale.CENTER_BOTH,
+            // mode: Phaser.Scale.FIT,
+            // autoCenter: Phaser.Scale.CENTER_BOTH,
+            // RESIZE로 변경함으로써 반응형 지원
+            mode: Phaser.Scale.RESIZE,
             parent: 'game-container',
             width,
             height
@@ -34,6 +37,7 @@ const createConfig = (Phaser) => {
             }
         },
         scene: [
+            BootScene,
             MetaverseScene
         ]
     };

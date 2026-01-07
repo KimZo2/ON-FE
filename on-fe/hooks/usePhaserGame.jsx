@@ -31,49 +31,34 @@ export default function usePhaserGame(userId, playerName, roomId, onGameReady, o
                 onGameReady(phaserGame);
             }
             
-            // MetaverseScene에 데이터 전달하며 재시작
+            /**
+             * Scene은 start / restart 하지 않는다
+             * BootScene에서 MetaverseScene으로 이미 진입함
+             * -> 데이터만 전달
+             */
             const metaverseScene = phaserGame.scene.getScene('MetaverseScene');
-            if (metaverseScene) {
-                // 씬을 데이터와 함께 재시작
-                const sceneData = {
-                    userId,
-                    playerName,
-                    roomId
-                };
-                metaverseScene.scene.restart(sceneData);
-                
-                if (onSceneReady) {
-                    onSceneReady(metaverseScene);
-                }
+            if (metaverseScene && metaverseScene.scene.isActive()) {
+                // 이미 준비된 경우
+                metaverseScene.setPlayerData({ userId, playerName, roomId });
+                onSceneReady?.(metaverseScene);
             } else {
-                // 씬이 아직 준비되지 않았다면 씬 이벤트 리스너 등록
-                phaserGame.events.once('ready', () => {
-                    const scene = phaserGame.scene.getScene('MetaverseScene');
-                    if (scene) {
-                        const sceneData = {
-                            userId,
-                            playerName,
-                            roomId
-                        };
-                        scene.scene.restart(sceneData);
-                        
-                        if (onSceneReady) {
-                            onSceneReady(scene);
-                        }
-                    }
-                });
+            // 아직 준비 안 된 경우 → 이벤트 대기
+            phaserGame.events.once('metaverse-scene-ready', (scene) => {
+                scene.setPlayerData({ userId, playerName, roomId });
+                onSceneReady?.(scene);
+            });
             }
-            
+
             isInitializingRef.current = false;
             
             return phaserGame;
-            
-        } catch (error) {
+
+            } catch (error) {
             console.error('Game initialization error:', error);
             isInitializingRef.current = false;
             throw error;
-        }
-    }, [userId, playerName, roomId, onGameReady, onSceneReady]);
+            }
+        }, [userId, playerName, roomId, onGameReady, onSceneReady]);
 
     const destroyGame = useCallback(() => {
         if (gameInstanceRef.current) {

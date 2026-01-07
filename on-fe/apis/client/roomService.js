@@ -23,9 +23,4 @@ export const roomService = {
   // joinByCode(code) {
   //   return clientApiInstance.post(API.ROOM.JOIN_BY_CODE, { code })
   // },
-
-  // // 기존 방 입장
-  // join(roomId) {
-  //   return clientApiInstance.post(API.ROOM.JOIN(roomId)) // TODO: API 경로 확인 필요
-  // },
 }

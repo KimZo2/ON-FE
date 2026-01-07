@@ -92,7 +92,6 @@ export function useJoinRoom() {
   const handleJoinExistingRoom = useCallback(async (roomId) => {
     setIsSubmitting(true);
     try {
-      const res = await roomService.join(roomId);
       router.push(`/room/${roomId}`);
     } catch (err) {
       console.error('기존 방 입장 실패:', err);
