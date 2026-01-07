@@ -25,43 +25,6 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
         this.mapType = data.mapType || 'CLASSROOM';
     }
 
-    preload() {
-        this.load.setPath('/assets');
-
-        // 플레이어 스프라이트시트 로드 (girl1.png) - 중복 로드 방지
-        if (!this.textures.exists('player')) {
-            this.load.spritesheet('player', '/girl1.png', {
-                frameWidth: 64,  // 각 프레임의 가로 크기 (4x4 그리드이므로 전체 이미지를 4로 나눈 크기)
-                frameHeight: 64  // 각 프레임의 세로 크기
-            });
-        }
-
-        // 맵 타일 생성 - 중복 로드 방지
-        if (!this.textures.exists('ground')) {
-            this.load.image('ground', 'data:image/svg+xml;base64,' + btoa(`
-                <svg width="32" height="32" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="32" height="32" fill="#90EE90" stroke="#228B22" stroke-width="1"/>
-                </svg>
-            `));
-        }
-
-        if (!this.textures.exists('wall')) {
-            this.load.image('wall', 'data:image/svg+xml;base64,' + btoa(`
-                <svg width="32" height="32" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="32" height="32" fill="#8B4513" stroke="#654321" stroke-width="1"/>
-                </svg>
-            `));
-        }
-
-        if (!this.textures.exists('water')) {
-            this.load.image('water', 'data:image/svg+xml;base64,' + btoa(`
-                <svg width="32" height="32" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="32" height="32" fill="#4169E1" stroke="#191970" stroke-width="1"/>
-                </svg>
-            `));
-        }
-    }
-
     create() {
         // 배경색 설정
         this.cameras.main.setBackgroundColor(0x87CEEB);
@@ -94,6 +57,9 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
         GameEventBus.onOnlineCountUpdate((count) => {
             this.onlineCountText.setText(`온라인: ${count}명`);
         });
+
+        // scene ready 이벤트 emit
+        this.game.events.emit('metaverse-scene-ready', this);
     }
 
     createPlayerAnimations() {
@@ -280,6 +246,18 @@ export class MetaverseScene extends (Phaser?.Scene || Object) {
             strokeThickness: 1,
             wordWrap: { width: 400 }
         }).setScrollFactor(0);
+    }
+    
+    setPlayerData({ userId, playerName, roomId }) {
+        this.userId = userId;
+        this.playerName = playerName;
+        this.roomId = roomId;
+        // 현재 플레이어 이름 텍스트 업데이트
+        if (this.currentPlayer?.nameText) {
+            this.currentPlayer.nameText.setText(playerName);
+        }
+        // 방 변경 로직
+        this.handleRoomChange?.();
     }
 
     setupSocketListeners() {

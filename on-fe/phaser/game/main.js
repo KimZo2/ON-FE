@@ -1,3 +1,4 @@
+import { BootScene } from './scenes/BootScene';
 import { MetaverseScene } from './scenes/MetaverseScene';
 import { getOptimalSize } from '@/phaser/game/util/gameUtil';
 
@@ -36,6 +37,7 @@ const createConfig = (Phaser) => {
             }
         },
         scene: [
+            BootScene,
             MetaverseScene
         ]
     };
