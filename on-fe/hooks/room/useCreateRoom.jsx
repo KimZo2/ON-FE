@@ -13,7 +13,11 @@ export function useCreateRoom({ onFormSubmissionStart, onFormSubmissionComplete 
     creatorNickname: getNickname(),
     maxParticipants: '',
     roomTime: '',
-    roomType: 0, // TODO: 방 타입 추가 시 수정
+    // TODO: 추후 방 타입 추가 시 활성화
+    // roomType: 0, 
+    // TODO: 추후 비공개 방 기능 추가 시 활성화
+    // isPrivate: false, 
+    // password: '',
   })
   
   const [isSubmitting, setIsSubmitting] = useState(false)
