@@ -36,7 +36,7 @@ const Header = () => {
       router.push(ROUTES.MY_PAGE);
     }
 
-  const isMyPage = pathname?.includes('mypage');
+  const isMyPage = pathname === ROUTES.MY_PAGE;
 
   return (
     <div className="flex justify-between px-[3rem] py-[3rem] items-center">

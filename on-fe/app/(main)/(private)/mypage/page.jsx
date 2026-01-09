@@ -35,10 +35,14 @@ const Page = () => {
     fetchMyInfo();
   }, []);
 
-  const handleSave = () => {
-    // localStorage에 선택한 캐릭터 인덱스 저장
-    localStorage.setItem('selectedCharacterId', selectedIndex.toString());
-    toast.success('캐릭터가 저장되었습니다!');
+    const handleSave = () => {
+    try {
+      localStorage.setItem('selectedCharacterId', selectedIndex.toString());
+      toast.success('캐릭터가 저장되었습니다!');
+    } catch (e) {
+      console.error('캐릭터 ID 저장 실패:', e);
+      toast.error('캐릭터 저장에 실패했습니다.');
+    }
   };
 
   const handleExit = () => {

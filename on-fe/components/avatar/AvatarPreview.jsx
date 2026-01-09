@@ -8,7 +8,7 @@ export default function AvatarPreview({ character, nickname }) {
         alt={character.name}
       />
 
-      <p className="mt-[2rem] text-4xl font-semibold">{nickname}</p>
+       {nickname && <p className="mt-[2rem] text-4xl font-semibold">{nickname}</p>}
       <p className="mt-[0.5rem] text-3xl text-gray-400">{character.name}</p>
     </div>
   );
