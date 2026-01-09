@@ -21,7 +21,7 @@ export function CroppedAvatar({ src, alt }) {
       <img
         src={src}
         alt={alt}
-        className="w-[256px] h-[256px] object-cover transform scale-300 translate-x-[-90px] translate-y-[255px]"
+        className="w-[256px] h-[256px] object-cover transform scale-250 translate-x-[-80px] translate-y-[220px]"
       />
     </div>
   );
