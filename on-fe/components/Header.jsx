@@ -12,10 +12,18 @@ const Header = () => {
   const router = useRouter();
   const pathname = usePathname();
   const [isLogin, setIsLogin] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     setIsLogin(isLoggedIn());
   }, []);
+
+  if (!mounted){
+    return (
+      <div className="h-[90px]" /> // 헤더 높이만 유지
+    );
+  }
 
   const handleLogout = async () => {
   try {

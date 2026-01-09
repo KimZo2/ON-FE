@@ -10,11 +10,12 @@ import { userService } from '@/apis/client/userService';
 import toast from 'react-hot-toast';
 
 const Page = () => {
-
+  const [mounted, setMounted] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [nickname, setNickname] = useState('');
+  const [nickname, setNickname] = useState(null);
 
   useEffect(() => {
+    setMounted(true);
     // localStorage에서 저장된 캐릭터 ID 가져오기
     const savedCharacterId = parseInt(localStorage.getItem('selectedCharacterId') ?? '0', 10);
     if (savedCharacterId >= 0 && savedCharacterId < CHARACTERS.length) {
@@ -34,6 +35,15 @@ const Page = () => {
 
     fetchMyInfo();
   }, []);
+
+  if (!mounted) {
+    return (
+      <DefaultPageFrame>
+        <div className="h-[50rem]" /> {/* skeleton */}
+      </DefaultPageFrame>
+    );
+  }
+
 
     const handleSave = () => {
     try {
@@ -62,10 +72,14 @@ const Page = () => {
 
           {/* 왼쪽 영역: 현재 선택되어 있는 캐릭터와 닉네임 보여주는 영역 */}
           <div className="flex items-center justify-center w-[40rem] h-full border border-white rounded-xl">
-            <AvatarPreview
-              character={CHARACTERS[selectedIndex]}
-              nickname={nickname}
-            />
+            {nickname === null ? (
+              <div className="text-gray-400">불러오는 중...</div>
+            ) : (
+              <AvatarPreview
+                character={CHARACTERS[selectedIndex]}
+                nickname={nickname}
+              />
+            )}
           </div>
 
           {/* 오른쪽 영역: 캐릭터 선택 및 닉네임 변경 영역 */}
