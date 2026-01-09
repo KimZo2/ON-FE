@@ -17,7 +17,11 @@ const Page = () => {
   useEffect(() => {
     // localStorage에서 저장된 캐릭터 ID 가져오기
     const savedCharacterId = parseInt(localStorage.getItem('selectedCharacterId') ?? '0', 10);
-    setSelectedIndex(savedCharacterId);
+    if (savedCharacterId >= 0 && savedCharacterId < CHARACTERS.length) {
+      setSelectedIndex(savedCharacterId);
+    } else {
+      setSelectedIndex(0);
+    }
 
     const fetchMyInfo = async () => {
       try {

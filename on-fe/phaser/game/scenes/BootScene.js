@@ -10,7 +10,7 @@ export class BootScene extends Phaser.Scene {
 
     // localStorage에서 선택한 캐릭터 ID 가져오기 (기본값: 0)
     const selectedCharacterId = parseInt(localStorage.getItem('selectedCharacterId') ?? '0', 10);
-    const selectedCharacter = CHARACTERS[selectedCharacterId];
+    const selectedCharacter = CHARACTERS[selectedCharacterId] ?? CHARACTERS[0];
 
     this.load.spritesheet('player', selectedCharacter.image, {
       frameWidth: 64,
