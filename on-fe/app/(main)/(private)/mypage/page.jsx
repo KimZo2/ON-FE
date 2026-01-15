@@ -13,34 +13,36 @@ const Page = () => {
 
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [nickname, setNickname] = useState('');
+  const [memberId, setMemberId] = useState(null);
 
   useEffect(() => {
-    // localStorage에서 저장된 캐릭터 ID 가져오기
-    const savedCharacterId = parseInt(localStorage.getItem('selectedCharacterId') ?? '0', 10);
-    if (savedCharacterId >= 0 && savedCharacterId < CHARACTERS.length) {
-      setSelectedIndex(savedCharacterId);
-    } else {
-      setSelectedIndex(0);
-    }
-
     const fetchMyInfo = async () => {
       try {
-        const res = await userService.getMyInfo();
-        setNickname(res.nickname);
+        const user_info_res = await userService.getMyInfo();
+        setMemberId(user_info_res.memberId);
+        setNickname(user_info_res.nickname);
+        const res = await userService.getCharacterInfo();
+        const characterId = res.avatar ?? 0;
+        if (characterId >= 0 && characterId < CHARACTERS.length) {
+          setSelectedIndex(characterId);
+        } else {
+          setSelectedIndex(0);
+        }
       } catch (e) {
         console.error(e);
+        toast.error('정보 조회에 실패했습니다.');
       }
     };
 
     fetchMyInfo();
   }, []);
 
-    const handleSave = () => {
+  const handleSave = async () => {
     try {
-      localStorage.setItem('selectedCharacterId', selectedIndex.toString());
-      toast.success('캐릭터가 저장되었습니다!');
+      await userService.changeCharacter({ memberId, avatar: selectedIndex });
+      toast.success('캐릭터 저장이 완료되었습니다.');
     } catch (e) {
-      console.error('캐릭터 ID 저장 실패:', e);
+      console.error('캐릭터 변경 실패:', e);
       toast.error('캐릭터 저장에 실패했습니다.');
     }
   };
