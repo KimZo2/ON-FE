@@ -27,6 +27,8 @@ const ROOM = {
 const USER = {
     MYINFO : "/member/info",
     ADDITIONAL_INFO : "/member/additional-info",
+    CHANGE_CHARACTER : "/member/change",
+    CHARACTER_INFO : "/member/me",
 }
 
 export default {AUTH, METAVERSE, WEBSOCKET, ROOM, USER};
