@@ -29,6 +29,7 @@ const Page = () => {
       await userService.changeCharacter(avatar);
       toast.success('캐릭터가 저장되었습니다!');
     } catch (e) {
+      console.error('캐릭터 저장 실패', e);
       toast.error('캐릭터 저장 실패');
     }
   };
