@@ -25,7 +25,7 @@ export const useUserStore = create((set, get) => ({
       set({
         memberId: myInfo.memberId,
         nickname: characterInfo.nickname,
-        avatar: characterInfo.avatar ?? 0,
+        avatar: characterInfo.avatar - 1 ?? 0,
         status: 'ready',
       });
     } catch (e) {
