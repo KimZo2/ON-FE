@@ -1,4 +1,5 @@
 import { CHARACTERS } from '@/constants/CHARACTERS';
+import { useUserStore } from '@/stores/userStore';
 
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -8,9 +9,9 @@ export class BootScene extends Phaser.Scene {
   preload() {
     this.load.setPath('/assets');
 
-    // localStorage에서 선택한 캐릭터 ID 가져오기 (기본값: 0)
-    const selectedCharacterId = parseInt(localStorage.getItem('selectedCharacterId') ?? '0', 10);
-    const selectedCharacter = CHARACTERS[selectedCharacterId] ?? CHARACTERS[0];
+    // Zustand에서 준비된 avatar 사용
+    const { avatar } = useUserStore.getState();
+    const selectedCharacter = CHARACTERS[avatar] ?? CHARACTERS[0];
 
     this.load.spritesheet('player', selectedCharacter.image, {
       frameWidth: 64,

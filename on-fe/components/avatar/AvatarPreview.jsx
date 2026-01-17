@@ -1,5 +1,9 @@
 
 export default function AvatarPreview({ character, nickname }) {
+  if (!character) {
+    return <div>캐릭터 로딩 중...</div>;
+  }
+
   return (
     <div className="flex flex-col items-center rounded-xl p-[3rem]">
       

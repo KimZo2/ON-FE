@@ -120,7 +120,7 @@ class MetaverseService {
         this.joinStatus = message;
         
         // 방 인원 수 업데이트 (성공한 경우에만)
-        if ((message === 'JOIN' || message === 'ALREADY') && normalizedCount !== null) {
+        if ((message === 'JOIN' || message === 'ALREADY' || message === 'OK') && normalizedCount !== null) {
             this._updateOnlineCount(normalizedCount);
         }
         
@@ -136,6 +136,16 @@ class MetaverseService {
                 break;
             }
             case 'ALREADY': {
+                this.setupRoomSubscriptions();
+                this.startPingInterval();
+                this.roomJoinTimestamp = Date.now();
+                this.subscribeChatChannel();
+                if (normalizedCount === null) {
+                    this._updateOnlineCount(Math.max(this.currentOnlineCount, 1));
+                }
+                break;
+            }
+             case 'OK': {
                 this.setupRoomSubscriptions();
                 this.startPingInterval();
                 this.roomJoinTimestamp = Date.now();
