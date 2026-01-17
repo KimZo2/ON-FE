@@ -24,6 +24,6 @@ export const userService = {
   // request body: { avatar: number }
   // 응답 : 없음
   changeCharacter(avatar) {
-    return clientApiInstance.patch(API.USER.CHANGE_CHARACTER, { avatar })
+    return clientApiInstance.patch(API.USER.CHANGE_CHARACTER, { avatar: avatar + 1 })
   }
 }
