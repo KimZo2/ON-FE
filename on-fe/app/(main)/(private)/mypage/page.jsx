@@ -8,44 +8,32 @@ import DefaultPageFrame from "@/components/DefaultPageFrame";
 import { pressStart2P } from '@/constants/FONT';
 import { userService } from '@/apis/client/userService';
 import toast from 'react-hot-toast';
+import {useUserStore} from '@/stores/userStore';
 
 const Page = () => {
 
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const [nickname, setNickname] = useState('');
-  const [memberId, setMemberId] = useState(null);
+ const {
+    nickname,
+    avatar,
+    status,
+    fetchUser,
+    updateAvatar,
+  } = useUserStore();
 
   useEffect(() => {
-    const fetchMyInfo = async () => {
-      try {
-        const user_info_res = await userService.getMyInfo();
-        setMemberId(user_info_res.memberId);
-        setNickname(user_info_res.nickname);
-        const res = await userService.getCharacterInfo();
-        const characterId = res.avatar ?? 0;
-        if (characterId >= 0 && characterId < CHARACTERS.length) {
-          setSelectedIndex(characterId);
-        } else {
-          setSelectedIndex(0);
-        }
-      } catch (e) {
-        console.error(e);
-        toast.error('정보 조회에 실패했습니다.');
-      }
-    };
-
-    fetchMyInfo();
-  }, []);
+    fetchUser();
+  }, [fetchUser]);
 
   const handleSave = async () => {
     try {
-      await userService.changeCharacter({ memberId, avatar: selectedIndex });
-      toast.success('캐릭터 저장이 완료되었습니다.');
+      await userService.changeCharacter(avatar);
+      toast.success('캐릭터가 저장되었습니다!');
     } catch (e) {
-      console.error('캐릭터 변경 실패:', e);
-      toast.error('캐릭터 저장에 실패했습니다.');
+      toast.error('캐릭터 저장 실패');
     }
   };
+
+  if (status === 'loading') return <div>로딩 중...</div>;
 
   const handleExit = () => {
     window.history.back();
@@ -65,7 +53,7 @@ const Page = () => {
           {/* 왼쪽 영역: 현재 선택되어 있는 캐릭터와 닉네임 보여주는 영역 */}
           <div className="flex items-center justify-center w-[40rem] h-full border border-white rounded-xl">
             <AvatarPreview
-              character={CHARACTERS[selectedIndex]}
+              character={CHARACTERS[avatar]}
               nickname={nickname}
             />
           </div>
@@ -73,8 +61,8 @@ const Page = () => {
           {/* 오른쪽 영역: 캐릭터 선택 및 닉네임 변경 영역 */}
           <AvatarSelector
             characters={CHARACTERS}
-            selectedIndex={selectedIndex}
-            onSelect={setSelectedIndex}
+            selectedIndex={avatar}
+            onSelect={updateAvatar}
             nickname={nickname}
           />
         </div>

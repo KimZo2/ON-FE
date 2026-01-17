@@ -21,9 +21,9 @@ export const userService = {
   },
 
   // 캐릭터 변경
-  // payload: { memberId: String, avatar: number }
+  // request body: { avatar: number }
   // 응답 : 없음
-  changeCharacter(payload) {
-    return clientApiInstance.post(API.USER.CHANGE_CHARACTER, payload)
+  changeCharacter(avatar) {
+    return clientApiInstance.patch(API.USER.CHANGE_CHARACTER, { avatar })
   }
 }
