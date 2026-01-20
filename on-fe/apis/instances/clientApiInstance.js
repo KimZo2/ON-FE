@@ -4,6 +4,7 @@ import {isLoggedIn,getAccessToken,saveAccessToken,saveTokenExpire,} from "@/util
 import API from "@/constants/API";
 import { handleApiResponse } from "@/apis/utils/handleApiResponse";
 import { transformAppError } from "@/apis/utils/transformAppError";
+import { refreshApiInstance } from "./refreshApiInstance";
 /**
  * Client API Instance
  * - 인증이 필요한 API 요청을 보내는 인스턴스
@@ -31,7 +32,7 @@ clientApiInstance.interceptors.request.use(
     }
 
     const token = getAccessToken();
-    if (token && isLoggedIn()) {
+    if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
 
@@ -59,7 +60,7 @@ clientApiInstance.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const refreshRes = await clientApiInstance.get(API.AUTH.REFRESH);
+        const refreshRes = await refreshApiInstance.get(API.AUTH.REFRESH);
         const { accessToken, accessTokenExpire } = refreshRes;
 
         saveAccessToken(accessToken);
