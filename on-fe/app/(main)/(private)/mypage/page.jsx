@@ -8,52 +8,33 @@ import DefaultPageFrame from "@/components/DefaultPageFrame";
 import { pressStart2P } from '@/constants/FONT';
 import { userService } from '@/apis/client/userService';
 import toast from 'react-hot-toast';
+import {useUserStore} from '@/stores/userStore';
 
 const Page = () => {
-  const [mounted, setMounted] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const [nickname, setNickname] = useState(null);
+
+ const {
+    nickname,
+    avatar,
+    status,
+    fetchUser,
+    updateAvatar,
+  } = useUserStore();
 
   useEffect(() => {
-    setMounted(true);
-    // localStorage에서 저장된 캐릭터 ID 가져오기
-    const savedCharacterId = parseInt(localStorage.getItem('selectedCharacterId') ?? '0', 10);
-    if (savedCharacterId >= 0 && savedCharacterId < CHARACTERS.length) {
-      setSelectedIndex(savedCharacterId);
-    } else {
-      setSelectedIndex(0);
-    }
+    fetchUser();
+  }, [fetchUser]);
 
-    const fetchMyInfo = async () => {
-      try {
-        const res = await userService.getMyInfo();
-        setNickname(res.nickname);
-      } catch (e) {
-        console.error(e);
-      }
-    };
-
-    fetchMyInfo();
-  }, []);
-
-  if (!mounted) {
-    return (
-      <DefaultPageFrame>
-        <div className="h-[50rem]" /> {/* skeleton */}
-      </DefaultPageFrame>
-    );
-  }
-
-
-    const handleSave = () => {
+  const handleSave = async () => {
     try {
-      localStorage.setItem('selectedCharacterId', selectedIndex.toString());
+      await userService.changeCharacter(avatar);
       toast.success('캐릭터가 저장되었습니다!');
     } catch (e) {
-      console.error('캐릭터 ID 저장 실패:', e);
-      toast.error('캐릭터 저장에 실패했습니다.');
+      console.error('캐릭터 저장 실패', e);
+      toast.error('캐릭터 저장 실패');
     }
   };
+
+  if (status === 'loading') return <div>로딩 중...</div>;
 
   const handleExit = () => {
     window.history.back();
@@ -72,21 +53,17 @@ const Page = () => {
 
           {/* 왼쪽 영역: 현재 선택되어 있는 캐릭터와 닉네임 보여주는 영역 */}
           <div className="flex items-center justify-center w-[40rem] h-full border border-white rounded-xl">
-            {nickname === null ? (
-              <div className="text-gray-400">불러오는 중...</div>
-            ) : (
-              <AvatarPreview
-                character={CHARACTERS[selectedIndex]}
-                nickname={nickname}
-              />
-            )}
+            <AvatarPreview
+              character={CHARACTERS[avatar]}
+              nickname={nickname}
+            />
           </div>
 
           {/* 오른쪽 영역: 캐릭터 선택 및 닉네임 변경 영역 */}
           <AvatarSelector
             characters={CHARACTERS}
-            selectedIndex={selectedIndex}
-            onSelect={setSelectedIndex}
+            selectedIndex={avatar}
+            onSelect={updateAvatar}
             nickname={nickname}
           />
         </div>
