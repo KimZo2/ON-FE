@@ -61,7 +61,6 @@ clientApiInstance.interceptors.response.use(
 
       try {
         const refreshRes = await refreshApiInstance.get(API.AUTH.REFRESH);
-        console.log("Token refreshed:", refreshRes);
         const { accessToken, accessTokenExpire } = refreshRes;
 
         saveAccessToken(accessToken);
