@@ -37,47 +37,47 @@ const Page = () => {
     const stopLoading = () => setShowLoadingSpinner(false);
 
     return (
-        <DefaultPageFrame>
+            <DefaultPageFrame>
 
-            {/* 램프 모양과 버튼 부분 */}
-            <div className="relative max-w-[120rem] mx-auto p-[3rem] px-[1.5rem] grid gap-12 items-center justify-items-center text-center min-h-screen">
-                <div className='flex flex-col gap-[5dvw]'>
-                    <StudyTogether />
-                    <div className='flex flex-row justify-between w-[50dvw]'>
-                        <div className='flex flex-col justify-between'>
-                            {onMouse[0] ? <LampOn /> : <LampOff />}
-                            <div onMouseOver={() => handleMouseOver(0)} onMouseLeave={() => handleMouseLeave(0)}>
-                                <RoomButton text={"Create Room"} onClick={openCreateModal} />
+                {/* 램프 모양과 버튼 부분 */}
+                <div className="relative max-w-[120rem] mx-auto p-[3rem] px-[1.5rem] grid gap-12 items-center justify-items-center text-center min-h-screen">
+                    <div className='flex flex-col gap-[5dvw]'>
+                        <StudyTogether />
+                        <div className='flex flex-row justify-between w-[50dvw]'>
+                            <div className='flex flex-col justify-between'>
+                                {onMouse[0] ? <LampOn /> : <LampOff />}
+                                <div onMouseOver={() => handleMouseOver(0)} onMouseLeave={() => handleMouseLeave(0)}>
+                                    <RoomButton text={"Create Room"} onClick={openCreateModal} />
+                                </div>
                             </div>
-                        </div>
-                        <div className='flex flex-col justify-between'>
-                            {onMouse[1] ? <LampOn /> : <LampOff />}
-                            <div onMouseOver={() => handleMouseOver(1)} onMouseLeave={() => handleMouseLeave(1)}>
-                                <RoomButton text={"Join Room"} onClick={openJoinModal} />
+                            <div className='flex flex-col justify-between'>
+                                {onMouse[1] ? <LampOn /> : <LampOff />}
+                                <div onMouseOver={() => handleMouseOver(1)} onMouseLeave={() => handleMouseLeave(1)}>
+                                    <RoomButton text={"Join Room"} onClick={openJoinModal} />
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {/* 모달 조건부 렌더링 */}
-            {isCreateModalOpen && (
-                <CreateRoomModal
-                    onClose={closeCreateModal}
-                    onStartLoading={startLoading}
-                    onStopLoading={stopLoading}
-                />
-            )}
-            {isJoinModalOpen && (
-                <JoinRoomModal
-                    onClose={closeJoinModal}
-                    onStartLoading={startLoading}
-                    onStopLoading={stopLoading}
-                />
-            )}
+                {/* 모달 조건부 렌더링 */}
+                {isCreateModalOpen && (
+                    <CreateRoomModal
+                        onClose={closeCreateModal}
+                        onStartLoading={startLoading}
+                        onStopLoading={stopLoading}
+                    />
+                )}
+                {isJoinModalOpen && (
+                    <JoinRoomModal
+                        onClose={closeJoinModal}
+                        onStartLoading={startLoading}
+                        onStopLoading={stopLoading}
+                    />
+                )}
 
-            {showLoadingSpinner && <LoadingSpinner />}
-        </DefaultPageFrame>
+                {showLoadingSpinner && <LoadingSpinner />}
+            </DefaultPageFrame>
     );
 };
 

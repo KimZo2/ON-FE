@@ -6,7 +6,7 @@ export const useUserStore = create((set, get) => ({
   memberId: null,
   nickname: '',
   avatar: 0,
-
+  loginStatus: false,
   status: 'idle', // idle | loading | ready | error
 
   // 액션
@@ -36,5 +36,13 @@ export const useUserStore = create((set, get) => ({
 
   updateAvatar: (avatar) => {
     set({ avatar });
+  },
+
+  setLoginStatus: (loginStatus) => {
+    set({ loginStatus });
+  },
+
+  setAuthStatus: (status) => {
+    set({ status });
   },
 }));
