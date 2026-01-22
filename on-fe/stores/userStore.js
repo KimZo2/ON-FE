@@ -1,14 +1,12 @@
 import { create } from 'zustand';
 import { userService } from '@/apis/client/userService';
-import { isLoggedIn } from '@/util/AuthUtil';
 
 export const useUserStore = create((set, get) => ({
   // 상태
   memberId: null,
   nickname: '',
   avatar: 0,
-  isLoggedIn: false,
-
+  loginStatus: false,
   status: 'idle', // idle | loading | ready | error
 
   // 액션
@@ -40,8 +38,8 @@ export const useUserStore = create((set, get) => ({
     set({ avatar });
   },
 
-  setLoginStatus: (isLoggedIn) => {
-    set({ isLoggedIn });
+  setLoginStatus: (loginStatus) => {
+    set({ loginStatus });
   },
 
   setAuthStatus: (status) => {
