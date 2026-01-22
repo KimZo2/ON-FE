@@ -22,10 +22,14 @@ export const AuthProvider = ({ children }) => {
         const delayTime = timeUntilExpire - refreshBuffer;
 
         if (delayTime > 0) {
-            console.log(`⏱️ Next refresh scheduled in ${Math.round(delayTime / 1000)}s`);
+            if (process.env.NODE_ENV === 'development') {
+                console.log(`⏱️ Next refresh scheduled in ${Math.round(delayTime / 1000)}s`);
+            }
             timerRef.current = setTimeout(async () => {
                 try {
-                    console.log('🔄 Token refresh triggered');
+                    if (process.env.NODE_ENV === 'development') {
+                        console.log('🔄 Token refresh triggered');
+                    }
                     const refreshRes = await refreshApiInstance.get(API.AUTH.REFRESH);
                     const { accessToken, accessTokenExpire } = refreshRes;
                     
@@ -35,8 +39,13 @@ export const AuthProvider = ({ children }) => {
                     setStoreLoginStatus(true);
                     scheduleNextRefresh(accessTokenExpire);
                 } catch (error) {
-                    console.log('❌ Token refresh failed');
+                    if (process.env.NODE_ENV === 'development') {
+                        console.log('❌ Token refresh failed');
+                    }
                     setStoreLoginStatus(false);
+                    removeAccessToken();
+                    removeNickname();
+                    removeTokenExpire();
                 }
             }, delayTime);
         }
@@ -52,7 +61,9 @@ export const AuthProvider = ({ children }) => {
 
             // 토큰 만료된 경우 갱신 시도
             if (tokenExpire && Date.now() >= tokenExpire) {
-                console.log('⚠️ Token expired, attempting refresh...');
+                if (process.env.NODE_ENV === 'development') {
+                    console.log('⚠️ Token expired, attempting refresh...');
+                }
                 try {
                     const refreshRes = await refreshApiInstance.get(API.AUTH.REFRESH);
                     const { accessToken, accessTokenExpire } = refreshRes;
@@ -65,7 +76,9 @@ export const AuthProvider = ({ children }) => {
                     scheduleNextRefresh(accessTokenExpire);
                     return;
                 } catch (error) {
-                    console.log('❌ Token refresh failed on init');
+                    if (process.env.NODE_ENV === 'development') {
+                        console.log('❌ Token refresh failed on init');
+                    }
                     setStoreLoginStatus(false);
                     setAuthStatus('ready'); 
                     removeAccessToken();

@@ -9,7 +9,6 @@ import DefaultPageFrame from '@/components/DefaultPageFrame';
 import CreateRoomModal from '@/components/modal/CreateRoomModal';
 import JoinRoomModal from '@/components/modal/JoinRoomModal';
 import LoadingSpinner from '@/components/loading/LoadingSpinner'; 
-// import AuthValidation from '@/components/form/AuthValidation';
 import { useModal } from '@/hooks/useModal';
 
 const Page = () => { 
@@ -38,7 +37,6 @@ const Page = () => {
     const stopLoading = () => setShowLoadingSpinner(false);
 
     return (
-        // <AuthValidation loginRequired={true}>
             <DefaultPageFrame>
 
                 {/* 램프 모양과 버튼 부분 */}
@@ -80,7 +78,6 @@ const Page = () => {
 
                 {showLoadingSpinner && <LoadingSpinner />}
             </DefaultPageFrame>
-        // </AuthValidation>
     );
 };
 
