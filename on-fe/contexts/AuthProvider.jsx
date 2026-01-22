@@ -92,13 +92,14 @@ export const AuthProvider = ({ children }) => {
 
             // 정상적인 토큰 상태 처리
             const isLogged = isLoggedIn();
-            setStoreLoginStatus(isLogged);
-            setAuthStatus('ready');
-
             if (isLogged) {
                 await fetchUser();
                 scheduleNextRefresh(tokenExpire);
             }
+            setStoreLoginStatus(isLogged);
+            setAuthStatus('ready');
+
+            
         };
 
         initAuth();
