@@ -7,7 +7,7 @@ import { useUserStore } from "@/stores/userStore";
 
 const AuthValidation = ({ loginRequired = true, children }) => {
 
-    const isLoggedIn = useUserStore((state) => state.isLoggedIn);
+    const loginStatus = useUserStore((state) => state.loginStatus);
     const authStatus = useUserStore((state) => state.status);
     const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
@@ -20,12 +20,12 @@ const AuthValidation = ({ loginRequired = true, children }) => {
         }
 
         // 인증 완료 후: 로그인 필요 여부 체크
-        if (loginRequired && !isLoggedIn) {
+        if (loginRequired && !loginStatus) {
             setIsOpen(true);
         } else {
             setIsOpen(false);
         }
-    }, [isLoggedIn, loginRequired, authStatus]);
+    }, [loginStatus, loginRequired, authStatus]);
     
     return (
         <>
