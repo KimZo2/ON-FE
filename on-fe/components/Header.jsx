@@ -12,7 +12,7 @@ import { useUserStore } from '@/stores/userStore';
 const Header = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const isLogin = useUserStore((state) => state.isLoggedIn);
+  const loginStatus = useUserStore((state) => state.loginStatus);
   const authStatus = useUserStore((state) => state.status);
   const setLoginStatus = useUserStore((state) => state.setLoginStatus);
   const setAuthStatus = useUserStore((state) => state.setAuthStatus);
@@ -23,12 +23,10 @@ const Header = () => {
     setMounted(true);
   }, []);
 
-  // 로딩 중이 아닐 때 이전 상태 업데이트
+  // 로그인 상태가 변경되면 즉시 이전 상태 업데이트
   useEffect(() => {
-    if (authStatus !== 'loading') {
-      setPreviousLoginState(isLogin);
-    }
-  }, [isLogin, authStatus]);
+    setPreviousLoginState(loginStatus);
+  }, [loginStatus]);
 
   if (!mounted){
     return (
@@ -37,7 +35,7 @@ const Header = () => {
   }
 
   // 로딩 중일 때는 이전 상태 사용, 아니면 현재 상태 사용
-  const displayLoginState = authStatus === 'loading' ? previousLoginState : isLogin;
+  const displayLoginState = authStatus === 'loading' ? previousLoginState : loginStatus;
 
   const handleLogout = async () => {
   try {
@@ -51,10 +49,12 @@ const Header = () => {
     removeTokenExpire();
     
     setLoginStatus(false);
+    setAuthStatus('ready');
 
     router.replace(ROUTES.MAIN);
   } catch (error) {
     console.error("로그아웃 중 오류 발생:", error);
+    setLoginStatus(false);
     setAuthStatus('ready');
   }
 };
