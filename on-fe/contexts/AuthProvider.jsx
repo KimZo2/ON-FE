@@ -1,21 +1,17 @@
 'use client'
-import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import { isLoggedIn, getTokenExpire, saveAccessToken, saveTokenExpire, removeAccessToken, removeNickname, removeTokenExpire } from '@/util/AuthUtil';
 import { refreshApiInstance } from '@/apis/instances/refreshApiInstance';
 import API from '@/constants/API';
 import { useUserStore } from '@/stores/userStore';
 
-const AuthContext = createContext();
-
 export const AuthProvider = ({ children }) => {
-    const [loginStatus, setLoginStatus] = useState(null);
     const timerRef = useRef(null);
     const setStoreLoginStatus = useUserStore((state) => state.setLoginStatus);
     const setAuthStatus = useUserStore((state) => state.setAuthStatus);
 
     // 다음 갱신 시간 스케줄링 
     const scheduleNextRefresh = useCallback((tokenExpire) => {
-        // 기존 타이머 제거
         if (timerRef.current) {
             clearTimeout(timerRef.current);
         }
@@ -36,13 +32,10 @@ export const AuthProvider = ({ children }) => {
                     saveAccessToken(accessToken);
                     saveTokenExpire(accessTokenExpire);
                     
-                    setLoginStatus(true);
                     setStoreLoginStatus(true);
-                    // 다음 갱신 다시 스케줄링
                     scheduleNextRefresh(accessTokenExpire);
                 } catch (error) {
                     console.log('❌ Token refresh failed');
-                    setLoginStatus(false);
                     setStoreLoginStatus(false);
                 }
             }, delayTime);
@@ -52,14 +45,12 @@ export const AuthProvider = ({ children }) => {
     // 앱 초기화 (마운트 시점)
     useEffect(() => {
         const initAuth = async () => {
-            // 로딩 상태 시작
             setAuthStatus('loading');
             
-            // 1. 토큰 존재 여부 확인 (만료 여부 무시)
             const token = getTokenExpire();
             const tokenExpire = Number(token);
 
-            // 2. 만료된 토큰 존재 시 갱신 시도
+            // 토큰 만료된 경우 갱신 시도
             if (tokenExpire && Date.now() >= tokenExpire) {
                 console.log('⚠️ Token expired, attempting refresh...');
                 try {
@@ -69,16 +60,14 @@ export const AuthProvider = ({ children }) => {
                     saveAccessToken(accessToken);
                     saveTokenExpire(accessTokenExpire);
                     
-                    setLoginStatus(true);
                     setStoreLoginStatus(true);
                     setAuthStatus('ready');
                     scheduleNextRefresh(accessTokenExpire);
                     return;
                 } catch (error) {
                     console.log('❌ Token refresh failed on init');
-                    setLoginStatus(false);
                     setStoreLoginStatus(false);
-                    setAuthStatus('ready');
+                    setAuthStatus('ready'); 
                     removeAccessToken();
                     removeNickname();
                     removeTokenExpire();
@@ -86,9 +75,8 @@ export const AuthProvider = ({ children }) => {
                 }
             }
 
-            // 3. 정상적인 토큰 상태 처리
+            // 정상적인 토큰 상태 처리
             const isLogged = isLoggedIn();
-            setLoginStatus(isLogged);
             setStoreLoginStatus(isLogged);
             setAuthStatus('ready');
 
@@ -107,17 +95,5 @@ export const AuthProvider = ({ children }) => {
         };
     }, [scheduleNextRefresh]);
 
-    return (
-        <AuthContext.Provider value={{ loginStatus, setLoginStatus }}>
-            {children}
-        </AuthContext.Provider>
-    );
-};
-
-export const useAuthContext = () => {
-    const context = useContext(AuthContext);
-    if (!context) {
-        throw new Error('useAuthContext must be used within AuthProvider');
-    }
-    return context;
+    return <>{children}</>;
 };
