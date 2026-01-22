@@ -58,6 +58,7 @@ export const AuthProvider = ({ children }) => {
             
             const token = getTokenExpire();
             const tokenExpire = Number(token);
+            const fetchUser = useUserStore.getState().fetchUser;
 
             // 토큰 만료된 경우 갱신 시도
             if (tokenExpire && Date.now() >= tokenExpire) {
@@ -72,6 +73,7 @@ export const AuthProvider = ({ children }) => {
                     saveTokenExpire(accessTokenExpire);
                     
                     setStoreLoginStatus(true);
+                    await fetchUser();
                     setAuthStatus('ready');
                     scheduleNextRefresh(accessTokenExpire);
                     return;
@@ -90,12 +92,14 @@ export const AuthProvider = ({ children }) => {
 
             // 정상적인 토큰 상태 처리
             const isLogged = isLoggedIn();
+            if (isLogged) {
+                await fetchUser();
+                scheduleNextRefresh(tokenExpire);
+            }
             setStoreLoginStatus(isLogged);
             setAuthStatus('ready');
 
-            if (isLogged) {
-                scheduleNextRefresh(tokenExpire);
-            }
+            
         };
 
         initAuth();
