@@ -5,11 +5,13 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import LoadingSpinner from '@/components/loading/LoadingSpinner'
 import { saveAccessToken, saveNickname, saveTokenExpire } from '@/util/AuthUtil'
 import ROUTES from '@/constants/ROUTES'
+import { useUserStore } from '@/stores/userStore'
 
 export default function OAuthCallbackContent() {
   const router = useRouter()
   const params = useSearchParams()
   const hasProcessed = useRef(false)
+  const fetchUser = useUserStore((state) => state.fetchUser)
 
   const accessToken = params.get('accessToken')
   const accessTokenExpire = params.get('accessTokenExpire')
@@ -28,6 +30,7 @@ export default function OAuthCallbackContent() {
     saveAccessToken(accessToken)
     saveTokenExpire(accessTokenExpire)
     saveNickname(nickname)
+    fetchUser() // 사용자 정보 로드
 
     router.replace(ROUTES.MAIN)
   }, [accessToken, accessTokenExpire, nickname, router])
