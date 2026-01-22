@@ -34,7 +34,7 @@ export default function OAuthCallbackContent() {
 
     
     router.replace(ROUTES.MAIN)
-  }, [accessToken, accessTokenExpire, nickname, router])
+  }, [accessToken, accessTokenExpire, nickname, router, fetchUser])
 
   return (
     <div className="flex items-center justify-center h-screen">
