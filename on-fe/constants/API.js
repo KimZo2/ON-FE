@@ -14,10 +14,26 @@ const WEBSOCKET = {
 }
 
 const METAVERSE = {
+    // Publish (클라이언트 → 서버)
     JOIN : (roomId) => `/app/room/${roomId}/join`,
-    PING : (roomId) => `/app/room/${roomId}.ping`,
-    MOVE : (roomId) => `/app/room/${roomId}.move`,
-    SYNC : (roomId) => `/app/room/${roomId}.sync`,
+    LEAVE : (roomId) => `/app/room/${roomId}/leave`,
+    MOVE : (roomId) => `/app/room/${roomId}/move`,
+    PING : (roomId) => `/app/room/${roomId}/ping`,
+    SYNC : (roomId) => `/app/room/${roomId}/sync`,
+    CHAT : (roomId) => `/app/room/${roomId}/chat`,
+    PLAYER_LEFT : "/app/playerLeft",
+    
+    // Subscribe (서버 → 클라이언트)
+    QUEUE_JOIN : "/user/queue/join",
+    QUEUE_POS_SNAPSHOT : "/user/queue/pos-snapshot",
+    QUEUE_MOVE_ACK : "/user/queue/move-ack",
+    TOPIC_POS : (roomId) => `/topic/room/${roomId}/pos`,
+    TOPIC_MSG : (roomId) => `/topic/room/${roomId}/msg`,
+    TOPIC_LEAVE : (roomId) => `/topic/room/${roomId}/leave`,
+    TOPIC_CHAT : (roomId) => `/topic/room/${roomId}/chat`,
+    TOPIC_NOTIFICATION : (roomId) => `/topic/room/${roomId}/notification`,
+    TOPIC_EXPIRATION : (roomId) => `/topic/room/${roomId}/expiration`,
+
 }
 
 const ROOM = {
