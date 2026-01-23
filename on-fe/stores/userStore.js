@@ -1,14 +1,18 @@
 import { create } from 'zustand';
 import { userService } from '@/apis/client/userService';
 
-export const useUserStore = create((set, get) => ({
-  // 상태
+const initialState = {
   memberId: null,
   nickname: '',
   avatar: 0,
   loginStatus: false,
   status: 'idle', // idle | loading | ready | error
+};
 
+export const useUserStore = create((set, get) => ({
+  // 상태
+  ...initialState,
+  
   // 액션
   fetchUser: async () => {
     const { status } = get();

@@ -1,27 +1,24 @@
 import { userService } from '@/apis/client/userService';
 import { isLoggedIn } from '@/util/AuthUtil';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
+import { useUserStore } from '@/stores/userStore';
 
 const useUserInfo = () => {
-    const [userInfo, setUserInfo] = useState({ memberId: null, nickname: null });
+    const memberId = useUserStore(state => state.memberId);
+    const nickname = useUserStore(state => state.nickname);   
+    const status = useUserStore(state => state.status);
+    const fetchUser = useUserStore(state => state.fetchUser);
 
     useEffect(() => {
-        const fetchUserInfo = async () => {
-            try {
-                const response = await userService.getMyInfo();
-                const { memberId, nickname } = response;
-                setUserInfo({ memberId: memberId, nickname: nickname });
-            } catch(e){
-                console.error("[useUserInfo] 조회 오류 : ", e);
-                setUserInfo({memberId : null, nickname : null});
-            }
-        }
-        if(isLoggedIn()) {
-            fetchUserInfo();
-        }
-    }, []);
+    if (status === 'idle' || status === 'error') {
+      fetchUser();
+    }
+  }, [status, fetchUser]);
 
-    return userInfo;
+    return {
+    memberId,
+    nickname
+  };
 }
 
 export default useUserInfo
