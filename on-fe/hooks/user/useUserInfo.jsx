@@ -1,4 +1,3 @@
-import { userService } from '@/apis/client/userService';
 import { isLoggedIn } from '@/util/AuthUtil';
 import { useEffect } from 'react';
 import { useUserStore } from '@/stores/userStore';
@@ -10,7 +9,7 @@ const useUserInfo = () => {
     const fetchUser = useUserStore(state => state.fetchUser);
 
     useEffect(() => {
-    if (status === 'idle' || status === 'error') {
+    if (isLoggedIn() && (status === 'idle' || status === 'error')) {
       fetchUser();
     }
   }, [status, fetchUser]);
