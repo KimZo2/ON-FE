@@ -2,6 +2,7 @@ import { StompConnectionManager } from './connection/StompConnectionManager';
 import { MetaverseEventManager } from './metaverse/MetaverseEventManager';
 import { PlayerManager } from './metaverse/PlayerManager';
 import { GameEventBus } from '../phaser/game/GameEventBus';
+import API from '../constants/API';
 
 const DEFAULT_PLAYER_SPAWN = {
     x: 400,
@@ -81,7 +82,7 @@ class MetaverseService {
                 password: roomPassword // private 방이면 비밀번호, public 방이면 null
             };
             
-            this.connectionManager.publish(`/app/room/${roomId}/join`, roomEnterDto);
+            this.connectionManager.publish(API.METAVERSE.JOIN(roomId), roomEnterDto);
             this.playerManager.setCurrentPlayer(playerData.id, playerData);
 
             // 초기 구독 (/user/queue/join)
@@ -103,7 +104,7 @@ class MetaverseService {
         }
 
         try {
-            this.connectionManager.publish(`/app/room/${roomId}/leave`, {});
+            this.connectionManager.publish(API.METAVERSE.LEAVE(roomId), {});
         } catch (error) {
             console.error('Failed to leave room:', error);
         } finally {
@@ -205,22 +206,22 @@ class MetaverseService {
         if (!this.currentRoomId) return;
 
          // 개인 입장 응답 큐 구독
-        this.connectionManager.subscribe('/user/queue/join', (response) => {
+        this.connectionManager.subscribe(API.METAVERSE.QUEUE_JOIN, (response) => {
             this.handleJoinResponse(response);
         });
 
         // 개인 위치 스냅샷 구독
-        this.connectionManager.subscribe('/user/queue/pos-snapshot', (snapshot) => {
+        this.connectionManager.subscribe(API.METAVERSE.QUEUE_POS_SNAPSHOT, (snapshot) => {
             GameEventBus.updateAllPlayers(snapshot);
         });
 
         // 이동 확인 구독 (선택적) - 현재 GameEventBus에서는 처리하지 않음
-        this.connectionManager.subscribe('/user/queue/move-ack', (ack) => {
+        this.connectionManager.subscribe(API.METAVERSE.QUEUE_MOVE_ACK, (ack) => {
             // 필요시 GameEventBus 이벤트 추가
         });
 
         // 방 브로드캐스트 구독
-        this.connectionManager.subscribe(`/topic/room/${this.currentRoomId}/pos`, (data) => {
+        this.connectionManager.subscribe(API.METAVERSE.TOPIC_POS(this.currentRoomId), (data) => {
             // updates 배열이 있으면 snapshot 데이터로 처리
             if (data.updates && Array.isArray(data.updates)) {
                 const enrichedSnapshot = this._enrichSnapshotPayload(data);
@@ -233,13 +234,23 @@ class MetaverseService {
         });
 
         // 방 메시지 구독 (새 플레이어 입장/퇴장 알림)
-        this.connectionManager.subscribe(`/topic/room/${this.currentRoomId}/msg`, (messageData) => {
+        this.connectionManager.subscribe(API.METAVERSE.TOPIC_MSG(this.currentRoomId), (messageData) => {
             this.handleRoomMessage(messageData);
         });
 
         // 방 퇴장 브로드캐스트 구독
-        this.connectionManager.subscribe(`/topic/room/${this.currentRoomId}/leave`, (leaveData) => {
+        this.connectionManager.subscribe(API.METAVERSE.TOPIC_LEAVE(this.currentRoomId), (leaveData) => {
             this._handlePlayerLeave(leaveData);
+        });
+
+        // 방 종료 10분전 알람 구독
+        this.connectionManager.subscribe(API.METAVERSE.TOPIC_NOTIFICATION(this.currentRoomId), (notificationData) => {
+            this._handleRoomNotification(notificationData);
+        });
+
+        // 방 종료 알람 구독
+        this.connectionManager.subscribe(API.METAVERSE.TOPIC_EXPIRATION(this.currentRoomId), (expirationData) => {
+            this._handleRoomExpiration(expirationData);
         });
     }
 
@@ -275,7 +286,7 @@ class MetaverseService {
             return;
         }
 
-        const topic = `/topic/room/${this.currentRoomId}/chat`;
+        const topic = API.METAVERSE.TOPIC_CHAT(this.currentRoomId);
 
         if (this.chatSubscriptionTopic === topic) {
             return;
@@ -408,11 +419,37 @@ class MetaverseService {
         this._updateOnlineCount(nextCount);
     }
 
+    // 방 종료 10분전 알람 처리
+    _handleRoomNotification(notificationData) {
+        try {
+            if (GameEventBus && typeof GameEventBus.showRoomNotification === 'function') {
+                GameEventBus.showRoomNotification(notificationData);
+            }
+            
+            console.info('Room will close in 10 minutes', notificationData);
+        } catch (error) {
+            console.error('Failed to handle room notification:', error);
+        }
+    }
+
+    // 방 종료 알람 처리
+    _handleRoomExpiration(expirationData) {
+        try {
+            if (GameEventBus && typeof GameEventBus.showRoomExpiration === 'function') {
+                GameEventBus.showRoomExpiration(expirationData);
+            }
+            
+            console.info('Room has expired', expirationData);
+        } catch (error) {
+            console.error('Failed to handle room expiration:', error);
+        }
+    }
+
     // 내부용 동기화 요청
     requestSync() {
         if (!this.currentRoomId) return;
 
-        this.connectionManager.publish(`/app/room/${this.currentRoomId}/sync`, {});
+        this.connectionManager.publish(API.METAVERSE.SYNC(this.currentRoomId), {});
     }
 
     // Scene 준비 완료 시 초기 위치 전송 및 동기화
@@ -461,7 +498,7 @@ class MetaverseService {
     sendPing() {
         if (!this.currentRoomId) return;
         
-        this.connectionManager.publish(`/app/room/${this.currentRoomId}/ping`, {});
+        this.connectionManager.publish(API.METAVERSE.PING(this.currentRoomId), {});
     }
 
     // 플레이어 이동 전송 (시퀀스 번호 포함)
@@ -485,7 +522,7 @@ class MetaverseService {
                 nickname
             };
 
-            this.connectionManager.publish(`/app/room/${this.currentRoomId}/move`, moveData);
+            this.connectionManager.publish(API.METAVERSE.MOVE(this.currentRoomId), moveData);
             
             this.playerManager.updatePlayerPosition(playerData.userId, 
                 { x: playerData.x, y: playerData.y }, 
@@ -500,7 +537,7 @@ class MetaverseService {
     // 플레이어 퇴장 전송
     sendPlayerLeft(userId) {
         try {
-            this.connectionManager.publish('/app/playerLeft', userId);
+            this.connectionManager.publish(API.METAVERSE.PLAYER_LEFT, userId);
             this.playerManager.removePlayer(userId);
         } catch (error) {
             console.error('Failed to send player left:', error);
@@ -527,7 +564,7 @@ class MetaverseService {
                 timestamp: Date.now()
             };
 
-            this.connectionManager.publish(`/app/room/${this.currentRoomId}/chat`, payload);
+            this.connectionManager.publish(API.METAVERSE.CHAT(this.currentRoomId), payload);
         } catch (error) {
             console.error('Failed to send chat message:', error);
             throw error;
