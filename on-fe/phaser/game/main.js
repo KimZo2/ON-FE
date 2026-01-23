@@ -31,7 +31,10 @@ const createConfig = (Phaser) => {
         scene: [
             BootScene,
             MetaverseScene
-        ]
+        ],
+        audio: {
+          disableWebAudio: true
+        }
     };
 };
 
