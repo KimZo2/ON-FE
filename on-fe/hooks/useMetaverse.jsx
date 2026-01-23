@@ -71,6 +71,16 @@ export default function useMetaverse(userId, userNickname, roomId) {
                 router.push('/room');
             });
 
+            // 방 알람 콜백 등록
+            metaverseService.setRoomNotificationCallback((notification) => {
+                actions.setRoomNotification(notification);
+            });
+
+            // 방 만료 콜백 등록
+            metaverseService.setRoomExpirationCallback(() => {
+                actions.setRoomExpired(true);
+            });
+
             // 플레이어 데이터 설정
             const playerData = {
                 id: userIdRef.current,
