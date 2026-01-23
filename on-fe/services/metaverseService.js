@@ -427,7 +427,7 @@ class MetaverseService {
             // UI 콜백 호출 (toast 표시)
             if (this.roomNotificationCallback) {
                 this.roomNotificationCallback({
-                    message: '방이 10분 후 종료됩니다'
+                    message: notificationData.message || '방이 10분 후 종료됩니다'
                 });
             }
 
