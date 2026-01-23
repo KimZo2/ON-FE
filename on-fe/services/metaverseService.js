@@ -20,6 +20,8 @@ class MetaverseService {
         this.onlineCountCallback = null;
         this.chatMessageCallback = null;
         this.errorCallback = null;
+        this.roomNotificationCallback = null;
+        this.roomExpirationCallback = null;
         this.currentRoomId = null;
         this.joinStatus = null;
         this.sequenceNumber = 0;
@@ -422,6 +424,13 @@ class MetaverseService {
     // 방 종료 10분전 알람 처리
     _handleRoomNotification(notificationData) {
         try {
+            // UI 콜백 호출 (toast 표시)
+            if (this.roomNotificationCallback) {
+                this.roomNotificationCallback({
+                    message: '방이 10분 후 종료됩니다'
+                });
+            }
+
             if (GameEventBus && typeof GameEventBus.showRoomNotification === 'function') {
                 GameEventBus.showRoomNotification(notificationData);
             }
@@ -435,6 +444,11 @@ class MetaverseService {
     // 방 종료 알람 처리
     _handleRoomExpiration(expirationData) {
         try {
+            // UI 콜백 호출 (AlertModal 표시)
+            if (this.roomExpirationCallback) {
+                this.roomExpirationCallback();
+            }
+
             if (GameEventBus && typeof GameEventBus.showRoomExpiration === 'function') {
                 GameEventBus.showRoomExpiration(expirationData);
             }
@@ -650,11 +664,21 @@ class MetaverseService {
         this.errorCallback = callback;
     }
 
+    setRoomNotificationCallback(callback) {
+        this.roomNotificationCallback = callback;
+    }
+
+    setRoomExpirationCallback(callback) {
+        this.roomExpirationCallback = callback;
+    }
+
     // UI 콜백 해제 메서드
     clearUICallbacks() {
         this.onlineCountCallback = null;
         this.chatMessageCallback = null;
         this.errorCallback = null;
+        this.roomNotificationCallback = null;
+        this.roomExpirationCallback = null;
     }
 
     _updateOnlineCount(count) {
