@@ -33,6 +33,7 @@ function MetaverseContent({ userId, userNickname, roomId }) {
     // 방 10분 알람 토스트 표시
     useEffect(() => {
         if (state.roomNotification) {
+            console.log('Room Notification:', state.roomNotification); // 디버깅용 로그, 필요시 제거
             toast.success('🔔 ' + state.roomNotification.message, {
                 duration: 6000,
                 position: 'top-center',
