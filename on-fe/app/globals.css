@@ -11,3 +11,7 @@ html {
   overflow: hidden;
   font-size: 62.5%; /* 1rem = 10px */
 }
+
+.react-hot-toast {
+  z-index: 99999 !important;
+}
