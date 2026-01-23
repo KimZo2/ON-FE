@@ -1,14 +1,18 @@
 'use client';
 
-import { MetaverseProvider } from '../../contexts/MetaverseContext';
+import { useEffect } from 'react';
+import { toast } from 'react-hot-toast';
+import { MetaverseProvider, useMetaverseContext } from '../../contexts/MetaverseContext';
 import useMetaverse from '../../hooks/useMetaverse';
 import usePhaserGame from '../../hooks/usePhaserGame';
 import MetaverseGameView from './MetaverseGameView';
 import FlyingStar from '../background/FlyingStar';
 import LoadingSpinner from '../loading/LoadingSpinner';
+import AlertModal from '../modal/AlertModal';
 
 function MetaverseContent({ userId, userNickname, roomId }) {
     const metaverse = useMetaverse(userId, userNickname, roomId);
+    const { state, actions } = useMetaverseContext();
     const phaserGame = usePhaserGame(
         metaverse.userId,
         metaverse.playerName,
@@ -23,6 +27,37 @@ function MetaverseContent({ userId, userNickname, roomId }) {
             metaverse.setGameReady(true);
         }
     );
+
+    // 방 10분 알람 토스트 표시
+    useEffect(() => {
+        if (state.roomNotification) {
+            toast.success('🔔 ' + state.roomNotification.message, {
+                duration: 6000,
+                position: 'top-center',
+                style: {
+                    fontSize: '16px',
+                    padding: '20px',
+                    backgroundColor: '#FF8C00',
+                    color: 'white',
+                    fontWeight: 'bold'
+                }
+            });
+            
+            // 토스트 표시 후 상태 초기화
+            const timer = setTimeout(() => {
+                actions.clearRoomNotification();
+            }, 6100);
+            
+            return () => clearTimeout(timer);
+        }
+    }, [state.roomNotification, actions]);
+
+    // 방 만료 시 AlertModal 표시
+    const handleRoomExpiredConfirm = () => {
+        actions.setRoomExpired(false);
+        // 방 목록 페이지로 이동
+        window.location.href = '/room';
+    };
 
     // STOMP 연결 중이면 연결 대기 화면 표시
     if (!metaverse.isConnected) {
@@ -43,22 +78,42 @@ function MetaverseContent({ userId, userNickname, roomId }) {
                         </button>
                     )}
                 </div>
+
+                {/* 방 만료 AlertModal */}
+                <AlertModal
+                    open={state.roomExpired}
+                    title="방이 만료되었습니다"
+                    description="학습 시간이 종료되어 방을 퇴장합니다."
+                    confirmText="확인"
+                    onConfirm={handleRoomExpiredConfirm}
+                />
             </div>
         );
     }
 
     // STOMP 연결 완료 후 게임 뷰 표시
     return (
-        <MetaverseGameView
-            gameContainerRef={phaserGame.gameContainerRef}
-            onlineCount={metaverse.onlineCount}
-            playerName={metaverse.player?.name || metaverse.playerName}
-            messages={metaverse.chatMessages}
-            onSendMessage={metaverse.sendChatMessage}
-            userId={metaverse.userId}
-            // TODO: 방 이름 전달 metaverse에 roomName이 없으면 roomId 사용
-            roomName={metaverse.roomName || "학습 공간 (추후 방 이름)"}
-        />
+        <>
+            <MetaverseGameView
+                gameContainerRef={phaserGame.gameContainerRef}
+                onlineCount={metaverse.onlineCount}
+                playerName={metaverse.player?.name || metaverse.playerName}
+                messages={metaverse.chatMessages}
+                onSendMessage={metaverse.sendChatMessage}
+                userId={metaverse.userId}
+                // TODO: 방 이름 전달 metaverse에 roomName이 없으면 roomId 사용
+                roomName={metaverse.roomName || "학습 공간 (추후 방 이름)"}
+            />
+
+            {/* 방 만료 AlertModal */}
+            <AlertModal
+                open={state.roomExpired}
+                title="방이 만료되었습니다"
+                description="학습 시간이 종료되어 방을 퇴장합니다."
+                confirmText="확인"
+                onConfirm={handleRoomExpiredConfirm}
+            />
+        </>
     );
 }
 
