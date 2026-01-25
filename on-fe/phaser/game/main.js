@@ -1,6 +1,5 @@
 import { BootScene } from './scenes/BootScene';
 import { MetaverseScene } from './scenes/MetaverseScene';
-import { getOptimalSize } from '@/phaser/game/util/gameUtil';
 
 // Dynamic import for Phaser to avoid SSR issues
 const getPhaser = () => {
@@ -12,22 +11,15 @@ const getPhaser = () => {
 
 // Dynamic config creation to avoid SSR issues
 const createConfig = (Phaser) => {
-    const { width, height } = getOptimalSize();
     
     return {
         type: Phaser.AUTO,
-        width,
-        height,
         parent: 'game-container',
         backgroundColor: '#028af8',
         scale: {
-            // mode: Phaser.Scale.FIT,
-            // autoCenter: Phaser.Scale.CENTER_BOTH,
             // RESIZE로 변경함으로써 반응형 지원
             mode: Phaser.Scale.RESIZE,
             parent: 'game-container',
-            width,
-            height
         },
         physics: {
             default: 'arcade',
@@ -39,7 +31,10 @@ const createConfig = (Phaser) => {
         scene: [
             BootScene,
             MetaverseScene
-        ]
+        ],
+        audio: {
+          disableWebAudio: true
+        }
     };
 };
 

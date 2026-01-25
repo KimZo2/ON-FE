@@ -11,7 +11,9 @@ const initialState = {
     chatMessages: [],
     gameInstance: null,
     currentScene: null,
-    isGameReady: false
+    isGameReady: false,
+    roomNotification: null, // { message: string }
+    roomExpired: false
 };
 
 // 액션 타입
@@ -37,7 +39,12 @@ const ActionTypes = {
 
     // 에러 관련
     SET_ERROR: 'SET_ERROR',
-    CLEAR_ERROR: 'CLEAR_ERROR'
+    CLEAR_ERROR: 'CLEAR_ERROR',
+
+    // 방 알람 관련
+    SET_ROOM_NOTIFICATION: 'SET_ROOM_NOTIFICATION',
+    CLEAR_ROOM_NOTIFICATION: 'CLEAR_ROOM_NOTIFICATION',
+    SET_ROOM_EXPIRED: 'SET_ROOM_EXPIRED'
 };
 
 // 리듀서
@@ -136,6 +143,24 @@ const metaverseReducer = (state, action) => {
                 error: null
             };
 
+        case ActionTypes.SET_ROOM_NOTIFICATION:
+            return {
+                ...state,
+                roomNotification: action.payload
+            };
+
+        case ActionTypes.CLEAR_ROOM_NOTIFICATION:
+            return {
+                ...state,
+                roomNotification: null
+            };
+
+        case ActionTypes.SET_ROOM_EXPIRED:
+            return {
+                ...state,
+                roomExpired: action.payload
+            };
+
         default:
             return state;
     }
@@ -206,7 +231,20 @@ export const MetaverseProvider = ({ children }) => {
             payload: error 
         }),
 
-        clearError: () => dispatch({ type: ActionTypes.CLEAR_ERROR })
+        clearError: () => dispatch({ type: ActionTypes.CLEAR_ERROR }),
+
+        // 방 알람 관련 액션
+        setRoomNotification: (notification) => dispatch({ 
+            type: ActionTypes.SET_ROOM_NOTIFICATION, 
+            payload: notification 
+        }),
+
+        clearRoomNotification: () => dispatch({ type: ActionTypes.CLEAR_ROOM_NOTIFICATION }),
+
+        setRoomExpired: (expired) => dispatch({ 
+            type: ActionTypes.SET_ROOM_EXPIRED, 
+            payload: expired 
+        })
     }), []);
 
     const value = useMemo(() => ({
