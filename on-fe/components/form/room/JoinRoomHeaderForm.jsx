@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { toast } from 'react-hot-toast';
 
 /**
  * 방 입장 모달의 검색창과 코드 버튼 헤더 컴포넌트
@@ -10,6 +11,11 @@ import React from 'react';
  * @param {function} props.onOpenCodeModal - 코드 모달 열기 핸들러
  */
 export default function JoinRoomHeaderForm({ searchTerm, onSearchChange, onOpenCodeModal }) {
+  
+  const handleCodeButtonClick = () => {
+    //TODO: 초대 기능(코드로 방 입장 기능) 개선 필요
+    toast('초대 기능은 곧 추가될 예정이에요!', {icon: '👋🏻',  duration: 1000 });
+  }
   return (
     <div className="flex items-center justify-between mx-14 mb-8 gap-4"> 
       <div className="relative flex-grow"> 
@@ -36,7 +42,7 @@ export default function JoinRoomHeaderForm({ searchTerm, onSearchChange, onOpenC
       </div>
       {/* 코드로 입장하기 위한 코드 버튼 */}
       <button 
-          onClick={onOpenCodeModal}
+          onClick={handleCodeButtonClick} // TODO: 초대 기능(코드로 방 입장 기능) 개선 필요
           className="h-[3.5rem] bg-transparent border border-white text-white px-[1rem] py-[0.5rem] rounded-xl">
           code
       </button>  

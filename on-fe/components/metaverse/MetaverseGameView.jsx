@@ -1,6 +1,7 @@
 'use client';
 
 import ChatInterface from './ChatInterface';
+import { toast } from 'react-hot-toast';
 
 export default function MetaverseGameView({ 
     gameContainerRef, 
@@ -14,7 +15,9 @@ export default function MetaverseGameView({
     onInviteFriend = () => { 
         try {
             //TODO: 초대 기능(코드로 방 입장 기능) 개선 필요
-            alert('초대 코드가 복사되었습니다.');
+            toast('초대 기능은 곧 추가될 예정이에요!', {icon: '👋🏻',  duration: 1000 });
+            return;
+
         } catch (e) {
             alert('초대 코드 복사에 실패했습니다.');
         }
@@ -34,13 +37,24 @@ export default function MetaverseGameView({
                     </div>
 
                     <div className="flex items-center gap-[1rem]">
-                        <button
+                        {/* <button
                             onClick={onInviteFriend}
                             className="px-[1rem] py-[0.5rem] rounded-xl bg-yellow-400 hover:bg-yellow-600 text-2xl text-black"
                             title="친구 초대 (링크 복사)"
                         >
                             친구 초대
+                        </button> */}
+                        <button
+                            onClick={onInviteFriend}
+                            className="relative px-[1rem] py-[0.5rem] rounded-xl 
+                                    bg-yellow-400 hover:bg-yellow-500 
+                                    text-2xl text-black opacity-80"
+                            title="초대 기능 준비 중"
+                        >
+                        친구 초대
+                        <span className="ml-2 text-sm text-gray-700">(준비 중)</span>
                         </button>
+
 
                         <button
                             onClick={onLeaveRoom}
