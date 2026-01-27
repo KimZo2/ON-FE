@@ -5,6 +5,7 @@ import API from "@/constants/API";
 import { handleApiResponse } from "@/apis/utils/handleApiResponse";
 import { transformAppError } from "@/apis/utils/transformAppError";
 import { refreshApiInstance } from "./refreshApiInstance";
+import router from "next/router";
 /**
  * Client API Instance
  * - 인증이 필요한 API 요청을 보내는 인스턴스
@@ -70,7 +71,7 @@ clientApiInstance.interceptors.response.use(
         return clientApiInstance(originalRequest);
       } catch (refreshResError) {
         // 갱신 실패 시 로그인 유도 및 변환된 에러 전달
-        if (typeof window !== "undefined") window.location.href = "/login";
+        if (typeof window !== "undefined") router.push('/login');
         return Promise.reject(transformAppError(refreshResError));
       }
     }

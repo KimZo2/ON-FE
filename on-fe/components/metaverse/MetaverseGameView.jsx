@@ -14,15 +14,23 @@ export default function MetaverseGameView({
     onLeaveRoom = () => { window.history.back(); },
     onInviteFriend = () => { 
         try {
-            //TODO: 초대 기능(코드로 방 입장 기능) 개선 필요
-            toast('초대 기능은 곧 추가될 예정이에요!', {icon: '👋🏻',  duration: 1000 });
+            if (!isInviteEnabled) {
+            toast('초대 기능은 곧 추가될 예정입니다!', {
+                icon: 'ℹ👋🏻',
+                duration: 1500,
+            });
             return;
+        }
+
+        // TODO: 실제 초대 로직
 
         } catch (e) {
             alert('초대 코드 복사에 실패했습니다.');
         }
     }
 }) {
+    const isInviteEnabled = false; // TODO: 초대 기능 구현 시 true로 변경
+
     return (
         <div className="relative w-full h-screen bg-gray-900">
             {/* 최상단 헤더/액션바 */}
@@ -37,22 +45,24 @@ export default function MetaverseGameView({
                     </div>
 
                     <div className="flex items-center gap-[1rem]">
-                        {/* <button
-                            onClick={onInviteFriend}
-                            className="px-[1rem] py-[0.5rem] rounded-xl bg-yellow-400 hover:bg-yellow-600 text-2xl text-black"
-                            title="친구 초대 (링크 복사)"
-                        >
-                            친구 초대
-                        </button> */}
                         <button
                             onClick={onInviteFriend}
-                            className="relative px-[1rem] py-[0.5rem] rounded-xl 
-                                    bg-yellow-400 hover:bg-yellow-500 
-                                    text-2xl text-black opacity-80"
-                            title="초대 기능 준비 중"
+                            disabled={!isInviteEnabled}
+                            className={`relative px-[1rem] py-[0.5rem] rounded-xl text-2xl
+                                ${isInviteEnabled
+                                    ? 'bg-yellow-400 hover:bg-yellow-500 text-black'
+                                    : 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                                }`}
+                            title={
+                                isInviteEnabled
+                                    ? '친구 초대'
+                                    : '초대 기능 준비 중'
+                            }
                         >
-                        친구 초대
-                        <span className="ml-2 text-sm text-gray-700">(준비 중)</span>
+                            친구 초대
+                            {!isInviteEnabled && (
+                                <span className="ml-2 text-sm">(준비 중)</span>
+                            )}
                         </button>
 
 

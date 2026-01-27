@@ -12,9 +12,14 @@ import { toast } from 'react-hot-toast';
  */
 export default function JoinRoomHeaderForm({ searchTerm, onSearchChange, onOpenCodeModal }) {
   
+  const isCodeJoinEnabled = false; // TODO: 코드 입장 기능 구현 시 true
   const handleCodeButtonClick = () => {
-    //TODO: 초대 기능(코드로 방 입장 기능) 개선 필요
-    toast('초대 기능은 곧 추가될 예정이에요!', {icon: '👋🏻',  duration: 1000 });
+    if(!isCodeJoinEnabled) {
+      toast('초대 기능은 곧 추가될 예정이에요!', {icon: '👋🏻',  duration: 1000 });
+      return;
+    }
+    // TODO: 코드로 방 입장 기능 구현
+    // onOpenCodeModal();
   }
   return (
     <div className="flex items-center justify-between mx-14 mb-8 gap-4"> 
@@ -42,10 +47,20 @@ export default function JoinRoomHeaderForm({ searchTerm, onSearchChange, onOpenC
       </div>
       {/* 코드로 입장하기 위한 코드 버튼 */}
       <button 
-          onClick={handleCodeButtonClick} // TODO: 초대 기능(코드로 방 입장 기능) 개선 필요
-          className="h-[3.5rem] bg-transparent border border-white text-white px-[1rem] py-[0.5rem] rounded-xl">
-          code
-      </button>  
+        onClick={handleCodeButtonClick}
+        disabled={!isCodeJoinEnabled}
+        className={`
+          h-[3.5rem] px-[1rem] py-[0.5rem] rounded-xl border
+          ${isCodeJoinEnabled
+            ? 'bg-transparent border-white text-white hover:bg-white/10'
+            : 'bg-gray-700 border-gray-500 text-gray-400 cursor-not-allowed'
+          }
+        `}
+        title={isCodeJoinEnabled ? '코드로 입장' : '코드 입장 기능 준비 중'}
+      >
+        code
+      </button>
+
     </div>
   );
 }

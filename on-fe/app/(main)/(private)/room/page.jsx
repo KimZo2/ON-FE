@@ -22,11 +22,9 @@ const Page = () => {
         newObj[index] = true;
         setOnMouse(newObj);
     }
-    const handleMouseLeave = (index) => { 
-        const newObj = [...onMouse];
-        newObj[index] = false;
-        setOnMouse(newObj);
-    }
+    const handleMouseLeave = (index) => {
+    setOnMouse(prevOnMouse => prevOnMouse.map((val, i) => (i === index ? false : val)));
+}
 
     // useModal 훅을 사용하여 각 모달의 상태를 관리
     const { isOpen: isCreateModalOpen, openModal: openCreateModal, closeModal: closeCreateModal } = useModal();

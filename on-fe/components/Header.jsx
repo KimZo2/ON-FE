@@ -55,7 +55,7 @@ const Header = () => {
   } catch (error) {
     console.error("로그아웃 중 오류 발생:", error);
     setLoginStatus(false);
-    setAuthStatus('ready');
+    setAuthStatus('error'); // Set status to 'error' on failure
   }
 };
 

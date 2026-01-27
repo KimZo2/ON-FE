@@ -1,6 +1,6 @@
 ---
-name: Refactoring issue template
-about: Describe this issue template's purpose here.
+name: Refactoring issue templete
+about: Describe this issue templete's purpose here.
 title: "[FE-##] Refactoring Templete"
 labels: ''
 assignees: ''

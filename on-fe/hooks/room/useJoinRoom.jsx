@@ -64,7 +64,7 @@ export function useJoinRoom() {
   // 검색어 변경 핸들러
   const handleSearchChange = useCallback((e) => {
     setSearchTerm(e.target.value);
-    setCurrentPage(0); // 새 검색 시 첫 페이지로 리셋
+    setCurrentPage(1); // 새 검색 시 첫 페이지로 리셋
   }, []);
   
   // 코드로 방 입장

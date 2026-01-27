@@ -21,7 +21,7 @@ const METAVERSE = {
     PING : (roomId) => `/app/room/${roomId}/ping`,
     SYNC : (roomId) => `/app/room/${roomId}/sync`,
     CHAT : (roomId) => `/app/room/${roomId}/chat`,
-    PLAYER_LEFT : "/app/playerLeft",
+    PLAYER_LEFT : (roomId) => `/app/room/${roomId}/leave`,
     
     // Subscribe (서버 → 클라이언트)
     QUEUE_JOIN : "/user/queue/join",

@@ -772,7 +772,7 @@ class MetaverseService {
     // localStorage 접근 헬퍼 메서드들
     _getAccessToken() {
         try {
-            return localStorage.getItem('accessToken');
+            return localStorage.getItem('j'); // Use the consistent key 'j'
         } catch (error) {
             console.warn('Failed to get accessToken from localStorage:', error);
             return null;

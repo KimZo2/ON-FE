@@ -201,6 +201,8 @@ const handleAppMessage = (destination, body, headers, clientId) => {
         // body가 비어있거나 null인 경우 처리
         if (!body || body.trim() === '') {
             console.warn(`⚠️  빈 body로 메시지 수신: ${destination}`);
+            // Optionally send an ERROR frame back to the client
+            // ws.send(StompFrameHandler.createFrame('ERROR', { message: 'Malformed JSON body' }));
             return;
         }
         
@@ -214,7 +216,7 @@ const handleAppMessage = (destination, body, headers, clientId) => {
                 handlePlayerMove(data);
                 break;
             case '/app/chatMessage':
-                handleChatMessage(data);
+                handleChatMessage(data, clientId);
                 break;
             case '/app/playerLeft':
                 handlePlayerLeft(data, clientId);
@@ -279,6 +281,11 @@ const handlePlayerJoined = (playerData, clientId) => {
 const handlePlayerMove = (moveData) => {
     const player = gameState.players.get(moveData.id);
     if (player) {
+        if (typeof moveData.x !== 'number' || typeof moveData.y !== 'number') {
+            console.warn(`⚠️  Invalid move data received for player ${moveData.id}: x or y is not a number`);
+            return;
+        }
+        // Further validation for bounds, etc. can be added here
         // 플레이어 위치와 방향 정보 업데이트
         player.x = moveData.x;
         player.y = moveData.y;
@@ -299,28 +306,64 @@ const handlePlayerMove = (moveData) => {
 };
 
 // 채팅 메시지 처리
-const handleChatMessage = (messageData) => {
-    const player = gameState.players.get(messageData.playerId);
-    if (player && messageData.message && messageData.message.trim()) {
-        const chatMessage = {
-            id: Date.now() + Math.random(),
-            playerId: messageData.playerId,
-            playerName: messageData.playerName,
-            message: messageData.message.trim(),
-            timestamp: new Date()
-        };
-
-        // 채팅 메시지 저장 (최대 개수 제한)
-        gameState.chatMessages.push(chatMessage);
-        if (gameState.chatMessages.length > gameState.maxChatMessages) {
-            gameState.chatMessages = gameState.chatMessages.slice(-gameState.maxChatMessages);
-        }
-
-        console.log(`💬 채팅 메시지: ${chatMessage.playerName}: ${chatMessage.message}`);
-
-        // 모든 플레이어에게 채팅 메시지 전송
-        broadcastToTopic('/topic/chatMessage', chatMessage);
+const handleChatMessage = (messageData, clientId) => {
+    // 1️⃣ 기본 구조 검증
+    if (
+        !messageData ||
+        typeof messageData.message !== 'string' ||
+        typeof messageData.playerId !== 'string'
+    ) {
+        console.warn('⚠️  Invalid chat message payload:', messageData);
+        sendToClient(clientId, '/topic/chatError', {
+            error: 'INVALID_PAYLOAD',
+            message: '잘못된 채팅 데이터입니다.'
+        });
+        return;
     }
+    const trimmedMessage = messageData.message.trim();
+    // 2️⃣ 메시지 길이 검증
+    if (trimmedMessage.length === 0) {
+        return;
+    }
+
+    if (trimmedMessage.length > MAX_MESSAGE_LENGTH) {
+        sendToClient(clientId, '/topic/chatError', {
+            error: 'MESSAGE_TOO_LONG',
+            message: `채팅 메시지는 최대 ${MAX_MESSAGE_LENGTH}자까지 가능합니다.`
+        });
+        return;
+    }
+
+    // 3️⃣ 플레이어 검증
+    const player = gameState.players.get(messageData.playerId);
+
+    if (!player) {
+        sendToClient(clientId, '/topic/chatError', {
+            error: 'INVALID_PLAYER',
+            message: '유효하지 않은 플레이어입니다.'
+        });
+        return;
+    }
+
+    // 4️⃣ playerName 신뢰 금지 (서버 값 사용)
+    const chatMessage = {
+        id: Date.now() + Math.random(),
+        playerId: player.id,
+        playerName: player.name, // 클라이언트 값 무시
+        message: trimmedMessage,
+        timestamp: new Date()
+    };
+
+    // 5️⃣ 메시지 저장 (개수 제한)
+    gameState.chatMessages.push(chatMessage);
+    if (gameState.chatMessages.length > gameState.maxChatMessages) {
+        gameState.chatMessages = gameState.chatMessages.slice(-gameState.maxChatMessages);
+    }
+
+    console.log(`💬 채팅 메시지: ${chatMessage.playerName}: ${chatMessage.message}`);
+
+    // 6️⃣ 브로드캐스트
+    broadcastToTopic('/topic/chatMessage', chatMessage);
 };
 
 // 플레이어 나가기 처리
